@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON SHOP — Витрина</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --primary: #6366f1;
+            --text: #1e293b;
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            margin: 0; padding: 20px 10px 120px 10px;
+            color: var(--text);
+        }
+
+        .container { max-width: 500px; margin: 0 auto; }
+        h2 { text-align: center; color: var(--primary); font-weight: 800; margin-bottom: 20px; text-transform: uppercase; }
+
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+
+        .product-card {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+
+        .product-icon { font-size: 40px; margin-bottom: 8px; }
+        .product-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; height: 34px; overflow: hidden; }
+        .product-price { color: var(--primary); font-weight: 800; margin-bottom: 12px; }
+
+        .add-controls { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .add-controls input { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: center; font-weight: bold; background: white; }
+        .btn-plus { background: var(--primary); color: white; border: none; width: 40px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 20px; font-weight: bold; }
+
+        .cart-section { background: var(--glass); border-radius: 24px; padding: 20px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .form-block { margin-top: 20px; display: grid; gap: 12px; }
+        .form-block input { padding: 15px; border-radius: 14px; border: 1px solid var(--glass-border); font-size: 16px; background: white; outline: none; }
+        .form-block input:focus { border-color: var(--primary); }
+
+        .btn-send {
+            background: var(--primary); color: white; border: none; padding: 18px;
+            border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer;
+            margin-top: 10px; width: 100%; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); transition: 0.3s;
+        }
+        .btn-send:active { transform: scale(0.98); }
+
+        .total-sum { font-size: 18px; font-weight: 800; text-align: right; margin-top: 15px; color: var(--primary); border-top: 2px solid rgba(99, 102, 241, 0.1); padding-top: 10px; }
+        .badge-stock { font-size: 10px; color: #64748b; margin-bottom: 5px; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🛍 ЗАЛИНИ ВИТРИНА</h2>
+
+    <div id="catalog" class="products-grid">
+        <p style="grid-column: 1/-1; text-align: center; color: #64748b;">Синхронизация со складом...</p>
+    </div>
+
+    <div class="cart-section" id="cart-block" style="display: none;">
+        <h3 style="margin-top: 0; color: var(--primary);">🛒 Ваша корзина</h3>
+        <div id="cart-items"></div>
+        <div class="total-sum" id="total-price">Итого: 0 ₽</div>
+
+        <div class="form-block">
+            <input type="text" id="userName" placeholder="👤 Ваше имя" required>
+            <input type="tel" id="userPhone" placeholder="📞 Номер телефона">
+            <button class="btn-send" id="sendBtn" onclick="sendOrder()">ОФОРМИТЬ ЗАКАЗ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBH0g83qEUERiDBjgMgRnSJ-s2lvpPtkz4",
+        authDomain: "vitrina-e0a00.firebaseapp.com",
+        databaseURL: "https://vitrina-e0a00-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vitrina-e0a00",
+        storageBucket: "vitrina-e0a00.firebasestorage.app",
+        messagingSenderId: "182787477088",
+        appId: "1:182787477088:web:35827926e1e885bb0bfd05"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let products = [];
+    let cart = [];
+
+    database.ref('skladData/products').on('value', (snapshot) => {
+        products = snapshot.val() || [];
+        renderCatalog();
+    });
+
+    function renderCatalog() {
+        const catalog = document.getElementById('catalog');
+        
+        // Фильтруем список: оставляем только НЕ скрытые и те, что есть в наличии
+        const visibleProducts = products.filter(p => {
+            const stock = (p.history || []).reduce((s, h) => s + h.qty, 0);
+            // Товар виден если: (он не скрыт) И (остаток больше 0)
+            return p.hidden !== true && stock > 0;
+        });
+
+        if (visibleProducts.length === 0) {
+            catalog.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b;">Товары временно отсутствуют</p>';
+            return;
+        }
+
+        catalog.innerHTML = visibleProducts.map(p => {
+            const stock = (p.history || []).reduce((s, h) => s + h.qty, 0);
+            return `
+                <div class="product-card">
+                    <div class="product-icon">${p.icon || '📦'}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="badge-stock">Остаток: ${stock} шт</div>
+                    <div class="product-price">${p.price} ₽</div>
+                    <div class="add-controls">
+                        <input type="number" id="q-${p.id}" value="0" min="0" max="${stock}">
+                        <button class="btn-plus" onclick="addToCart(${p.id})">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function addToCart(pId) {
+        const input = document.getElementById(`q-${pId}`);
+        const qty = parseInt(input.value);
+        
+        if (qty <= 0) {
+            alert("Укажите количество больше 0");
+            return;
+        }
+
+        const product = products.find(p => p.id === pId);
+        const existing = cart.find(item => item.id === pId);
+
+        if (existing) {
+            existing.qty += qty;
+        } else {
+            cart.push({ id: product.id, name: product.name, price: product.price, qty: qty });
+        }
+        
+        input.value = 0; 
+        renderCart();
+    }
+
+    function renderCart() {
+        const block = document.getElementById('cart-block');
+        const list = document.getElementById('cart-items');
+        const totalEl = document.getElementById('total-price');
+
+        if (cart.length === 0) {
+            block.style.display = 'none';
+            return;
+        }
+
+        block.style.display = 'block';
+        let total = 0;
+
+        list.innerHTML = cart.map(item => {
+            total += item.price * item.qty;
+            return `
+                <div class="cart-item">
+                    <span><b>${item.name}</b> (${item.qty} шт)</span>
+                    <div>
+                        <span style="margin-right:10px;">${item.price * item.qty} ₽</span>
+                        <button class="btn-del" onclick="removeFromCart(${item.id})">✕</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        totalEl.innerText = `Итого: ${total} ₽`;
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(i => i.id !== id);
+        renderCart();
+    }
+
+    function sendOrder() {
+        const name = document.getElementById('userName').value;
+        const phone = document.getElementById('userPhone').value;
+        
+        if (!name) return alert("Введите ваше имя!");
+
+        const btn = document.getElementById('sendBtn');
+        btn.disabled = true;
+        btn.innerText = "ОТПРАВЛЯЕМ...";
+
+        const order = {
+            id: Date.now(),
+            clientName: name + (phone ? ` (${phone})` : ""),
+            date: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+            items: cart.map(i => ({ name: i.name, qty: i.qty }))
+        };
+
+        database.ref('skladData/incomingOrders').get().then(snap => {
+            let orders = snap.val() || [];
+            orders.push(order);
+            database.ref('skladData/incomingOrders').set(orders).then(() => {
+                alert("✅ Заказ отправлен!");
+                cart = [];
+                document.getElementById('userName').value = '';
+                document.getElementById('userPhone').value = '';
+                renderCart();
+                btn.disabled = false;
+                btn.innerText = "ОФОРМИТЬ ЗАКАЗ";
+            });
+        });
+    }
+</script>
+</body>
+</html>
