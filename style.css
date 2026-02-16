@@ -1,0 +1,89 @@
+:root {
+    --bg: #0f172a; /* Темный фон всего сайта */
+    --card-dark: #1e293b; /* Очень темный блок отчета */
+    --green-money: #22c55e;
+    --blue-total: #3b82f6;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    margin: 0; padding: 20px;
+}
+
+.monitor-container { max-width: 600px; margin: 0 auto; }
+
+/* ЗЕЛЕНЫЕ БЛОКИ КАССЫ И ПЕРЕВОДА */
+.money-stack { display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px; }
+
+.money-card {
+    background: var(--green-money);
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    color: white;
+}
+
+/* СИНИЙ БЛОК ИТОГО */
+.total-card-blue {
+    background: var(--blue-total);
+    padding: 30px;
+    border-radius: 25px;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.money-label { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
+.money-value { font-size: 48px; font-weight: 900; margin-top: 5px; }
+
+.sync-status { text-align: center; font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+
+/* ТЕМНЫЙ БЛОК ОТЧЕТА */
+.report-item {
+    background: var(--card-dark);
+    border-radius: 30px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.report-header {
+    display: flex; justify-content: space-between;
+    padding-bottom: 15px; margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px; color: var(--text-dim);
+}
+
+/* СТИЛЬ ИМЕНИ И ТОВАРОВ (КРАСНАЯ СТРОКА) */
+.order-body {
+    font-size: 22px;
+    line-height: 1.6;
+    white-space: pre-wrap; /* Чтобы каждый товар был с новой строки */
+}
+
+/* Имя заказчика выделяем */
+.client-title {
+    font-size: 28px;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Отступ для товаров от края (имитация красной строки) */
+.product-line {
+    display: block;
+    padding-left: 30px; /* Тот самый отступ */
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+/* Цвета для типов отчетов (полоска слева) */
+.type-success { border-left: 10px solid var(--green-money); }
+.type-danger { border-left: 10px solid #ef4444; }
+.type-primary { border-left: 10px solid var(--blue-total); }
+
+.btn-del { background: none; border: none; color: #475569; font-size: 20px; cursor: pointer; }

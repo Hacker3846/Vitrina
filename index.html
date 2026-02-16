@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONITORING SYSTEM</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="monitor-container">
+    <div class="money-stack">
+        <div class="money-card cash">
+            <span class="money-label">💰 КАССА (НА РУКАХ)</span>
+            <div id="total-cash" class="money-value">0 ₽</div>
+        </div>
+        <div class="money-card transfer">
+            <span class="money-label">💳 ПЕРЕВОДЫ</span>
+            <div id="total-transfer" class="money-value">0 ₽</div>
+        </div>
+    </div>
+
+    <div class="total-card-blue">
+        <span class="money-label">🚀 ИТОГО ОБЩЕЕ</span>
+        <div id="total-all" class="money-value">0 ₽</div>
+    </div>
+
+    <div id="last-update" class="sync-status">Синхронизация...</div>
+
+    <div id="reports-list"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
