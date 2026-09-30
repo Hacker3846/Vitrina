@@ -1,0 +1,55 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Подбор аромата</title><link rel="stylesheet" href="style.css"></head><body class="client"><div id="mist"></div>
+<header class="bar"><button onclick="dr(1)" aria-label="Меню">☰</button><h1>Подбор аромата</h1><span class="sp"></span><span class="m" id="cnt"></span></header>
+<div class="prog"><i id="pb"></i></div>
+<div id="sh" onclick="dr(0)"></div>
+<aside id="dr"><div class="row"><b>Меню</b><span class="sp"></span><button onclick="dr(0)">✕</button></div>
+<div class="row" style="margin-top:14px"><button onclick="back()">← Назад</button><button onclick="start()">↻ Заново</button></div>
+<h3>Ваш путь</h3><ol id="path"></ol><p class="m" id="pe">Вы ещё не отвечали.</p>
+<h3>Ароматы</h3><div id="tree"></div>
+<h3>Данные</h3><button onclick="loadDB()">Обновить из БД</button></aside>
+<main class="stage">
+<div id="ld" class="card frame"><div class="cn tl"></div><div class="cn tr"></div><div class="cn bl"></div><div class="cn br"></div><h3 style="margin-top:0">Загрузка теста</h3><div id="st" class="m">Загружаем из базы…</div><div id="err"></div><div class="row" style="margin-top:10px"><button id="rt" onclick="loadDB()" hidden>Повторить</button></div></div>
+<div id="t" hidden><div class="card frame"><div class="cn tl"></div><div class="cn tr"></div><div class="cn bl"></div><div class="cn br"></div><div id="q"></div></div></div>
+</main>
+<script src="fx.js"></script>
+<script>
+let D,cur,gone,hist,roots,tot=1;
+const $=i=>document.getElementById(i),
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const node=id=>id=='*'?{id:'*',lv:99,name:'Старт',ch:roots.map(r=>r.id),q:null}:D.nodes[id];
+const dr=o=>{$('dr').classList.toggle('open',!!o);$('sh').classList.toggle('open',!!o)};
+function load(t){try{D=JSON.parse(t);if(!D.nodes)throw 0}catch(e){$('err').textContent='Неверный JSON';return}
+ const all=Object.values(D.nodes),hp=new Set(all.flatMap(x=>x.ch)),gs=all.filter(x=>x.lv>0&&!hp.has(x.id));
+ if(!gs.length){$('err').textContent='В БД пока нет групп — сохраните тест из админки.';return}
+ const top=Math.max(...gs.map(x=>x.lv));roots=gs.filter(x=>x.lv==top);
+ $('err').textContent='';$('ld').hidden=true;$('t').hidden=false;start()}
+function start(){hist=[];gone=new Set();cur=roots.length==1?roots[0].id:'*';tot=roots.reduce((s,r)=>s+cnt(r.id),0);dr(0);show()}
+function sub(id){gone.add(id);(D.nodes[id].ch||[]).forEach(sub)}
+function go(to,i){const n=node(cur),l=n.q&&n.q.o[i]?n.q.o[i].l:D.nodes[to].name;
+ hist.push({cur,gone:new Set(gone),l,q:n.q&&n.q.t?n.q.t:'Выбор группы'});n.ch.forEach(c=>{if(c!=to)sub(c)});cur=to;show()}
+function back(){dr(0);if(hist.length){const h=hist.pop();cur=h.cur;gone=h.gone;show()}}
+function cnt(id){if(gone.has(id))return 0;const n=D.nodes[id];return n.lv==0?1:n.ch.reduce((s,c)=>s+cnt(c),0)}
+function tr(id){const n=D.nodes[id];return `<li class="${gone.has(id)?'x':''}${id==cur?' cu':''}">${esc(n.name)}${n.ch.length?'<ul>'+n.ch.map(tr).join('')+'</ul>':''}</li>`}
+function show(){const n=node(cur);let h='';
+ if(n.lv==0)h=`<div class="kick">Результат</div><div class="qt">Ваш аромат — ${esc(n.name)}</div><p class="m">Он подходит под все ваши ответы.</p>`;
+ else{const o=n.q&&n.q.o.length;
+  h=`<div class="kick">Шаг ${hist.length+1}</div><div class="qt">${o?esc(n.q.t||'Выберите вариант'):'Выберите группу'}</div><div class="opts">`+
+  (o?n.q.o.map((x,i)=>`<button ${x.to&&D.nodes[x.to]?`onclick="go('${x.to}',${i})"`:'disabled'}>${esc(x.l)}</button>`).join(''):n.ch.map(c=>`<button onclick="go('${c}')">${esc(D.nodes[c].name)}</button>`).join(''))+'</div>'}
+ $('q').innerHTML=h;FX.enter('#q>*,#q button',1);
+ const rem=roots.reduce((s,r)=>s+cnt(r.id),0);
+ $('cnt').textContent='Осталось: '+rem;$('pb').style.width=(tot>1?100*(tot-rem)/(tot-1):100)+'%';
+ $('path').innerHTML=hist.map(x=>`<li><span class="m">${esc(x.q)}</span><br><b>${esc(x.l)}</b></li>`).join('');$('pe').hidden=!!hist.length;
+ $('tree').innerHTML='<ul>'+roots.map(r=>tr(r.id)).join('')+'</ul>'}
+</script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+const ref=doc(getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"})),"aroma","tree");
+const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
+window.loadDB=async()=>{dr(0);$("t").hidden=true;$("ld").hidden=false;$("err").textContent="";$("rt").hidden=true;$("st").textContent="Загружаем из базы…";
+ try{const x=await Promise.race([getDoc(ref),tmo()]);$("st").textContent="";
+  if(x.exists()){const v=x.data();if(v.cnOut!=null)document.documentElement.style.setProperty('--cn-out',v.cnOut/10);load(v.json)}else $("err").textContent="В БД пока нет теста — сохраните его из админки."}
+ catch(e){$("st").textContent="";$("err").textContent="Не удалось загрузить: "+e.message}
+ if($("t").hidden)$("rt").hidden=false};
+loadDB();
+</script></body></html>

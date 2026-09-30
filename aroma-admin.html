@@ -1,0 +1,73 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Ароматы — админка</title><link rel="stylesheet" href="style.css"></head><body class="admin"><div id="mist"></div>
+<header class="bar"><h1>Админка ароматов</h1><span class="sp"></span>
+<span class="m" style="display:flex;align-items:center;gap:6px">Выступ уголков<input type="range" id="cnOut" min="0" max="1000" step="1" oninput="setCnOut(this.value)" style="width:120px"><span id="cnOutVal" style="min-width:44px;display:inline-block">0.0%</span></span>
+<span class="m" id="stat"></span><span class="m" id="dbs"></span><button onclick="dbLoad()">Из БД</button><button class="pri" onclick="dbSave()">☁ Сохранить в БД</button></header>
+<div class="wrap">
+<aside class="side">
+<div class="card frame"><h3>Создать</h3>
+<div class="row"><input type="range" id="r" min="0" max="9" value="0" oninput="$('lv').value=this.value;picks()"><input type="number" id="lv" min="0" max="9" value="0" style="width:64px" oninput="$('r').value=this.value;picks()"></div>
+<div class="m" id="lh"></div>
+<textarea id="nm" rows="3" placeholder="Название (ароматы — по одному на строку)" style="margin-top:8px"></textarea>
+<div id="p"></div>
+<button class="pri" id="ab" onclick="add()" style="width:100%;margin-top:10px">Добавить</button></div>
+<details class="card"><summary>JSON: экспорт / импорт</summary><textarea id="js" rows="6"></textarea><div class="row"><button onclick="cp()">Копировать</button><button onclick="imp()">Применить локально</button><button class="pri" onclick="impDb()">Заменить в БД этим JSON</button></div></details>
+</aside>
+<main id="list"></main>
+</div>
+<script src="fx.js"></script>
+<script>
+let D={n:1,nodes:{}},op={};
+try{const s=localStorage.getItem('aroma');if(s)D=JSON.parse(s)}catch(e){}
+const $=i=>document.getElementById(i),V=()=>Object.values(D.nodes),L='АБВГДЕЖЗИК'.split(''),
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+par=id=>V().find(x=>x.ch.includes(id));
+function st(){try{localStorage.setItem('aroma',JSON.stringify(D))}catch(e){}$('js').value=JSON.stringify(D)}
+function save(){st();render()}
+function picks(){const l=+$('lv').value;
+ $('lh').textContent=l?'Группа уровня '+l+' — выберите, что в неё входит:':'Аромат (уровень 0)';
+ const a=V().filter(x=>x.lv==l-1&&!par(x.id)).map(x=>`<label class="chip"><input type="checkbox" class="pick" value="${x.id}"> ${esc(x.name)}</label>`).join('');
+ $('p').innerHTML=l?(a||'<span class="m">Нет несортированных элементов уровня '+(l-1)+'</span>'):''}
+function add(){const l=+$('lv').value,t=$('nm').value.trim();if(!t)return;
+ const names=l?[t]:t.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+ const c=l?[...document.querySelectorAll('.pick:checked')].map(x=>x.value):[];
+ names.forEach(name=>{const id='n'+D.n++;D.nodes[id]={id,name,lv:l,ch:c.slice(),q:null}});$('nm').value='';save()}
+function del(id){delete D.nodes[id];V().forEach(x=>{x.ch=x.ch.filter(i=>i!=id);if(x.q)x.q.o.forEach(o=>{if(o.to==id)o.to=''})});save()}
+function tq(id){const n=D.nodes[id];if(!n.q)n.q={t:'',link:false,o:[]};op[id]=!op[id];render()}
+function sy(id){const n=D.nodes[id],q=n.q;if(!q.link)return;V().forEach(x=>{if(x.id!=id&&x.lv==n.lv)x.q={t:q.t,link:true,o:q.o.map(o=>({l:o.l,to:((x.q&&x.q.o.find(p=>p.l==o.l))||{}).to||''}))}})}
+const uq=(id,v)=>{D.nodes[id].q.t=v;sy(id);st()},
+uo=(id,i,v)=>{D.nodes[id].q.o[i].l=v;sy(id);st()},
+us=(id,i,v)=>{D.nodes[id].q.o[i].to=v;st()},
+lk=(id,v)=>{D.nodes[id].q.link=v;sy(id);save()},
+ao=id=>{const q=D.nodes[id].q;q.o.push({l:q.o.length<10?L[q.o.length]:'',to:''});sy(id);save()},
+dq=(id,i)=>{D.nodes[id].q.o.splice(i,1);sy(id);save()};
+function qe(n){const q=n.q,id=n.id;return `<div class="qe"><textarea rows="2" placeholder="Текст вопроса" oninput="uq('${id}',this.value)">${esc(q.t)}</textarea>
+<label class="m"><input type="checkbox" ${q.link?'checked':''} onchange="lk('${id}',this.checked)"> связать с другими группами этого уровня</label>`+
+q.o.map((o,i)=>`<div class="opt"><input value="${esc(o.l)}" placeholder="значение" oninput="uo('${id}',${i},this.value)"><select onchange="us('${id}',${i},this.value)"><option value="">— куда ведёт —</option>${n.ch.map(c=>`<option value="${c}" ${o.to==c?'selected':''}>${esc(D.nodes[c].name)}</option>`).join('')}</select><button onclick="dq('${id}',${i})">✕</button></div>`).join('')+`<button onclick="ao('${id}')">+ вариант ответа</button></div>`}
+function card(n){const p=par(n.id);
+ return `<div class="card node" data-id="${n.id}"><div class="top"><b>${esc(n.name)}</b><span class="chip">${p?'в: '+esc(p.name):'не сортировано'}</span>
+ ${n.lv?`<button onclick="tq('${n.id}')">${n.q&&n.q.t?'Вопрос ✎':'+ Вопрос'}</button>`:''}<button onclick="del('${n.id}')">✕</button></div>
+ ${n.ch.length?'<div>'+n.ch.map(i=>`<span class="chip">${esc(D.nodes[i].name)}</span>`).join('')+'</div>':''}${op[n.id]&&n.q?qe(n):''}</div>`}
+function render(){picks();let h='';
+ for(let l=9;l>=0;l--){const a=V().filter(x=>x.lv==l);if(a.length)h+=`<h3>${l?'Группы · уровень '+l:'Ароматы · уровень 0'} <span class="chip">${a.length}</span></h3>`+a.map(card).join('')}
+ $('list').innerHTML=h||'<div class="card m">Пока пусто. Начните с добавления ароматов (ползунок на 0).</div>';
+ $('stat').textContent=V().filter(x=>!x.lv).length+' ароматов · '+V().filter(x=>x.lv).length+' групп';
+ $('js').value=JSON.stringify(D);FX.enter('#list .node')}
+function cp(){$('js').select();try{document.execCommand('copy')}catch(e){}}
+function imp(){try{D=JSON.parse($('js').value);if(!D.nodes)throw 0;save()}catch(e){alert('Неверный JSON')}}
+window.getD=()=>JSON.stringify(D);window.setD=t=>{D=JSON.parse(t);save()};
+window.setCnOut=v=>{const pct=(v/10).toFixed(1);document.documentElement.style.setProperty('--cn-out',v/10);$('cnOutVal').textContent=pct+'%';try{localStorage.setItem('cnOut',v)}catch(e){}};
+(function(){let sv=null;try{sv=localStorage.getItem('cnOut')}catch(e){}if(sv==null)sv=140;$('cnOut').value=sv;setCnOut(sv)})();
+render();
+</script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import{getFirestore,doc,getDoc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+const ref=doc(getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"})),"aroma","tree");
+const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
+const st=t=>document.getElementById("dbs").textContent=t;
+window.dbSave=async()=>{st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:getD(),cnOut:+$('cnOut').value,updatedAt:serverTimestamp()}),tmo()]);st("Сохранено "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
+window.impDb=async()=>{let parsed;try{parsed=JSON.parse(document.getElementById("js").value);if(!parsed.nodes)throw 0}catch(e){alert("Неверный JSON");return}
+ if(!confirm("Заменить данные в БД содержимым поля JSON? Текущие данные в БД будут перезаписаны."))return;
+ st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:JSON.stringify(parsed),cnOut:+$('cnOut').value,updatedAt:serverTimestamp()}),tmo()]);window.setD(JSON.stringify(parsed));st("Сохранено в БД "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
+window.dbLoad=async()=>{if(!confirm("Заменить текущие данные данными из БД?"))return;st("Загружаем…");try{const x=await Promise.race([getDoc(ref),tmo()]);if(!x.exists()){st("В БД пока пусто");return}const v=x.data();setD(v.json);if(v.cnOut!=null)setCnOut(v.cnOut);st("Загружено из БД")}catch(e){st("Ошибка: "+e.message)}};
+</script></body></html>
