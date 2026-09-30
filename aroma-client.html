@@ -32,6 +32,10 @@ function cnt(id){if(gone.has(id))return 0;const n=D.nodes[id];return n.lv==0?1:n
 function tr(id){const n=D.nodes[id];return `<li class="${gone.has(id)?'x':''}${id==cur?' cu':''}">${esc(n.name)}${n.ch.length?'<ul>'+n.ch.map(tr).join('')+'</ul>':''}</li>`}
 function show(){const n=node(cur);let h='';
  if(n.lv==0)h=`<div class="kick">Результат</div><div class="qt">Ваш аромат — ${esc(n.name)}</div><p class="m">Он подходит под все ваши ответы.</p>`;
+ else if(n.lv==1&&(!n.q||!n.q.t)){
+  h=`<div class="kick">Результат</div><div class="qt">Ваши ароматы — ${esc(n.name)}</div><p class="m">Вам подходит любой из этой группы:</p><ul class="res-list">`+
+  n.ch.map(c=>`<li>${esc(D.nodes[c].name)}</li>`).join('')+'</ul>';
+ }
  else{const o=n.q&&n.q.o.length;
   h=`<div class="kick">Шаг ${hist.length+1}</div><div class="qt">${o?esc(n.q.t||'Выберите вариант'):'Выберите группу'}</div><div class="opts">`+
   (o?n.q.o.map((x,i)=>`<button ${x.to&&D.nodes[x.to]?`onclick="go('${x.to}',${i})"`:'disabled'}>${esc(x.l)}</button>`).join(''):n.ch.map(c=>`<button onclick="go('${c}')">${esc(D.nodes[c].name)}</button>`).join(''))+'</div>'}
