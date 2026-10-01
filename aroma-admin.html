@@ -1,16 +1,25 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Ароматы — админка</title><link rel="stylesheet" href="style.css"></head><body class="admin"><div id="mist"></div>
-<header class="bar"><h1>Админка ароматов</h1><span class="sp"></span>
-<span class="m" style="display:flex;align-items:center;gap:6px">Выступ уголков<input type="range" id="cnOut" min="0" max="1000" step="1" oninput="setCnOut(this.value)" style="width:120px"><span id="cnOutVal" style="min-width:44px;display:inline-block">0.0%</span></span>
-<span class="m" id="stat"></span><span class="m" id="dbs"></span><button onclick="dbLoad()">Из БД</button><button class="pri" onclick="dbSave()">☁ Сохранить в БД</button></header>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#070b16"><title>Ароматы — админка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t=="old"?"old":"new"}catch(e){document.documentElement.dataset.theme="new"}</script><link rel="stylesheet" href="style.css"></head><body class="admin"><div id="mist"></div>
+<header class="bar"><h1>Админка ароматов</h1><span class="sp"></span><span class="m pill" id="stat"></span><span class="m" id="dbs" role="status"></span><button onclick="dbLoad()">Из БД</button><button class="pri" onclick="dbSave()">☁ Сохранить в БД</button><button class="ico ghost theme" onclick="toggleTheme()" aria-label="Старая тема" title="Старая тема"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button></header>
 <div class="wrap">
 <aside class="side">
 <div class="card frame"><h3>Создать</h3>
-<div class="row"><input type="range" id="r" min="0" max="9" value="0" oninput="$('lv').value=this.value;picks()"><input type="number" id="lv" min="0" max="9" value="0" style="width:64px" oninput="$('r').value=this.value;picks()"></div>
+<label class="lbl" for="lv" style="margin-top:0">Уровень</label>
+<div class="row lvl"><input type="range" id="r" aria-label="Уровень, ползунок" min="0" max="9" value="0" oninput="$('lv').value=this.value;picks()"><input type="number" id="lv" min="0" max="9" value="0" oninput="$('r').value=this.value;picks()"></div>
 <div class="m" id="lh"></div>
-<textarea id="nm" rows="3" placeholder="Название (ароматы — по одному на строку)" style="margin-top:8px"></textarea>
+<label class="lbl" for="nm">Название</label>
+<textarea id="nm" rows="3" placeholder="Название (ароматы — по одному на строку)"></textarea>
 <div id="p"></div>
-<button class="pri" id="ab" onclick="add()" style="width:100%;margin-top:10px">Добавить</button></div>
-<details class="card"><summary>JSON: экспорт / импорт</summary><textarea id="js" rows="6"></textarea><div class="row"><button onclick="cp()">Копировать</button><button onclick="imp()">Применить локально</button><button class="pri" onclick="impDb()">Заменить в БД этим JSON</button></div></details>
+<button class="pri" id="ab" onclick="add()">Добавить</button></div>
+<div class="card deco"><div class="row"><label for="cnOut">Выступ уголков</label><span class="m" id="cnOutVal">0.0%</span></div><input type="range" id="cnOut" min="0" max="1000" step="1" oninput="setCnOut(this.value)">
+<div class="row"><label for="edT">Толщина рамы</label><span class="m" id="edTVal">10 px</span></div><input type="range" id="edT" min="0" max="40" step="1" oninput="setEdge(this.value)"></div>
+<details class="card imgs"><summary>Картинки тем (ZIP → БД)</summary>
+<p class="m" style="margin:10px 0 0">Закиньте ZIP со всеми картинками обеих тем. Они сохранятся в БД и подставятся на сайте, если файлы рядом с ним не загрузятся.</p>
+<label class="drop" id="drop" for="zip">Перетащите ZIP сюда или нажмите, чтобы выбрать</label><input type="file" id="zip" accept=".zip,application/zip" hidden>
+<div id="imgn" class="m" role="status"></div><div id="imgl"></div></details>
+<details class="card"><summary>JSON: экспорт / импорт</summary><textarea id="js" rows="6" aria-label="JSON"></textarea><div class="row"><button class="sm" onclick="cp()">Копировать</button><button class="sm" onclick="imp()">Применить локально</button><button class="sm pri" style="width:auto;margin:0" onclick="impDb()">Заменить в БД этим JSON</button></div></details>
 </aside>
 <main id="list"></main>
 </div>
@@ -42,32 +51,87 @@ ao=id=>{const q=D.nodes[id].q;q.o.push({l:q.o.length<10?L[q.o.length]:'',to:''})
 dq=(id,i)=>{D.nodes[id].q.o.splice(i,1);sy(id);save()};
 function qe(n){const q=n.q,id=n.id;return `<div class="qe"><textarea rows="2" placeholder="Текст вопроса" oninput="uq('${id}',this.value)">${esc(q.t)}</textarea>
 <label class="m"><input type="checkbox" ${q.link?'checked':''} onchange="lk('${id}',this.checked)"> связать с другими группами этого уровня</label>`+
-q.o.map((o,i)=>`<div class="opt"><input value="${esc(o.l)}" placeholder="значение" oninput="uo('${id}',${i},this.value)"><select onchange="us('${id}',${i},this.value)"><option value="">— куда ведёт —</option>${n.ch.map(c=>`<option value="${c}" ${o.to==c?'selected':''}>${esc(D.nodes[c].name)}</option>`).join('')}</select><button onclick="dq('${id}',${i})">✕</button></div>`).join('')+`<button onclick="ao('${id}')">+ вариант ответа</button></div>`}
+q.o.map((o,i)=>`<div class="opt"><input value="${esc(o.l)}" placeholder="значение" oninput="uo('${id}',${i},this.value)"><select onchange="us('${id}',${i},this.value)"><option value="">— куда ведёт —</option>${n.ch.map(c=>`<option value="${c}" ${o.to==c?'selected':''}>${esc(D.nodes[c].name)}</option>`).join('')}</select><button onclick="dq('${id}',${i})" aria-label="Убрать вариант" title="Убрать вариант">✕</button></div>`).join('')+`<button class="sm" onclick="ao('${id}')">+ вариант ответа</button></div>`}
 function card(n){const p=par(n.id);
- return `<div class="card node" data-id="${n.id}"><div class="top"><b>${esc(n.name)}</b><span class="chip">${p?'в: '+esc(p.name):'не сортировано'}</span>
- ${n.lv?`<button onclick="tq('${n.id}')">${n.q&&n.q.t?'Вопрос ✎':'+ Вопрос'}</button>`:''}<button onclick="del('${n.id}')">✕</button></div>
+ return `<div class="card node${n.lv?'':' leaf'}" data-id="${n.id}"><div class="top"><b>${esc(n.name)}</b><span class="chip">${p?'в: '+esc(p.name):'не сортировано'}</span>
+ ${n.lv?`<button class="sm" onclick="tq('${n.id}')">${n.q&&n.q.t?'Вопрос ✎':'+ Вопрос'}</button>`:''}<button class="sm" onclick="del('${n.id}')" aria-label="Удалить" title="Удалить">✕</button></div>
  ${n.ch.length?'<div>'+n.ch.map(i=>`<span class="chip">${esc(D.nodes[i].name)}</span>`).join('')+'</div>':''}${op[n.id]&&n.q?qe(n):''}</div>`}
 function render(){picks();let h='';
- for(let l=9;l>=0;l--){const a=V().filter(x=>x.lv==l);if(a.length)h+=`<h3>${l?'Группы · уровень '+l:'Ароматы · уровень 0'} <span class="chip">${a.length}</span></h3>`+a.map(card).join('')}
- $('list').innerHTML=h||'<div class="card m">Пока пусто. Начните с добавления ароматов (ползунок на 0).</div>';
- $('stat').textContent=V().filter(x=>!x.lv).length+' ароматов · '+V().filter(x=>x.lv).length+' групп';
+ for(let l=9;l>=0;l--){const a=V().filter(x=>x.lv==l);if(a.length)h+=`<section><h3>${l?'Группы уровня '+l:'Ароматы'} <span class="chip">${a.length}</span></h3>`+(l?a.map(card).join(''):'<div class="grid">'+a.map(card).join('')+'</div>')+'</section>'}
+ $('list').innerHTML=h||'<div class="card m">Здесь пока пусто. Добавьте ароматы слева: уровень 0, названия по одному на строку.</div>';
+ $('stat').textContent=V().filter(x=>!x.lv).length+' ароматов, '+V().filter(x=>x.lv).length+' групп';
  $('js').value=JSON.stringify(D);FX.enter('#list .node')}
 function cp(){$('js').select();try{document.execCommand('copy')}catch(e){}}
 function imp(){try{D=JSON.parse($('js').value);if(!D.nodes)throw 0;save()}catch(e){alert('Неверный JSON')}}
 window.getD=()=>JSON.stringify(D);window.setD=t=>{D=JSON.parse(t);save()};
 window.setCnOut=v=>{const pct=(v/10).toFixed(1);document.documentElement.style.setProperty('--cn-out',v/10);$('cnOutVal').textContent=pct+'%';try{localStorage.setItem('cnOut',v)}catch(e){}};
 (function(){let sv=null;try{sv=localStorage.getItem('cnOut')}catch(e){}if(sv==null)sv=140;$('cnOut').value=sv;setCnOut(sv)})();
+window.setEdge=v=>{document.documentElement.style.setProperty('--eu',v);$('edT').value=v;$('edTVal').textContent=v+' px';try{localStorage.setItem('edgeT',v)}catch(e){}};
+(function(){let sv=null;try{sv=localStorage.getItem('edgeT')}catch(e){}if(sv==null)sv=10;setEdge(sv)})();
 render();
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import{getFirestore,doc,getDoc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-const ref=doc(getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"})),"aroma","tree");
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree");
 const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
+window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}});
 const st=t=>document.getElementById("dbs").textContent=t;
-window.dbSave=async()=>{st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:getD(),cnOut:+$('cnOut').value,updatedAt:serverTimestamp()}),tmo()]);st("Сохранено "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
+window.dbSave=async()=>{st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:getD(),cnOut:+$('cnOut').value,edgeT:+$('edT').value,updatedAt:serverTimestamp()}),tmo()]);st("Сохранено "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
 window.impDb=async()=>{let parsed;try{parsed=JSON.parse(document.getElementById("js").value);if(!parsed.nodes)throw 0}catch(e){alert("Неверный JSON");return}
  if(!confirm("Заменить данные в БД содержимым поля JSON? Текущие данные в БД будут перезаписаны."))return;
- st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:JSON.stringify(parsed),cnOut:+$('cnOut').value,updatedAt:serverTimestamp()}),tmo()]);window.setD(JSON.stringify(parsed));st("Сохранено в БД "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
-window.dbLoad=async()=>{if(!confirm("Заменить текущие данные данными из БД?"))return;st("Загружаем…");try{const x=await Promise.race([getDoc(ref),tmo()]);if(!x.exists()){st("В БД пока пусто");return}const v=x.data();setD(v.json);if(v.cnOut!=null)setCnOut(v.cnOut);st("Загружено из БД")}catch(e){st("Ошибка: "+e.message)}};
+ st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:JSON.stringify(parsed),cnOut:+$('cnOut').value,edgeT:+$('edT').value,updatedAt:serverTimestamp()}),tmo()]);window.setD(JSON.stringify(parsed));st("Сохранено в БД "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
+window.dbLoad=async()=>{if(!confirm("Заменить текущие данные данными из БД?"))return;st("Загружаем…");try{const x=await Promise.race([getDoc(ref),tmo()]);if(!x.exists()){st("В БД пока пусто");return}const v=x.data();setD(v.json);if(v.cnOut!=null)setCnOut(v.cnOut);if(v.edgeT!=null)setEdge(v.edgeT);st("Загружено из БД")}catch(e){st("Ошибка: "+e.message)}};
+
+/* ===== Картинки тем: ZIP -> БД (коллекция aroma, документы img-<имя>, список — в img-meta) ===== */
+{const GROUPS=[['Новая тема',[['bg-pc','Фон, широкий экран'],['bg-phone','Фон, телефон'],['edge-t','Кромка рамы'],['corner','Уголок рамы'],['smoke','Дымок']]],
+ ['Старая тема',[['old-bg-pc','Фон, широкий экран'],['old-bg-phone','Фон, телефон'],['old-edge-t','Кромка рамы'],['old-corner','Уголок рамы']]]],
+KEYS=new Set(GROUPS.flatMap(g=>g[1].map(x=>x[0]))),MIME={webp:'image/webp',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',avif:'image/avif',gif:'image/gif'},
+MAX=700*1024,metaRef=doc(db,"aroma","img-meta"),ST={};
+const kb=n=>Math.max(1,Math.round(n/1024))+' КБ',when=t=>new Date(t).toLocaleString('ru-RU',{dateStyle:'short',timeStyle:'short'});
+const draw=()=>{$('imgl').innerHTML=GROUPS.map(([t,a])=>`<h4>${t}</h4>`+a.map(([k,n])=>{const s=ST[k]||{};
+ const txt=s.busy?'сохраняем…':s.err?'ошибка: '+esc(s.err):s.size?'в БД · '+kb(s.size)+(s.t?' · '+when(s.t):''):'нет в БД';
+ return `<div class="it ${s.err?'er':s.size&&!s.busy?'ok':''}"><span>${n}</span><span>${txt}</span></div>`}).join('')).join('')};
+const note=t=>$('imgn').textContent=t;
+/* распаковка ZIP средствами браузера: метод 0 (без сжатия) и 8 (deflate) */
+async function unzip(buf){const dv=new DataView(buf),u=new Uint8Array(buf);let e=buf.byteLength-22;
+ while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw new Error('это не ZIP-архив');
+ const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out=[];
+ for(let i=0;i<n&&dv.getUint32(p,true)===0x02014b50;i++){const m=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true),
+  name=new TextDecoder().decode(u.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;if(name.endsWith('/'))continue;
+  const ds=off+30+dv.getUint16(off+26,true)+dv.getUint16(off+28,true);out.push({name,m,raw:u.subarray(ds,ds+cs)})}
+ return out}
+async function bytesOf(z){if(z.m===0)return z.raw;if(z.m!==8)throw new Error('неподдерживаемое сжатие');
+ return new Uint8Array(await new Response(new Blob([z.raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer())}
+/* слишком тяжёлую картинку (лимит документа в БД ~1 МБ) пережимаем в webp */
+async function fit(b,type){if(b.length<=MAX)return{b,type};const bmp=await createImageBitmap(new Blob([b],{type}));let sc=1;
+ for(let k=0;k<8;k++){const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  const o=await new Promise(r=>c.toBlob(r,'image/webp',.82));if(o&&o.size<=MAX)return{b:new Uint8Array(await o.arrayBuffer()),type:'image/webp'};sc*=.8}
+ throw new Error('слишком тяжёлая')}
+const dataUrl=(b,type)=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(new Blob([b],{type}))});
+/* имя в архиве -> ключ: bg-pc.webp, old-bg-pc.webp или папка old/bg-pc.webp */
+function keyOf(path){const seg=path.split('/').filter(Boolean),file=seg.pop()||'';if(file.startsWith('.')||seg.includes('__MACOSX'))return null;
+ const m=file.match(/^(.*)\.([a-z0-9]+)$/i);if(!m)return null;const ext=m[2].toLowerCase();if(!MIME[ext])return null;
+ let b=m[1].toLowerCase().trim();if(seg.some(s=>/^(old|старая|старый)$/i.test(s))&&!b.startsWith('old-'))b='old-'+b;
+ return KEYS.has(b)?{key:b,type:MIME[ext]}:{skip:file}}
+async function zipUpload(file){if(!file)return;note('Читаем архив…');
+ let list;try{list=await unzip(await file.arrayBuffer())}catch(e){note('Не получилось открыть: '+e.message);return}
+ const found={},skipped=[];list.forEach(z=>{const k=keyOf(z.name);if(!k)return;if(k.skip)skipped.push(k.skip);else found[k.key]={...k,z}});
+ const keys=[...KEYS].filter(k=>found[k]);if(!keys.length){note('В архиве нет подходящих картинок. Ожидаются имена: '+[...KEYS].join(', ')+' (старую тему можно положить в папку old/).');return}
+ let ok=0,t=Date.now();const meta={};
+ for(const k of keys){ST[k]={...ST[k],busy:1,err:''};draw();note(`Сохраняем в БД: ${ok+1} из ${keys.length}…`);
+  try{const f=found[k];let{b,type}=await fit(await bytesOf(f.z),f.type);const data=await dataUrl(b,type);
+   await Promise.race([setDoc(doc(db,"aroma","img-"+k),{data,type,size:b.length,updatedAt:serverTimestamp()}),tmo()]);
+   ST[k]={size:b.length,t};meta[k]={size:b.length,t};ok++}
+  catch(e){ST[k]={...ST[k],busy:0,err:e.message||String(e)}}draw()}
+ if(ok)try{await Promise.race([setDoc(metaRef,{files:meta},{merge:true}),tmo()])}catch(e){}
+ const miss=[...KEYS].filter(k=>!found[k]);
+ note(`Сохранено в БД: ${ok} из ${keys.length}.`+(miss.length?` Не было в архиве: ${miss.join(', ')}.`:'')+(skipped.length?` Пропущены (неизвестные имена): ${skipped.join(', ')}.`:'')+(ok<keys.length?' Если «ошибка» — проверьте правила доступа к коллекции aroma в Firestore.':''))}
+const zi=$('zip'),dz=$('drop');
+zi.onchange=()=>{zipUpload(zi.files[0]);zi.value=''};
+['dragenter','dragover'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.add('on')}));
+['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.classList.remove('on')}));
+dz.addEventListener('drop',e=>zipUpload(e.dataTransfer.files[0]));
+draw();
+getDoc(metaRef).then(x=>{if(x.exists()){const f=x.data().files||{};Object.keys(f).forEach(k=>ST[k]=f[k]);draw()}}).catch(()=>{});}
 </script></body></html>
