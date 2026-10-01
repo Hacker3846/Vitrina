@@ -75,7 +75,8 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-ap
 import{getFirestore,doc,getDoc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree");
 const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
-window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}});
+window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}},
+ async()=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-meta")),tmo()]);return x.exists()?x.data().files||{}:{}}catch(e){return null}});
 const st=t=>document.getElementById("dbs").textContent=t;
 window.dbSave=async()=>{st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:getD(),cnOut:+$('cnOut').value,edgeT:+$('edT').value,updatedAt:serverTimestamp()}),tmo()]);st("Сохранено "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
 window.impDb=async()=>{let parsed;try{parsed=JSON.parse(document.getElementById("js").value);if(!parsed.nodes)throw 0}catch(e){alert("Неверный JSON");return}
@@ -122,7 +123,7 @@ async function zipUpload(file){if(!file)return;note('Читаем архив…'
  for(const k of keys){ST[k]={...ST[k],busy:1,err:''};draw();note(`Сохраняем в БД: ${ok+1} из ${keys.length}…`);
   try{const f=found[k];let{b,type}=await fit(await bytesOf(f.z),f.type);const data=await dataUrl(b,type);
    await Promise.race([setDoc(doc(db,"aroma","img-"+k),{data,type,size:b.length,updatedAt:serverTimestamp()}),tmo()]);
-   ST[k]={size:b.length,t};meta[k]={size:b.length,t};ok++}
+   ST[k]={size:b.length,t};meta[k]={size:b.length,t};ok++;window.imgPut&&imgPut(k,data,t)}
   catch(e){ST[k]={...ST[k],busy:0,err:e.message||String(e)}}draw()}
  if(ok)try{await Promise.race([setDoc(metaRef,{files:meta},{merge:true}),tmo()])}catch(e){}
  const miss=[...KEYS].filter(k=>!found[k]);

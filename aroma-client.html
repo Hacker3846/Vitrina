@@ -54,7 +54,8 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-ap
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree");
 const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
-window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}});
+window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}},
+ async()=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-meta")),tmo()]);return x.exists()?x.data().files||{}:{}}catch(e){return null}});
 window.loadDB=async()=>{dr(0);$("t").hidden=true;$("ld").hidden=false;$("err").textContent="";$("rt").hidden=true;$("st").textContent="Загружаем из базы…";
  try{const x=await Promise.race([getDoc(ref),tmo()]);$("st").textContent="";
   if(x.exists()){const v=x.data();if(v.cnOut!=null)document.documentElement.style.setProperty('--cn-out',v.cnOut/10);if(v.edgeT!=null)document.documentElement.style.setProperty('--eu',v.edgeT);load(v.json)}else $("err").textContent="В БД пока нет теста — сохраните его из админки."}
