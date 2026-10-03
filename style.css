@@ -1,3 +1,4 @@
+
 /* ============ Токены ============ */
 /* ============ Токены ============
    Две темы: «новая» (лунная синева, по умолчанию) и «старая» (золото).
@@ -34,7 +35,7 @@
   --fl-sh:#4f8cff80;
   --serif:'Spectral',Georgia,'Times New Roman',serif;
   --disp:'Forum','Spectral',Georgia,serif;
-  --cn-out:14;          /* выступ уголков, % (задаётся в админке) */
+  --cn-out:10;          /* выступ уголков, % (задаётся в админке) */
   --wall-l:url(bg-pc.webp);      /* фон, широкий экран */
   --wall-p:url(bg-phone.webp);   /* фон, телефон */
   --wall:var(--wall-l);
@@ -122,7 +123,7 @@ h3{margin:24px 0 10px;font:400 1.2rem/1.2 var(--disp);letter-spacing:.02em;color
 .card.frame{--cw:clamp(64px,16vw,104px);border-radius:4px;border-color:var(--b2);
   box-shadow:0 30px 90px #000b,0 0 0 1px #0006,inset 0 0 90px rgb(var(--gc)/0.06)}
 /* бордюр по рёбрам: лежит внутри рамки и обрезается её границей, уголки лежат поверх */
-.card.frame{--et:calc(var(--eu,10) * 1px)} /* толщина рамы в px, задаётся в админке */
+.card.frame{--et:calc(var(--eu,6) * 1px)} /* толщина рамы в px, задаётся в админке */
 .card.frame::before{content:'';position:absolute;inset:calc(var(--et) + 7px);border:1px solid rgb(var(--gc)/0.17);border-radius:2px;pointer-events:none}
 .ed{position:absolute;z-index:0;pointer-events:none;background-repeat:repeat}
 /* одна картинка edge-t на всю раму (своя для каждой темы): низ — зеркало по вертикали, боковины — поворот на ±90° */

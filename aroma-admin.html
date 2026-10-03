@@ -3,12 +3,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Forum&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script>try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t=="old"?"old":"new"}catch(e){document.documentElement.dataset.theme="new"}</script><link rel="stylesheet" href="style.css"><style>.ob{display:flex;align-items:center;gap:6px;margin:4px 0}.bd{width:28px;height:28px;flex:none;display:grid;place-items:center;border:1px solid var(--b2);border-radius:4px;font-size:13px;color:var(--g2)}
 .tx{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;border:0;padding:4px;color:var(--t);font:inherit;cursor:pointer;box-shadow:none}
-.ob input{flex:1;min-width:0}.ib{width:28px;height:28px;padding:0;flex:none;display:grid;place-items:center;font-size:14px}.scr{height:300px;overflow-y:auto;margin:8px 0}#w1 .row{gap:4px}</style></head><body class="admin"><div id="mist"></div>
+.ob input{flex:1;min-width:0}.ib{width:28px;height:28px;padding:0;flex:none;display:grid;place-items:center;font-size:14px}.scr{height:300px;overflow-y:auto;margin:8px 0}#w1 .row{gap:4px}.imgs{scroll-margin-top:76px}
+button{transition:transform .12s ease,box-shadow .2s,opacity .2s,background .2s}
+button:not(:disabled):hover{box-shadow:0 0 0 1px rgb(var(--gc)/.5),0 0 14px rgb(var(--gc)/.28)}
+button:not(:disabled):active{transform:scale(.9);box-shadow:0 0 0 2px rgb(var(--gc)/.6)}
+button:disabled{opacity:.4}.tx:not(:disabled):hover{box-shadow:none;color:var(--g2)}
+.ob{border-radius:6px;transition:background .2s}.ob:hover{background:rgb(var(--gc)/.08)}
+@media(prefers-reduced-motion:reduce){button,.ob{transition:none}}</style></head><body class="admin"><div id="mist"></div>
 <header class="bar"><h1>Админка ароматов</h1><span class="sp"></span><span class="m pill" id="stat"></span><span class="m" id="dbs" role="status"></span><button onclick="dbLoad()">Из БД</button><button class="pri" onclick="dbSave()">☁ Сохранить в БД</button><button class="ico ghost theme" onclick="toggleTheme()" aria-label="Старая тема" title="Старая тема"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button></header>
 <div class="wrap">
 <aside class="side">
 <div class="card deco"><div class="row"><label for="cnOut">Выступ уголков</label><span class="m" id="cnOutVal">0.0%</span></div><input type="range" id="cnOut" min="0" max="1000" step="1" oninput="setCnOut(this.value)">
-<div class="row"><label for="edT">Толщина рамы</label><span class="m" id="edTVal">10 px</span></div><input type="range" id="edT" min="0" max="40" step="1" oninput="setEdge(this.value)"></div>
+<div class="row"><label for="edT">Толщина рамы</label><span class="m" id="edTVal">6 px</span></div><input type="range" id="edT" min="0" max="40" step="1" oninput="setEdge(this.value)"></div>
 <details class="card imgs"><summary>Картинки тем (ZIP → БД)</summary>
 <p class="m" style="margin:10px 0 0">Закиньте ZIP со всеми картинками обеих тем. Они сохранятся в БД и подставятся на сайте, если файлы рядом с ним не загрузятся.</p>
 <label class="drop" id="drop" for="zip">Перетащите ZIP сюда или нажмите, чтобы выбрать</label><input type="file" id="zip" accept=".zip,application/zip" hidden>
@@ -23,36 +29,50 @@
 const $=i=>document.getElementById(i),LT='АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ',
 esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* папка: {objs:[вопрос, ответ-папка, ...], e:[id элементов]}; objs[0] — всегда вопрос, остальные — варианты ответа (у каждого своя папка f) */
-const mk=()=>({objs:[],e:[]});let D={n:1,els:{},root:mk()},P=[],ed=-1;   // P — путь: индексы вариантов от корня
+const mk=()=>({objs:[{t:''}],e:[]}),ens=()=>{const f=cur();if(!f.objs.length)f.objs.push({t:''});return f};let D={n:1,els:{},root:mk()},P=[],ed=-1,fr=-1,dir=0,fe=[];   // fr/fe — что подсветить после перерисовки; dir: 1 вглубь, -1 наверх, 2 прыжок по ссылке
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,
+pop=e=>!RM&&e.animate&&e.animate([{opacity:.3,transform:'scale(.94)',background:'rgb(var(--gc)/.28)'},{opacity:1,transform:'none',background:'transparent'}],{duration:520,easing:'cubic-bezier(.2,.8,.2,1)'}),
+out=(el,fn)=>{if(!el||RM||!el.animate||el.dataset.d)return fn();el.dataset.d=1;el.style.overflow='hidden';
+ el.animate([{opacity:1,transform:'none',maxHeight:el.offsetHeight+'px'},{opacity:0,transform:'translateX(28px)',maxHeight:'0px'}],{duration:200,easing:'ease-in',fill:'forwards'}).onfinish=fn},
+fly=(a,t,id)=>{const to=$('w1').querySelector(`[data-e="${id}"]`);if(!to||RM||!to.animate)return;to.scrollIntoView({block:'nearest'});
+ const b=to.getBoundingClientRect(),c=document.createElement('span');c.className='chip';c.textContent=t;
+ c.style.cssText=`position:fixed;left:${a.left}px;top:${a.top}px;z-index:99;pointer-events:none;margin:0`;document.body.append(c);to.style.opacity=0;
+ c.animate([{transform:'none'},{transform:`translate(${b.left-a.left}px,${b.top-a.top}px) scale(1.08)`}],{duration:440,easing:'cubic-bezier(.3,.7,.2,1)'}).onfinish=()=>{c.remove();to.style.opacity='';pop(to)}};   // P — путь: индексы вариантов от корня
 try{const s=localStorage.getItem('aroma2');if(s)D=JSON.parse(s)}catch(e){}
 const at=p=>p.reduce((f,i)=>f.objs[i].f,D.root),cur=()=>at(P),each=(f,fn)=>{fn(f);f.objs.forEach(o=>o.f&&each(o.f,fn))};
 function fix(){let f=D.root,k=0;while(k<P.length&&f.objs[P[k]]&&f.objs[P[k]].f){f=f.objs[P[k]].f;k++}P=P.slice(0,k)}
 function st(){try{localStorage.setItem('aroma2',JSON.stringify(D))}catch(e){}$('js').value=JSON.stringify(D)}
 function save(){st();render()}
-function addObj(){const f=cur();f.objs.push({t:'',f:f.objs.length?mk():undefined});ed=f.objs.length-1;save()}
-const edit=i=>{ed=i;render()},fin=(i,v)=>{if(ed!=i)return;cur().objs[i].t=v.trim();ed=-1;save()},op=i=>{P.push(i);ed=-1;render()},up=n=>{P=P.slice(0,n);ed=-1;render()};
-function delAt(p,i){const f=at(p),o=f.objs[i];if(o.f&&(o.f.objs.length||o.f.e.length)&&!confirm('Удалить вместе со всем содержимым?'))return;f.objs.splice(i,1);save()}
+function addObj(){const f=cur();f.objs.push({t:'',f:f.objs.length?mk():undefined});ed=fr=f.objs.length-1;save()}
+const edit=i=>{ed=i;render()},fin=(i,v)=>{if(ed!=i)return;cur().objs[i].t=v.trim();ed=-1;fr=i;save()},op=i=>{P.push(i);dir=1;ed=ens().objs[0].t?-1:0;render()},up=n=>{dir=n<P.length?-1:0;P=P.slice(0,n);ed=-1;render()},jump=p=>{P=p;ed=-1;dir=2;render()};
+function delAt(p,i,el){const f=at(p),o=f.objs[i];if(o.f&&(o.f.objs.length||o.f.e.length)&&!confirm('Удалить вместе со всем содержимым?'))return;out(el,()=>{f.objs.splice(i,1);save()})}
 function addEls(){const have=new Set(Object.values(D.els).map(x=>x.toLowerCase()));
- $('nm').value.split(/\n|,/).map(x=>x.trim()).filter(Boolean).forEach(n=>{if(have.has(n.toLowerCase()))return;have.add(n.toLowerCase());D.els['e'+D.n++]=n});$('nm').value='';save()}
-const putEl=id=>{const f=cur();if(!f.e.includes(id))f.e.push(id);save()},takeEl=id=>{const f=cur();f.e=f.e.filter(x=>x!=id);save()};
-function delEl(id){if(!confirm('Удалить элемент «'+D.els[id]+'» везде?'))return;delete D.els[id];each(D.root,f=>f.e=f.e.filter(x=>x!=id));save()}
-const tr=(f,p)=>f.objs.length>1||f.e.length?'<ul>'+f.objs.map((o,i)=>i?`<li><a href="#" onclick="P=[${p.concat(i)}];ed=-1;render();return false">${LT[i-1]||'•'}) ${esc(o.t||'…')}</a> <button class="sm" onclick="delAt([${p}],${i})" aria-label="Удалить" title="Удалить">✕</button>${tr(o.f,p.concat(i))}</li>`:'').join('')+f.e.map(id=>`<li class="m">• ${esc(D.els[id])}</li>`).join('')+'</ul>':'';
-function render(){fix();const f=cur();let g=D.root;const nm=P.map(i=>{const n=(LT[i-1]||'•')+')';g=g.objs[i].f;return n});
- const row=(o,i)=>`<div class="ob"><span class="bd">${i?(LT[i-1]||'•')+')':'?'}</span>`+(ed==i?`<input value="${esc(o.t)}" placeholder="${i?'Ответ':'Вопрос'}" onblur="fin(${i},this.value)" onkeydown="if(event.key=='Enter')this.blur()">`:
-  `<button class="tx" onclick="${i?`op(${i})`:`edit(0)`}">${esc(o.t||'…')}</button>`)+`<button class="ib" onclick="edit(${i})" aria-label="Изменить" title="Изменить">✎</button>`+
-  (i==0&&f.objs.length>1?'':`<button class="ib" onclick="delAt([${P}],${i})" aria-label="Удалить" title="Удалить">✕</button>`)+'</div>';
+ $('nm').value.split(/\n|,/).map(x=>x.trim()).filter(Boolean).forEach(n=>{if(have.has(n.toLowerCase()))return;have.add(n.toLowerCase());{const id='e'+D.n++;D.els[id]=n;fe.push(id)}});$('nm').value='';save()}
+const putEl=(id,b)=>{const f=cur();if(f.e.includes(id))return;const r=b.closest('.ob').querySelector('.tx'),a=r.getBoundingClientRect(),t=r.textContent;f.e.push(id);save();fly(a,t,id)},takeEl=(id,el)=>{const f=cur();out(el,()=>{f.e=f.e.filter(x=>x!=id);save()})};
+function delEl(id,el){if(!confirm('Удалить элемент «'+D.els[id]+'» везде?'))return;out(el,()=>{delete D.els[id];each(D.root,f=>f.e=f.e.filter(x=>x!=id));save()})}
+const tr=(f,p)=>f.objs.length>1||f.e.length?'<ul>'+f.objs.map((o,i)=>i?`<li><a href="#" onclick="jump([${p.concat(i)}]);return false">${LT[i-1]||'•'}) ${esc(o.t||'…')}</a> <button class="sm" onclick="delAt([${p}],${i},this.closest('li'))" aria-label="Удалить" title="Удалить">✕</button>${tr(o.f,p.concat(i))}</li>`:'').join('')+f.e.map(id=>`<li class="m">• ${esc(D.els[id])}</li>`).join('')+'</ul>':'';
+function render(){fix();const f=ens();let g=D.root;const nm=P.map(i=>{const n=(LT[i-1]||'•')+')';g=g.objs[i].f;return n});
+ const row=(o,i)=>`<div class="ob" data-i="${i}"><span class="bd">${i?(LT[i-1]||'•')+')':'?'}</span>`+(ed==i?`<input value="${esc(o.t)}" placeholder="${i?'Ответ':'Задайте вопрос'}" onblur="fin(${i},this.value)" onkeydown="if(event.key=='Enter')this.blur()">`:
+  `<button class="tx" onclick="${i?`op(${i})`:`edit(0)`}">${o.t?esc(o.t):i?'…':'<span class="m">Задайте вопрос</span>'}</button>`)+`<button class="ib" onclick="edit(${i})" aria-label="Изменить" title="Изменить">✎</button>`+
+  (i==0?'':`<button class="ib" onclick="delAt([${P}],${i},this.closest('.ob'))" aria-label="Удалить" title="Удалить">✕</button>`)+'</div>';
  $('w1').innerHTML='<div class="row"><button class="sm" onclick="up(0)" aria-label="Корень" title="Корень">⌂</button>'+nm.map((n,k)=>`<button class="sm" onclick="up(${k+1})">${n}</button>`).join('')+'<span class="sp"></span><button class="ib" onclick="addObj()" aria-label="Добавить объект" title="Добавить объект">+</button></div><div class="scr">'+f.objs.map(row).join('')+
- (f.e.length?'<div>'+f.e.map(id=>`<span class="chip">${esc(D.els[id])} <button class="sm" onclick="takeEl('${id}')" aria-label="Убрать" title="Убрать">✕</button></span>`).join('')+'</div>':'')+'</div>';
+ (f.e.length?'<div>'+f.e.map(id=>`<span class="chip" data-e="${id}">${esc(D.els[id])} <button class="sm" onclick="takeEl('${id}',this.closest('.chip'))" aria-label="Убрать" title="Убрать">✕</button></span>`).join('')+'</div>':'')+'</div>';
  if(ed>=0){const x=$('w1').querySelector('input');if(x){x.focus();x.select()}}
- $('w2').innerHTML=Object.keys(D.els).map(id=>{const h=f.e.includes(id);return `<div class="ob"><span class="tx">${esc(D.els[id])}</span><button class="ib" onclick="putEl('${id}')" ${h?'disabled':''} aria-label="Добавить в папку" title="Добавить в папку">+</button><button class="ib" onclick="delEl('${id}')" aria-label="Удалить везде" title="Удалить везде">✕</button></div>`}).join('')+'<hr>'+tr(D.root,[]);
- let no=0;each(D.root,x=>no+=Math.max(x.objs.length-1,0));$('stat').textContent=no+' ответов, '+Object.keys(D.els).length+' элементов';$('js').value=JSON.stringify(D)}
+ $('w2').innerHTML=Object.keys(D.els).map(id=>{const h=f.e.includes(id);return `<div class="ob" data-id="${id}"><span class="tx">${esc(D.els[id])}</span><button class="ib" onclick="putEl('${id}',this)" ${h?'disabled':''} aria-label="Добавить в папку" title="Добавить в папку">+</button><button class="ib" onclick="delEl('${id}',this.closest('.ob'))" aria-label="Удалить везде" title="Удалить везде">✕</button></div>`}).join('')+'<hr>'+tr(D.root,[]);
+ let no=0;each(D.root,x=>no+=Math.max(x.objs.length-1,0));$('stat').textContent=no+' ответов, '+Object.keys(D.els).length+' элементов';$('js').value=JSON.stringify(D);anim()}
+function anim(){const w=$('w1'),sc=w.querySelector('.scr');if(RM){dir=0;fr=-1;fe=[];return}
+ if(dir==2){w.parentElement.animate([{opacity:.35,transform:'scale(.96)',filter:'blur(4px)'},{opacity:1,transform:'none',filter:'none'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});(document.querySelector('.imgs')||w).scrollIntoView({behavior:'smooth',block:'start'})}
+ else if(dir&&sc)sc.animate([{opacity:0,transform:`translateX(${dir*32}px)`},{opacity:1,transform:'none'}],{duration:260,easing:'ease-out'});
+ dir=0;if(fr>=0){const e=w.querySelector(`.ob[data-i="${fr}"]`);if(e){e.scrollIntoView({block:'nearest'});pop(e)}fr=-1}
+ fe.forEach(id=>{const e=$('w2').querySelector(`[data-id="${id}"]`);if(e){e.scrollIntoView({block:'nearest'});pop(e)}});fe=[];
+ if(ed>=0){const x=w.querySelector('input');x&&pop(x)}}
 function cp(){$('js').select();try{document.execCommand('copy')}catch(e){}}
 function imp(){try{D=JSON.parse($('js').value);if(!D.root)throw 0;P=[];save()}catch(e){alert('Неверный JSON')}}
 window.getD=()=>JSON.stringify(D);window.setD=t=>{D=JSON.parse(t);P=[];save()};
 window.setCnOut=v=>{const pct=(v/10).toFixed(1);document.documentElement.style.setProperty('--cn-out',v/10);$('cnOutVal').textContent=pct+'%';try{localStorage.setItem('cnOut',v)}catch(e){}};
-(function(){let sv=null;try{sv=localStorage.getItem('cnOut')}catch(e){}if(sv==null)sv=140;$('cnOut').value=sv;setCnOut(sv)})();
+(function(){let sv=null;try{sv=localStorage.getItem('cnOut')}catch(e){}if(sv==null)sv=60;$('cnOut').value=sv;setCnOut(sv)})();
 window.setEdge=v=>{document.documentElement.style.setProperty('--eu',v);$('edT').value=v;$('edTVal').textContent=v+' px';try{localStorage.setItem('edgeT',v)}catch(e){}};
-(function(){let sv=null;try{sv=localStorage.getItem('edgeT')}catch(e){}if(sv==null)sv=10;setEdge(sv)})();
+(function(){let sv=null;try{sv=localStorage.getItem('edgeT')}catch(e){}if(sv==null)sv=6;setEdge(sv)})();
 render();
 </script>
 <script type="module">
