@@ -1,18 +1,12 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#070b16"><title>Ароматы — админка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Forum&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script>try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t=="old"?"old":"new"}catch(e){document.documentElement.dataset.theme="new"}</script><link rel="stylesheet" href="style.css"></head><body class="admin"><div id="mist"></div>
+<script>try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t=="old"?"old":"new"}catch(e){document.documentElement.dataset.theme="new"}</script><link rel="stylesheet" href="style.css"><style>.ob{display:flex;align-items:center;gap:6px;margin:4px 0}.bd{width:28px;height:28px;flex:none;display:grid;place-items:center;border:1px solid var(--b2);border-radius:4px;font-size:13px;color:var(--g2)}
+.tx{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;border:0;padding:4px;color:var(--t);font:inherit;cursor:pointer;box-shadow:none}
+.ob input{flex:1;min-width:0}.ib{width:28px;height:28px;padding:0;flex:none;display:grid;place-items:center;font-size:14px}.scr{height:300px;overflow-y:auto;margin:8px 0}#w1 .row{gap:4px}</style></head><body class="admin"><div id="mist"></div>
 <header class="bar"><h1>Админка ароматов</h1><span class="sp"></span><span class="m pill" id="stat"></span><span class="m" id="dbs" role="status"></span><button onclick="dbLoad()">Из БД</button><button class="pri" onclick="dbSave()">☁ Сохранить в БД</button><button class="ico ghost theme" onclick="toggleTheme()" aria-label="Старая тема" title="Старая тема"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button></header>
 <div class="wrap">
 <aside class="side">
-<div class="card frame"><h3>Создать</h3>
-<label class="lbl" for="lv" style="margin-top:0">Уровень</label>
-<div class="row lvl"><input type="range" id="r" aria-label="Уровень, ползунок" min="0" max="9" value="0" oninput="$('lv').value=this.value;picks()"><input type="number" id="lv" min="0" max="9" value="0" oninput="$('r').value=this.value;picks()"></div>
-<div class="m" id="lh"></div>
-<label class="lbl" for="nm">Название</label>
-<textarea id="nm" rows="3" placeholder="Название (ароматы — по одному на строку)"></textarea>
-<div id="p"></div>
-<button class="pri" id="ab" onclick="add()">Добавить</button></div>
 <div class="card deco"><div class="row"><label for="cnOut">Выступ уголков</label><span class="m" id="cnOutVal">0.0%</span></div><input type="range" id="cnOut" min="0" max="1000" step="1" oninput="setCnOut(this.value)">
 <div class="row"><label for="edT">Толщина рамы</label><span class="m" id="edTVal">10 px</span></div><input type="range" id="edT" min="0" max="40" step="1" oninput="setEdge(this.value)"></div>
 <details class="card imgs"><summary>Картинки тем (ZIP → БД)</summary>
@@ -21,49 +15,40 @@
 <div id="imgn" class="m" role="status"></div><div id="imgl"></div></details>
 <details class="card"><summary>JSON: экспорт / импорт</summary><textarea id="js" rows="6" aria-label="JSON"></textarea><div class="row"><button class="sm" onclick="cp()">Копировать</button><button class="sm" onclick="imp()">Применить локально</button><button class="sm pri" style="width:auto;margin:0" onclick="impDb()">Заменить в БД этим JSON</button></div></details>
 </aside>
-<main id="list"></main>
+<main id="list"><div class="card"><div id="w1"></div></div>
+<div class="card"><textarea id="nm" rows="2" placeholder="Новые элементы (по одному на строку)"></textarea><button class="ib" style="width:100%" onclick="addEls()" aria-label="Создать элементы" title="Создать элементы">+</button><div class="scr" id="w2"></div></div></main>
 </div>
 <script src="fx.js"></script>
 <script>
-let D={n:1,nodes:{}},op={};
-try{const s=localStorage.getItem('aroma');if(s)D=JSON.parse(s)}catch(e){}
-const $=i=>document.getElementById(i),V=()=>Object.values(D.nodes),L='АБВГДЕЖЗИК'.split(''),
-esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
-par=id=>V().find(x=>x.ch.includes(id));
-function st(){try{localStorage.setItem('aroma',JSON.stringify(D))}catch(e){}$('js').value=JSON.stringify(D)}
+const $=i=>document.getElementById(i),LT='АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ',
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* папка: {objs:[вопрос, ответ-папка, ...], e:[id элементов]}; objs[0] — всегда вопрос, остальные — варианты ответа (у каждого своя папка f) */
+const mk=()=>({objs:[],e:[]});let D={n:1,els:{},root:mk()},P=[],ed=-1;   // P — путь: индексы вариантов от корня
+try{const s=localStorage.getItem('aroma2');if(s)D=JSON.parse(s)}catch(e){}
+const at=p=>p.reduce((f,i)=>f.objs[i].f,D.root),cur=()=>at(P),each=(f,fn)=>{fn(f);f.objs.forEach(o=>o.f&&each(o.f,fn))};
+function fix(){let f=D.root,k=0;while(k<P.length&&f.objs[P[k]]&&f.objs[P[k]].f){f=f.objs[P[k]].f;k++}P=P.slice(0,k)}
+function st(){try{localStorage.setItem('aroma2',JSON.stringify(D))}catch(e){}$('js').value=JSON.stringify(D)}
 function save(){st();render()}
-function picks(){const l=+$('lv').value;
- $('lh').textContent=l?'Группа уровня '+l+' — выберите, что в неё входит:':'Аромат (уровень 0)';
- const a=V().filter(x=>x.lv==l-1&&!par(x.id)).map(x=>`<label class="chip"><input type="checkbox" class="pick" value="${x.id}"> ${esc(x.name)}</label>`).join('');
- $('p').innerHTML=l?(a||'<span class="m">Нет несортированных элементов уровня '+(l-1)+'</span>'):''}
-function add(){const l=+$('lv').value,t=$('nm').value.trim();if(!t)return;
- const names=l?[t]:t.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
- const c=l?[...document.querySelectorAll('.pick:checked')].map(x=>x.value):[];
- names.forEach(name=>{const id='n'+D.n++;D.nodes[id]={id,name,lv:l,ch:c.slice(),q:null}});$('nm').value='';save()}
-function del(id){delete D.nodes[id];V().forEach(x=>{x.ch=x.ch.filter(i=>i!=id);if(x.q)x.q.o.forEach(o=>{if(o.to==id)o.to=''})});save()}
-function tq(id){const n=D.nodes[id];if(!n.q)n.q={t:'',link:false,o:[]};op[id]=!op[id];render()}
-function sy(id){const n=D.nodes[id],q=n.q;if(!q.link)return;V().forEach(x=>{if(x.id!=id&&x.lv==n.lv)x.q={t:q.t,link:true,o:q.o.map(o=>({l:o.l,to:((x.q&&x.q.o.find(p=>p.l==o.l))||{}).to||''}))}})}
-const uq=(id,v)=>{D.nodes[id].q.t=v;sy(id);st()},
-uo=(id,i,v)=>{D.nodes[id].q.o[i].l=v;sy(id);st()},
-us=(id,i,v)=>{D.nodes[id].q.o[i].to=v;st()},
-lk=(id,v)=>{D.nodes[id].q.link=v;sy(id);save()},
-ao=id=>{const q=D.nodes[id].q;q.o.push({l:q.o.length<10?L[q.o.length]:'',to:''});sy(id);save()},
-dq=(id,i)=>{D.nodes[id].q.o.splice(i,1);sy(id);save()};
-function qe(n){const q=n.q,id=n.id;return `<div class="qe"><textarea rows="2" placeholder="Текст вопроса" oninput="uq('${id}',this.value)">${esc(q.t)}</textarea>
-<label class="m"><input type="checkbox" ${q.link?'checked':''} onchange="lk('${id}',this.checked)"> связать с другими группами этого уровня</label>`+
-q.o.map((o,i)=>`<div class="opt"><input value="${esc(o.l)}" placeholder="значение" oninput="uo('${id}',${i},this.value)"><select onchange="us('${id}',${i},this.value)"><option value="">— куда ведёт —</option>${n.ch.map(c=>`<option value="${c}" ${o.to==c?'selected':''}>${esc(D.nodes[c].name)}</option>`).join('')}</select><button onclick="dq('${id}',${i})" aria-label="Убрать вариант" title="Убрать вариант">✕</button></div>`).join('')+`<button class="sm" onclick="ao('${id}')">+ вариант ответа</button></div>`}
-function card(n){const p=par(n.id);
- return `<div class="card node${n.lv?'':' leaf'}" data-id="${n.id}"><div class="top"><b>${esc(n.name)}</b><span class="chip">${p?'в: '+esc(p.name):'не сортировано'}</span>
- ${n.lv?`<button class="sm" onclick="tq('${n.id}')">${n.q&&n.q.t?'Вопрос ✎':'+ Вопрос'}</button>`:''}<button class="sm" onclick="del('${n.id}')" aria-label="Удалить" title="Удалить">✕</button></div>
- ${n.ch.length?'<div>'+n.ch.map(i=>`<span class="chip">${esc(D.nodes[i].name)}</span>`).join('')+'</div>':''}${op[n.id]&&n.q?qe(n):''}</div>`}
-function render(){picks();let h='';
- for(let l=9;l>=0;l--){const a=V().filter(x=>x.lv==l);if(a.length)h+=`<section><h3>${l?'Группы уровня '+l:'Ароматы'} <span class="chip">${a.length}</span></h3>`+(l?a.map(card).join(''):'<div class="grid">'+a.map(card).join('')+'</div>')+'</section>'}
- $('list').innerHTML=h||'<div class="card m">Здесь пока пусто. Добавьте ароматы слева: уровень 0, названия по одному на строку.</div>';
- $('stat').textContent=V().filter(x=>!x.lv).length+' ароматов, '+V().filter(x=>x.lv).length+' групп';
- $('js').value=JSON.stringify(D);FX.enter('#list .node')}
+function addObj(){const f=cur();f.objs.push({t:'',f:f.objs.length?mk():undefined});ed=f.objs.length-1;save()}
+const edit=i=>{ed=i;render()},fin=(i,v)=>{if(ed!=i)return;cur().objs[i].t=v.trim();ed=-1;save()},op=i=>{P.push(i);ed=-1;render()},up=n=>{P=P.slice(0,n);ed=-1;render()};
+function delAt(p,i){const f=at(p),o=f.objs[i];if(o.f&&(o.f.objs.length||o.f.e.length)&&!confirm('Удалить вместе со всем содержимым?'))return;f.objs.splice(i,1);save()}
+function addEls(){const have=new Set(Object.values(D.els).map(x=>x.toLowerCase()));
+ $('nm').value.split(/\n|,/).map(x=>x.trim()).filter(Boolean).forEach(n=>{if(have.has(n.toLowerCase()))return;have.add(n.toLowerCase());D.els['e'+D.n++]=n});$('nm').value='';save()}
+const putEl=id=>{const f=cur();if(!f.e.includes(id))f.e.push(id);save()},takeEl=id=>{const f=cur();f.e=f.e.filter(x=>x!=id);save()};
+function delEl(id){if(!confirm('Удалить элемент «'+D.els[id]+'» везде?'))return;delete D.els[id];each(D.root,f=>f.e=f.e.filter(x=>x!=id));save()}
+const tr=(f,p)=>f.objs.length>1||f.e.length?'<ul>'+f.objs.map((o,i)=>i?`<li><a href="#" onclick="P=[${p.concat(i)}];ed=-1;render();return false">${LT[i-1]||'•'}) ${esc(o.t||'…')}</a> <button class="sm" onclick="delAt([${p}],${i})" aria-label="Удалить" title="Удалить">✕</button>${tr(o.f,p.concat(i))}</li>`:'').join('')+f.e.map(id=>`<li class="m">• ${esc(D.els[id])}</li>`).join('')+'</ul>':'';
+function render(){fix();const f=cur();let g=D.root;const nm=P.map(i=>{const n=(LT[i-1]||'•')+')';g=g.objs[i].f;return n});
+ const row=(o,i)=>`<div class="ob"><span class="bd">${i?(LT[i-1]||'•')+')':'?'}</span>`+(ed==i?`<input value="${esc(o.t)}" placeholder="${i?'Ответ':'Вопрос'}" onblur="fin(${i},this.value)" onkeydown="if(event.key=='Enter')this.blur()">`:
+  `<button class="tx" onclick="${i?`op(${i})`:`edit(0)`}">${esc(o.t||'…')}</button>`)+`<button class="ib" onclick="edit(${i})" aria-label="Изменить" title="Изменить">✎</button>`+
+  (i==0&&f.objs.length>1?'':`<button class="ib" onclick="delAt([${P}],${i})" aria-label="Удалить" title="Удалить">✕</button>`)+'</div>';
+ $('w1').innerHTML='<div class="row"><button class="sm" onclick="up(0)" aria-label="Корень" title="Корень">⌂</button>'+nm.map((n,k)=>`<button class="sm" onclick="up(${k+1})">${n}</button>`).join('')+'<span class="sp"></span><button class="ib" onclick="addObj()" aria-label="Добавить объект" title="Добавить объект">+</button></div><div class="scr">'+f.objs.map(row).join('')+
+ (f.e.length?'<div>'+f.e.map(id=>`<span class="chip">${esc(D.els[id])} <button class="sm" onclick="takeEl('${id}')" aria-label="Убрать" title="Убрать">✕</button></span>`).join('')+'</div>':'')+'</div>';
+ if(ed>=0){const x=$('w1').querySelector('input');if(x){x.focus();x.select()}}
+ $('w2').innerHTML=Object.keys(D.els).map(id=>{const h=f.e.includes(id);return `<div class="ob"><span class="tx">${esc(D.els[id])}</span><button class="ib" onclick="putEl('${id}')" ${h?'disabled':''} aria-label="Добавить в папку" title="Добавить в папку">+</button><button class="ib" onclick="delEl('${id}')" aria-label="Удалить везде" title="Удалить везде">✕</button></div>`}).join('')+'<hr>'+tr(D.root,[]);
+ let no=0;each(D.root,x=>no+=Math.max(x.objs.length-1,0));$('stat').textContent=no+' ответов, '+Object.keys(D.els).length+' элементов';$('js').value=JSON.stringify(D)}
 function cp(){$('js').select();try{document.execCommand('copy')}catch(e){}}
-function imp(){try{D=JSON.parse($('js').value);if(!D.nodes)throw 0;save()}catch(e){alert('Неверный JSON')}}
-window.getD=()=>JSON.stringify(D);window.setD=t=>{D=JSON.parse(t);save()};
+function imp(){try{D=JSON.parse($('js').value);if(!D.root)throw 0;P=[];save()}catch(e){alert('Неверный JSON')}}
+window.getD=()=>JSON.stringify(D);window.setD=t=>{D=JSON.parse(t);P=[];save()};
 window.setCnOut=v=>{const pct=(v/10).toFixed(1);document.documentElement.style.setProperty('--cn-out',v/10);$('cnOutVal').textContent=pct+'%';try{localStorage.setItem('cnOut',v)}catch(e){}};
 (function(){let sv=null;try{sv=localStorage.getItem('cnOut')}catch(e){}if(sv==null)sv=140;$('cnOut').value=sv;setCnOut(sv)})();
 window.setEdge=v=>{document.documentElement.style.setProperty('--eu',v);$('edT').value=v;$('edTVal').textContent=v+' px';try{localStorage.setItem('edgeT',v)}catch(e){}};
@@ -73,13 +58,13 @@ render();
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import{getFirestore,doc,getDoc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree");
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree2");
 const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
 window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}},
  async()=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-meta")),tmo()]);return x.exists()?x.data().files||{}:{}}catch(e){return null}});
 const st=t=>document.getElementById("dbs").textContent=t;
 window.dbSave=async()=>{st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:getD(),cnOut:+$('cnOut').value,edgeT:+$('edT').value,updatedAt:serverTimestamp()}),tmo()]);st("Сохранено "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
-window.impDb=async()=>{let parsed;try{parsed=JSON.parse(document.getElementById("js").value);if(!parsed.nodes)throw 0}catch(e){alert("Неверный JSON");return}
+window.impDb=async()=>{let parsed;try{parsed=JSON.parse(document.getElementById("js").value);if(!parsed.root)throw 0}catch(e){alert("Неверный JSON");return}
  if(!confirm("Заменить данные в БД содержимым поля JSON? Текущие данные в БД будут перезаписаны."))return;
  st("Сохраняем…");try{await Promise.race([setDoc(ref,{json:JSON.stringify(parsed),cnOut:+$('cnOut').value,edgeT:+$('edT').value,updatedAt:serverTimestamp()}),tmo()]);window.setD(JSON.stringify(parsed));st("Сохранено в БД "+new Date().toLocaleTimeString("ru-RU"))}catch(e){st("Ошибка: "+e.message)}};
 window.dbLoad=async()=>{if(!confirm("Заменить текущие данные данными из БД?"))return;st("Загружаем…");try{const x=await Promise.race([getDoc(ref),tmo()]);if(!x.exists()){st("В БД пока пусто");return}const v=x.data();setD(v.json);if(v.cnOut!=null)setCnOut(v.cnOut);if(v.edgeT!=null)setEdge(v.edgeT);st("Загружено из БД")}catch(e){st("Ошибка: "+e.message)}};

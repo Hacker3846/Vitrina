@@ -15,44 +15,33 @@
 </main>
 <script src="fx.js"></script>
 <script>
-let D,cur,gone,hist,roots,tot=1;
-const $=i=>document.getElementById(i),
+let D,path,hist,tot=1;
+const $=i=>document.getElementById(i),LT='АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ',
 esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const node=id=>id=='*'?{id:'*',lv:99,name:'Старт',ch:roots.map(r=>r.id),q:null}:D.nodes[id];
-const dr=o=>{$('dr').classList.toggle('open',!!o);$('sh').classList.toggle('open',!!o);if(o)setTimeout(()=>$('dc').focus(),50)};
+const fol=()=>path.reduce((f,i)=>f.objs[i].f,D.root),
+ids=f=>{const s=new Set(f.e);f.objs.forEach(o=>o.f&&ids(o.f).forEach(x=>s.add(x)));return s},
+dr=o=>{$('dr').classList.toggle('open',!!o);$('sh').classList.toggle('open',!!o);if(o)setTimeout(()=>$('dc').focus(),50)};
 addEventListener('keydown',e=>{if(e.key=='Escape')dr(0)});
-function load(t){try{D=JSON.parse(t);if(!D.nodes)throw 0}catch(e){$('err').textContent='Неверный JSON';return}
- const all=Object.values(D.nodes),hp=new Set(all.flatMap(x=>x.ch)),gs=all.filter(x=>x.lv>0&&!hp.has(x.id));
- if(!gs.length){$('err').textContent='В БД пока нет групп — сохраните тест из админки.';return}
- const top=Math.max(...gs.map(x=>x.lv));roots=gs.filter(x=>x.lv==top);
+function load(t){try{D=JSON.parse(t);if(!D.root)throw 0}catch(e){$('err').textContent='Неверный JSON';return}
+ if(!D.root.objs.length&&!D.root.e.length){$('err').textContent='В БД пока пусто — сохраните тест из админки.';return}
  $('err').textContent='';$('ld').hidden=true;$('t').hidden=false;start()}
-function start(){hist=[];gone=new Set();cur=roots.length==1?roots[0].id:'*';tot=roots.reduce((s,r)=>s+cnt(r.id),0);dr(0);show()}
-function sub(id){gone.add(id);(D.nodes[id].ch||[]).forEach(sub)}
-function go(to,i){const n=node(cur),l=n.q&&n.q.o[i]?n.q.o[i].l:D.nodes[to].name;
- hist.push({cur,gone:new Set(gone),l,q:n.q&&n.q.t?n.q.t:'Выбор группы'});n.ch.forEach(c=>{if(c!=to)sub(c)});cur=to;show()}
-function back(){dr(0);if(hist.length){const h=hist.pop();cur=h.cur;gone=h.gone;show()}}
-function cnt(id){if(gone.has(id))return 0;const n=D.nodes[id];return n.lv==0?1:n.ch.reduce((s,c)=>s+cnt(c),0)}
-function tr(id){const n=D.nodes[id];return `<li class="${gone.has(id)?'x':''}${id==cur?' cu':''}">${esc(n.name)}${n.ch.length?'<ul>'+n.ch.map(tr).join('')+'</ul>':''}</li>`}
-function show(){const n=node(cur);let h='';
- const bk=hist.length?'<button class="ghost" onclick="back()">← Назад</button>':'';
- if(n.lv==0)h=`<div class="res"><div class="kick">Результат</div><div class="qt">Ваш аромат — ${esc(n.name)}</div><div class="orn" aria-hidden="true"></div><p>Он подходит под все ваши ответы.</p><div class="nav">${bk}<button class="pri" onclick="start()">↻ Пройти заново</button></div></div>`;
- else if(n.lv==1&&(!n.q||!n.q.t)){
-  h=`<div class="res"><div class="kick">Результат</div><div class="qt">Ваши ароматы — ${esc(n.name)}</div><div class="orn" aria-hidden="true"></div><p>Вам подходит любой из этой группы:</p><ul class="res-list">`+
-  n.ch.map(c=>`<li>${esc(D.nodes[c].name)}</li>`).join('')+`</ul><div class="nav">${bk}<button class="pri" onclick="start()">↻ Пройти заново</button></div></div>`;
- }
- else{const o=n.q&&n.q.o.length;
-  h=`<div class="kick">Шаг ${hist.length+1}</div><div class="qt">${o?esc(n.q.t||'Выберите вариант'):'Выберите группу'}</div><div class="opts">`+
-  (o?n.q.o.map((x,i)=>`<button ${x.to&&D.nodes[x.to]?`onclick="go('${x.to}',${i})"`:'disabled'}>${esc(x.l)}</button>`).join(''):n.ch.map(c=>`<button onclick="go('${c}')">${esc(D.nodes[c].name)}</button>`).join(''))+'</div>'+(bk?`<div class="nav">${bk}</div>`:'')}
+function start(){path=[];hist=[];tot=Math.max(ids(D.root).size,1);dr(0);show()}
+function go(i){const f=fol();hist.push({q:f.objs[0].t||'Выбор',l:(LT[i-1]||'•')+') '+f.objs[i].t});path.push(i);show()}
+function back(){dr(0);if(hist.length){hist.pop();path.pop();show()}}
+const tr=(f,p)=>'<ul>'+f.objs.slice(1).map((o,k)=>`<li class="${path.join()==p.concat(k+1).join()?'cu':''}">${LT[k]||'•'}) ${esc(o.t)}${tr(o.f,p.concat(k+1))}</li>`).join('')+f.e.map(id=>`<li>${esc(D.els[id])}</li>`).join('')+'</ul>';
+function show(){const f=fol(),bk=hist.length?'<button class="ghost" onclick="back()">← Назад</button>':'',n=f.objs.length-1;let h;
+ if(n>0)h=`<div class="kick">Шаг ${hist.length+1}</div><div class="qt">${esc(f.objs[0].t||'Выберите вариант')}</div><div class="opts">`+f.objs.slice(1).map((o,k)=>`<button onclick="go(${k+1})">${LT[k]||'•'}) ${esc(o.t)}</button>`).join('')+'</div>'+(bk?`<div class="nav">${bk}</div>`:'');
+ else{const e=f.e.map(id=>D.els[id]).filter(Boolean);
+  h=`<div class="res"><div class="kick">Результат</div><div class="qt">${e.length==1?'Ваш аромат — '+esc(e[0]):e.length?'Ваши ароматы':'Здесь пока ничего нет'}</div><div class="orn" aria-hidden="true"></div>`+(e.length>1?'<p>Вам подходит любой из этой группы:</p><ul class="res-list">'+e.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'')+`<div class="nav">${bk}<button class="pri" onclick="start()">↻ Пройти заново</button></div></div>`}
  $('q').innerHTML=h;FX.enter('#q>*,#q button',1);
- const rem=roots.reduce((s,r)=>s+cnt(r.id),0);
- $('cnt').textContent='Осталось: '+rem;$('pb').style.width=(tot>1?100*(tot-rem)/(tot-1):100)+'%';
+ const rem=ids(f).size;$('cnt').textContent='Осталось: '+rem;$('pb').style.width=(tot>1?100*(tot-rem)/(tot-1):100)+'%';
  $('path').innerHTML=hist.map(x=>`<li><span class="m">${esc(x.q)}</span><br><b>${esc(x.l)}</b></li>`).join('');$('pe').hidden=!!hist.length;
- $('tree').innerHTML='<ul>'+roots.map(r=>tr(r.id)).join('')+'</ul>'}
+ $('tree').innerHTML=tr(D.root,[])}
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree");
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));const ref=doc(db,"aroma","tree2");
 const tmo=()=>new Promise((_,r)=>setTimeout(()=>r(new Error("нет ответа от БД")),12000));
 window.dbImgSet&&dbImgSet(async k=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-"+k)),tmo()]);return x.exists()&&x.data().data||null}catch(e){return null}},
  async()=>{try{const x=await Promise.race([getDoc(doc(db,"aroma","img-meta")),tmo()]);return x.exists()?x.data().files||{}:{}}catch(e){return null}});
