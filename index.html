@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>ALFIYA Perfume</title>
+<style>
+/* Фирменные шрифты Gotham Pro: Black и Bold — заголовки, Regular — подзаголовки и текст */
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Reg.otf") format("opentype");font-weight:400;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bol.otf") format("opentype");font-weight:700;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bla.otf") format("opentype");font-weight:900;font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+ --ink:#111111;      /* чёрный матовый  RGB 17 17 17  · CMYK 73 67 66 83 */
+ --copper:#c58457;   /* медный          RGB 197 132 87 · CMYK 21 52 72 3 */
+ --light:#f3f3f5;    /* светлый         RGB 243 243 245 · CMYK 3 2 2 0 */
+ --grey:#8a8a8f;--line:#e2e2e6;
+ --ease:cubic-bezier(.22,.9,.28,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:"Gotham Pro",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-weight:400;color:var(--ink);background:var(--light);line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.b9{font-weight:900}
+.b7{font-weight:700}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- Шапка ---------- */
+header.top{position:sticky;top:0;z-index:30;background:var(--ink);border-bottom:1px solid rgba(197,132,87,.35)}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:68px}
+header.top img.lg{height:44px;width:auto;display:block}
+.sp{flex:1}
+.cartbtn{position:relative;display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 20px 0 16px;border:1.5px solid var(--copper);background:transparent;color:var(--copper);border-radius:23px;font-size:15px;font-weight:700;letter-spacing:.04em;transition:background .25s,color .25s,transform .25s}
+.cartbtn:hover{background:var(--copper);color:var(--ink)}
+.cartbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cartbtn .n{min-width:22px;height:22px;border-radius:11px;background:var(--copper);color:var(--ink);font-size:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;transition:background .25s,color .25s}
+.cartbtn:hover .n{background:var(--ink);color:var(--copper)}
+.cartbtn.bump{animation:bump .5s var(--ease)}
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.14) rotate(-3deg)}100%{transform:scale(1)}}
+@media(max-width:520px){.cartbtn .w{display:none}.cartbtn{padding:0 14px}header.top img.lg{height:38px}}
+
+/* ---------- Hero с фирменным паттерном ---------- */
+.hero{position:relative;background:var(--ink) url("assets/pattern.png") 50% 0/170px;color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(17,17,17,.92) 0%,rgba(17,17,17,.75) 45%,rgba(17,17,17,.35) 100%)}
+.hero .wrap{position:relative;padding-top:54px;padding-bottom:54px;text-align:center}
+.hero .kick{color:var(--copper);font-size:13px;letter-spacing:.38em;text-transform:uppercase;font-weight:400}
+.hero h1{font-size:clamp(34px,7vw,66px);line-height:1.04;margin-top:14px;letter-spacing:.01em}
+.hero h1 em{font-style:normal;color:var(--copper)}
+.hero p{max-width:520px;margin:16px auto 0;color:rgba(243,243,245,.72);font-size:16px}
+.ctc{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.ctc a{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 20px;border-radius:24px;border:1.5px solid rgba(197,132,87,.7);color:#fff;text-decoration:none;font-size:15px;font-weight:700;background:rgba(17,17,17,.55);backdrop-filter:blur(4px);transition:background .25s,color .25s,border-color .25s,transform .25s}
+.ctc a:hover{background:var(--copper);color:var(--ink);border-color:var(--copper);transform:translateY(-2px)}
+.ctc svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ctc a.wa{background:var(--copper);color:var(--ink);border-color:var(--copper)}
+.ctc a.wa:hover{background:#fff;border-color:#fff}
+
+/* ---------- Каталог ---------- */
+.tools{padding:26px 0 4px}
+.search{width:100%;height:50px;border:1.5px solid var(--line);border-radius:25px;padding:0 22px;font:inherit;font-size:16px;outline:none;background:#fff;transition:border-color .2s}
+.search:focus{border-color:var(--copper)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:19px;height:38px;padding:0 18px;font-size:14px;color:var(--ink);transition:all .2s}
+.chip:hover{border-color:var(--copper)}
+.chip.on{background:var(--ink);color:var(--copper);border-color:var(--ink);font-weight:700}
+section.grp{padding:42px 0 6px}
+.grp h2{font-size:clamp(32px,6.4vw,58px);color:#000;line-height:1.02;letter-spacing:-.01em}
+.grp h2::after{content:"";display:block;width:56px;height:3px;background:var(--copper);margin-top:14px;border-radius:2px}
+.grp p.d{font-size:14px;color:var(--grey);margin-top:12px;max-width:640px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(224px,1fr));gap:20px;margin-top:24px}
+.card{background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line);transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(17,17,17,.12);border-color:rgba(197,132,87,.5)}
+.im{aspect-ratio:1/1;background:var(--ink) url("assets/pattern.png") 0 0/96px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.im img{width:100%;height:100%;object-fit:cover;display:block;position:relative}
+.im::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(17,17,17,.9) 0%,rgba(17,17,17,.55) 100%)}
+.im img.ph{position:relative;width:64%;height:auto;object-fit:contain}
+.inf{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.br{font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.18em;font-weight:400}
+.nm{font-size:18px;font-weight:700;margin-top:3px;line-height:1.2}
+.pr{font-size:18px;font-weight:900;margin-top:10px}
+.add{margin-top:auto;margin-top:14px;height:44px;width:100%;border:1.5px solid var(--ink);background:var(--ink);color:var(--copper);border-radius:12px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background .25s,color .25s,transform .15s}
+.add:hover{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.add:active{transform:scale(.97)}
+.add.done{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.demo{margin-top:18px;font-size:13px;color:var(--grey);padding:10px 14px;background:#fff;border:1px dashed var(--copper);border-radius:12px;display:inline-block}
+.state{padding:80px 0;text-align:center;color:var(--grey)}
+
+footer{margin-top:70px;background:var(--ink) url("assets/pattern.png") 50% 0/170px;color:rgba(243,243,245,.75);position:relative}
+footer::before{content:"";position:absolute;inset:0;background:rgba(17,17,17,.88)}
+footer .wrap{position:relative;padding:44px 20px;display:flex;gap:30px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+footer img{height:56px}
+footer b{color:var(--copper);display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;font-weight:400}
+
+/* ---------- Корзина (выезжающее окно) ---------- */
+#ov{position:fixed;inset:0;background:rgba(17,17,17,.55);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;z-index:60}
+#ov.open{opacity:1;visibility:visible}
+#drw{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--light);z-index:61;display:flex;flex-direction:column;transform:translateX(104%);visibility:hidden;transition:transform .55s var(--ease),visibility 0s linear .55s,box-shadow .55s;box-shadow:none}
+#drw.open{transform:none;visibility:visible;transition:transform .55s var(--ease),visibility 0s,box-shadow .55s;box-shadow:-20px 0 60px rgba(0,0,0,.35)}
+.dh{background:var(--ink) url("assets/pattern.png") 0 0/160px;position:relative;color:#fff;padding:0 20px;height:72px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--copper)}
+.dh::before{content:"";position:absolute;inset:0;background:rgba(17,17,17,.82)}
+.dh>*{position:relative}
+.dh h3{font-size:20px;letter-spacing:.04em}
+.dh .cn{color:var(--copper);font-weight:700;font-size:14px}
+.xb{width:42px;height:42px;border-radius:21px;border:1.5px solid rgba(197,132,87,.7);background:transparent;color:var(--copper);display:flex;align-items:center;justify-content:center;transition:all .25s}
+.xb:hover{background:var(--copper);color:var(--ink);transform:rotate(90deg)}
+.xb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.dl{flex:1;overflow-y:auto;padding:14px 18px}
+.ci{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:10px;margin-bottom:10px;border:1px solid var(--line);animation:inr .5s var(--ease) both}
+@keyframes inr{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.ci .pi{width:64px;height:64px;border-radius:10px;background:var(--ink) url("assets/pattern.png") 0 0/70px;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.ci .pi img{width:100%;height:100%;object-fit:cover;display:block}
+.ci .pi img.ph{width:78%;height:auto;object-fit:contain}
+.ci .tx{flex:1;min-width:0}
+.ci .tx .b{font-size:10px;color:var(--copper);letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.ci .tx .n{font-weight:700;font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
+.ci .tx .p{font-size:14px;color:var(--grey);margin-top:2px}
+.qt{display:flex;align-items:center;gap:2px;margin-top:6px}
+.qt button{width:30px;height:30px;border-radius:15px;border:1.5px solid var(--line);background:#fff;font-size:16px;line-height:1;color:var(--ink);transition:all .2s}
+.qt button:hover{border-color:var(--copper);background:var(--copper)}
+.qt span{min-width:28px;text-align:center;font-weight:700}
+.rm{width:34px;height:34px;border:0;background:transparent;color:var(--grey);border-radius:17px;flex:none;transition:all .2s}
+.rm:hover{background:#f6e4da;color:var(--copper)}
+.rm svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.emp{text-align:center;color:var(--grey);padding:60px 20px}
+.emp img{width:120px;opacity:.85;margin-bottom:14px}
+.df{padding:16px 20px calc(18px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line)}
+.tt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.tt span{color:var(--grey);font-size:14px}
+.tt b{font-size:24px;font-weight:900}
+.ord{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border-radius:26px;background:var(--copper);color:var(--ink);border:0;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .25s,transform .15s}
+.ord:hover{background:var(--ink);color:var(--copper)}
+.ord:active{transform:scale(.98)}
+.ord svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ord[aria-disabled=true]{opacity:.4;pointer-events:none}
+.clr{margin-top:10px;width:100%;background:transparent;border:0;color:var(--grey);font-size:13px;height:32px}
+.clr:hover{color:var(--ink);text-decoration:underline}
+.sec{display:flex;gap:8px;margin-top:10px}
+.sec a{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:21px;border:1.5px solid var(--line);color:var(--ink);text-decoration:none;font-size:14px;font-weight:700;transition:all .2s}
+.sec a:hover{border-color:var(--copper);color:var(--copper)}
+.sec svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+body.lock{overflow:hidden}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}.nm{font-size:16px}.inf{padding:12px}.hero .wrap{padding-top:40px;padding-bottom:40px}.ctc a{padding:0 16px;height:44px;font-size:14px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+ <img class="lg" src="assets/logo-horizontal.png" alt="ALFIYA Perfume" id="hlogo">
+ <span class="sp"></span>
+ <button class="cartbtn" id="cartBtn" aria-label="Открыть корзину">
+  <svg viewBox="0 0 24 24"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.500" cy="19.500" r="1.300"/><circle cx="17" cy="19.500" r="1.300"/></svg>
+  <span class="w">Корзина</span><span class="n" id="cartN">0</span>
+ </button>
+</div></header>
+
+<section class="hero"><div class="wrap">
+ <div class="kick" id="heroKick">Perfume</div>
+ <h1 id="heroTitle">Ароматы, которые<br><em>остаются с вами</em></h1>
+ <p>Выберите аромат, добавьте в корзину и отправьте заказ в один клик. Или свяжитесь с нами напрямую.</p>
+ <div class="ctc" id="contacts"></div>
+</div></section>
+
+<main class="wrap">
+ <div class="tools"><input class="search" type="search" id="q" placeholder="Поиск по названию или бренду"><div class="chips" id="chips"></div></div>
+ <div id="list"><div class="state">Загрузка…</div></div>
+</main>
+
+<footer><div class="wrap">
+ <img src="assets/logo-horizontal.png" alt="ALFIYA Perfume">
+ <div id="foot"></div>
+</div></footer>
+
+<div id="ov"></div>
+<aside id="drw" role="dialog" aria-modal="true" aria-label="Корзина" aria-hidden="true">
+ <div class="dh"><h3>Корзина</h3><span class="cn" id="dCnt"></span><span class="sp"></span>
+  <button class="xb" id="dClose" aria-label="Закрыть корзину"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dl" id="dList"></div>
+ <div class="df">
+  <div class="tt"><span>Итого</span><b id="dTot">0</b></div>
+  <a class="ord" id="ordBtn" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.8A9 9 0 1 1 8 19.5L3 21z"/><path d="M9 8.500c0 4 2.500 6.500 6.500 6.500l1-1.500-2-1-1 .8c-1-.4-2-1.400-2.400-2.400l.8-1-1-2L9 8.500z"/></svg>Оформить в WhatsApp</a>
+  <div class="sec" id="dSec"></div>
+  <button class="clr" id="dClr">Очистить корзину</button>
+ </div>
+</aside>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import{getFirestore,collection,doc,getDoc,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Пробные контакты — показываются, пока в админке ничего не сохранено */
+const DEMO_C={shopName:"ALFIYA Perfume",phone:"+7 900 123-45-67",whatsapp:"+7 900 123-45-67",instagram:"@alfiya.perfume",address:"г. Москва, ул. Примерная, д. 1",currency:"₽"};
+/* Пробные ароматы — только пока в базе нет ни одного */
+const DEMO_G=[{id:"d-g1",name:"Для неё",desc:"Цветочные и сладкие ноты, которые подчёркивают женственность.",order:1},{id:"d-g2",name:"Для него",desc:"Древесные и пряные композиции для уверенного характера.",order:2}];
+const DEMO_B={"d-b1":"Brand One","d-b2":"Brand Two"};
+const DEMO_P=[
+ {id:"d-p1",name:"Rose Noir",brandId:"d-b1",groupId:"d-g1",price:4500,img:""},
+ {id:"d-p2",name:"Velvet Musk",brandId:"d-b2",groupId:"d-g1",price:5200,img:""},
+ {id:"d-p3",name:"Amber Wood",brandId:"d-b1",groupId:"d-g2",price:4900,img:""},
+ {id:"d-p4",name:"Black Oud",brandId:"d-b2",groupId:"d-g2",price:6300,img:""}];
+
+let groups=[],brands={},perfumes=[],C={...DEMO_C},brandSel="",demo=false;
+let cart={};try{cart=JSON.parse(localStorage.getItem("alfiya-cart")||"{}")||{}}catch(e){}
+const saveCart=()=>{try{localStorage.setItem("alfiya-cart",JSON.stringify(cart))}catch(e){}};
+const cur=()=>C.currency||"₽";
+const money=n=>Number(n||0).toLocaleString("ru-RU")+" "+cur();
+const digits=s=>String(s||"").replace(/[^\d]/g,"");
+
+const IC={
+ phone:'<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+ wa:'<svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.8A9 9 0 1 1 8 19.5L3 21z"/><path d="M9 8.5c0 4 2.5 6.5 6.5 6.5l1-1.5-2-1-1 .8c-1-.4-2-1.4-2.4-2.4l.8-1-1-2L9 8.5z"/></svg>',
+ ig:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.500" cy="6.500" r="1" fill="currentColor"/></svg>',
+ pin:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg>'};
+const igUrl=v=>/^https?:/.test(v)?v:"https://instagram.com/"+String(v).replace(/^@/,"");
+const waUrl=(txt)=>"https://wa.me/"+digits(C.whatsapp)+(txt?"?text="+encodeURIComponent(txt):"");
+
+function renderContacts(){
+ document.title=C.shopName||"ALFIYA Perfume";
+ const a=[];
+ if(C.whatsapp)a.push(`<a class="wa" href="${esc(waUrl())}" target="_blank" rel="noopener">${IC.wa}WhatsApp</a>`);
+ if(C.phone)a.push(`<a href="tel:+${esc(digits(C.phone))}">${IC.phone}${esc(C.phone)}</a>`);
+ if(C.instagram)a.push(`<a href="${esc(igUrl(C.instagram))}" target="_blank" rel="noopener">${IC.ig}Instagram</a>`);
+ if(C.address)a.push(`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(C.address)}" target="_blank" rel="noopener">${IC.pin}Адрес</a>`);
+ $("contacts").innerHTML=a.join("");
+ const f=[];if(C.address)f.push(`<b>Адрес</b>${esc(C.address)}`);if(C.phone)f.push(`<b style="margin-top:12px">Телефон</b>${esc(C.phone)}`);
+ $("foot").innerHTML=f.join("");
+ $("dSec").innerHTML=(C.phone?`<a href="tel:+${esc(digits(C.phone))}">${IC.phone}Позвонить</a>`:"")+(C.instagram?`<a href="${esc(igUrl(C.instagram))}" target="_blank" rel="noopener">${IC.ig}Instagram</a>`:"");
+ updateCart();
+}
+
+/* ---------- Каталог ---------- */
+const ph='<img class="ph" src="assets/logo-horizontal.png" alt="">';
+function cardHtml(p){const b=brands[p.brandId]||"";const inC=cart[p.id]>0;
+ return `<article class="card"><div class="im">${p.img?`<img loading="lazy" src="${p.img}" alt="${esc(p.name)}">`:ph}</div><div class="inf">${b?`<div class="br">${esc(b)}</div>`:""}<div class="nm">${esc(p.name)}</div>${p.price!==""&&p.price!=null?`<div class="pr">${money(p.price)}</div>`:""}<button class="add${inC?" done":""}" data-add="${esc(p.id)}">${inC?"В корзине · "+cart[p.id]:"В корзину"}</button></div></article>`}
+function render(){
+ const s=$("q").value.trim().toLowerCase();
+ const ok=p=>(!brandSel||p.brandId==brandSel)&&(!s||(p.name+" "+(brands[p.brandId]||"")).toLowerCase().includes(s));
+ const used=[...new Set(perfumes.map(p=>p.brandId))].filter(id=>brands[id]).sort((a,b)=>brands[a].localeCompare(brands[b]));
+ $("chips").innerHTML=used.length?`<button class="chip ${brandSel?"":"on"}" data-b="">Все бренды</button>`+used.map(id=>`<button class="chip ${brandSel==id?"on":""}" data-b="${esc(id)}">${esc(brands[id])}</button>`).join(""):"";
+ let h="";
+ for(const g of [...groups,{id:"",name:"Другое",desc:""}]){
+  const items=perfumes.filter(p=>(g.id?p.groupId==g.id:!groups.some(x=>x.id==p.groupId))&&ok(p));
+  if(!items.length)continue;
+  h+=`<section class="grp"><h2>${esc(g.name)}</h2>${g.desc?`<p class="d">${esc(g.desc)}</p>`:""}<div class="grid">${items.map(cardHtml).join("")}</div></section>`}
+ if(demo)h='<div class="demo">Это демо-ароматы. Добавьте свои в админке — демо исчезнет.</div>'+h;
+ $("list").innerHTML=h||'<div class="state">Ничего не найдено</div>'}
+$("q").oninput=render;
+$("chips").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;brandSel=b.dataset.b;render()};
+$("list").onclick=e=>{const b=e.target.closest("[data-add]");if(!b)return;
+ const id=b.dataset.add;cart[id]=(cart[id]||0)+1;saveCart();
+ const bt=$("cartBtn");bt.classList.remove("bump");void bt.offsetWidth;bt.classList.add("bump");
+ b.classList.add("done");b.textContent="В корзине · "+cart[id];updateCart()};
+
+/* ---------- Корзина ---------- */
+function lines(){return Object.keys(cart).map(id=>({p:perfumes.find(x=>x.id==id),q:cart[id]})).filter(x=>x.p&&x.q>0)}
+function updateCart(){
+ const L=lines(),n=L.reduce((s,x)=>s+x.q,0),tot=L.reduce((s,x)=>s+x.q*(Number(x.p.price)||0),0);
+ $("cartN").textContent=n;$("dCnt").textContent=n?n+" шт.":"";
+ $("dTot").textContent=money(tot);
+ $("dList").innerHTML=L.length?L.map(({p,q})=>{const b=brands[p.brandId]||"";
+  return `<div class="ci"><div class="pi">${p.img?`<img src="${p.img}" alt="">`:ph}</div><div class="tx">${b?`<div class="b">${esc(b)}</div>`:""}<div class="n">${esc(p.name)}</div><div class="p">${p.price!==""&&p.price!=null?money(p.price):""}</div><div class="qt"><button data-m="${esc(p.id)}" aria-label="Меньше">−</button><span>${q}</span><button data-p="${esc(p.id)}" aria-label="Больше">+</button></div></div><button class="rm" data-r="${esc(p.id)}" aria-label="Удалить"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div>`}).join(""):
+  '<div class="emp"><img src="assets/logo-stack-black.png" alt=""><div class="b7">Корзина пуста</div>Добавьте ароматы из каталога</div>';
+ const ob=$("ordBtn");ob.setAttribute("aria-disabled",L.length&&C.whatsapp?"false":"true");
+ let t="Здравствуйте! Хочу заказать:\n"+L.map((x,i)=>`${i+1}. ${(brands[x.p.brandId]?brands[x.p.brandId]+" ":"")+x.p.name} × ${x.q}${x.p.price!==""&&x.p.price!=null?" — "+money(x.q*x.p.price):""}`).join("\n")+"\n\nИтого: "+money(tot);
+ ob.href=L.length&&C.whatsapp?waUrl(t):"#";
+ $("dClr").style.display=L.length?"":"none";
+ document.querySelectorAll("[data-add]").forEach(b=>{const id=b.dataset.add,c=cart[id]>0;b.classList.toggle("done",c);b.textContent=c?"В корзине · "+cart[id]:"В корзину"});
+}
+$("dList").onclick=e=>{
+ const m=e.target.closest("[data-m]"),p=e.target.closest("[data-p]"),r=e.target.closest("[data-r]");
+ if(m){const id=m.dataset.m;cart[id]=(cart[id]||0)-1;if(cart[id]<=0)delete cart[id]}
+ else if(p){const id=p.dataset.p;cart[id]=(cart[id]||0)+1}
+ else if(r)delete cart[r.dataset.r];else return;
+ saveCart();updateCart()};
+$("dClr").onclick=()=>{cart={};saveCart();updateCart()};
+function drawer(o){$("drw").classList.toggle("open",o);$("ov").classList.toggle("open",o);$("drw").setAttribute("aria-hidden",!o);document.body.classList.toggle("lock",o);if(o)setTimeout(()=>$("dClose").focus(),300)}
+$("cartBtn").onclick=()=>drawer(true);$("dClose").onclick=()=>drawer(false);$("ov").onclick=()=>drawer(false);
+addEventListener("keydown",e=>{if(e.key=="Escape")drawer(false)});
+
+/* ---------- Загрузка данных ---------- */
+renderContacts();
+(async()=>{
+ try{
+  const col=collection(db,"aroma");
+  const [c,g,b,p]=await Promise.all([getDoc(doc(db,"aroma","shop-contacts")),
+   getDocs(query(col,where("kind","==","shop-group"))),getDocs(query(col,where("kind","==","shop-brand"))),getDocs(query(col,where("kind","==","shop-perfume")))]);
+  if(c.exists())C=c.data();
+  groups=g.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
+  b.docs.forEach(d=>brands[d.id]=d.data().name);
+  perfumes=p.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if(!perfumes.length){demo=true;groups=DEMO_G;brands=DEMO_B;perfumes=DEMO_P}
+ }catch(e){
+  demo=true;groups=DEMO_G;brands=DEMO_B;perfumes=DEMO_P;
+ }
+ renderContacts();render();
+})();
+</script>
+</body>
+</html>
