@@ -44,6 +44,36 @@ button.b:disabled{opacity:.5;cursor:wait}
 .prev{margin-top:10px}.prev img{width:120px;height:120px;object-fit:cover;border-radius:12px;display:block;border:1px solid var(--line)}
 .prev button{margin-top:8px;height:34px;font-size:13px}
 .hint{font-size:12px;color:var(--grey);margin-top:6px}
+.prev img{object-fit:contain!important;background:#1a1a1a}
+.fg{margin-top:12px;border:1px dashed #c9a27f;background:#fffaf5;border-radius:12px;padding:12px}
+.fg .fgrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fg .fgrow label.chk{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);font-size:14px}
+.fg .fgrow input[type=checkbox]{width:auto}
+.fg details{margin-top:10px;font-size:13px;color:var(--grey)}
+.fg summary{cursor:pointer}
+.fg-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px}
+.fg-res:empty{display:none}
+.fg-c{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:6px}
+.fg-c:hover{border-color:#c58457}
+.fg-c img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#f1f1f1;border-radius:8px}
+.fg-c b{font-size:13px;line-height:1.2}
+.fg-c span{font-size:12px;color:var(--grey)}
+.fg-msg{font-size:13px;margin-top:8px;color:var(--grey)}
+.fg-msg.err{color:var(--red)}
+.chk2{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:14px;color:var(--ink)}
+.chk2 input{width:auto}
+.bk{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.bk:first-child{border-top:0}
+.bk-img{width:64px;height:64px;border-radius:10px;background:#1a1a1a;overflow:hidden}
+.bk-img img{width:100%;height:100%;object-fit:contain;display:block}
+.bk-f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.bk-f input,.bk-f select{padding:8px 10px;font-size:15px}
+.bk-st{font-size:12px;color:var(--grey)}
+.bk-st.warn{color:#b26a00}
+.bk-r{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.bk-r select{flex:1 1 150px;min-width:0;padding:9px 10px;font-size:15px}
+.bk-r input{flex:0 0 110px;width:110px;padding:9px 10px;font-size:15px}
+.bk-r button{height:40px;padding:0 14px;font-size:14px}
 </style>
 </head>
 <body>
@@ -52,6 +82,8 @@ button.b:disabled{opacity:.5;cursor:wait}
 <nav class="tabs" id="tabs">
  <button data-p="perfumes" class="on">Ароматы</button>
  <button data-p="groups">Группы</button>
+ <button data-p="bulk">Массовая загрузка</button>
+ <button data-p="bottles">Флаконы</button>
  <button data-p="brands">Бренды</button>
  <button data-p="contacts">Контакты</button>
 </nav>
@@ -61,6 +93,19 @@ button.b:disabled{opacity:.5;cursor:wait}
  <div class="box">
   <h2 id="pf-title">Добавить аромат</h2>
   <label>Название</label><input id="pf-name" placeholder="Например, Sauvage">
+  <div class="fg">
+   <div class="fgrow">
+    <button class="b g" id="fg-go" type="button">🔍 Найти в Fragella</button>
+    <label class="chk"><input type="checkbox" id="fg-tr" checked> прозрачный фон бутылки</label>
+   </div>
+   <div class="hint">Введите название выше (от 3 букв) и нажмите «Найти» — выберите аромат, и название, бренд и картинка подставятся сами.</div>
+   <div class="fg-msg" id="fg-msg"></div>
+   <div class="fg-res" id="fg-res"></div>
+   <details id="fg-set"><summary>API-ключ Fragella</summary>
+    <input id="fg-key" type="password" autocomplete="off" placeholder="Вставьте ключ с api.fragella.com" style="margin-top:8px">
+    <div class="hint">Ключ хранится только в этом браузере (не в коде сайта и не в базе). Бесплатный тариф — 20 запросов в месяц, каждый поиск = 1 запрос.</div>
+   </details>
+  </div>
   <div class="row">
    <div><label>Бренд</label><select id="pf-brand"></select></div>
    <div><label>Группа</label><select id="pf-group"></select></div>
@@ -72,6 +117,49 @@ button.b:disabled{opacity:.5;cursor:wait}
  </div>
  <div class="box"><h2>Все ароматы <span id="pf-cnt" style="color:var(--grey);font-weight:400"></span></h2><div id="pf-list"></div></div>
 </section>
+
+<!-- Флаконы -->
+<section class="panel" id="p-bottles">
+ <div class="box">
+  <h2 id="bt-title">Добавить флакон</h2>
+  <label>Название или индекс (можно оставить пустым — будет следующий по порядку)</label><input id="bt-name" placeholder="#1">
+  <div class="row">
+   <div><label>Объём, мл</label><input id="bt-vol" type="number" inputmode="decimal" min="0" placeholder="10"></div>
+   <div><label>Цена (необязательно)</label><input id="bt-price" type="number" inputmode="decimal" min="0" placeholder="пусто = бесплатно"></div>
+  </div>
+  <label>Фото флакона</label><input id="bt-file" type="file" accept="image/*">
+  <div class="prev" id="bt-prev"></div>
+  <div class="acts"><button class="b" id="bt-save">Сохранить</button><button class="b g" id="bt-cancel" hidden>Отмена</button></div>
+  <p class="hint">Без цены флакон бесплатный: стоимость заказа не меняется. Если цена указана, она прибавляется к цене аромата за каждую штуку.</p>
+ </div>
+ <div class="box"><h2>Все флаконы <span id="bt-cnt" style="color:var(--grey);font-weight:400"></span></h2><div id="bt-list"></div></div>
+</section>
+
+<!-- Массовая загрузка -->
+<section class="panel" id="p-bulk">
+ <div class="box">
+  <h2>Массовая загрузка ароматов</h2>
+  <label>Список: бренд и название, через запятую (или с новой строки)</label>
+  <textarea id="bk-text" placeholder="Bvlgari Le Gemme Tygar, Louis Vuitton L'Immensite"></textarea>
+  <div class="row">
+   <div><label>Группа для всех</label><select id="bk-group"></select></div>
+  </div>
+  <label class="chk2"><input type="checkbox" id="bk-tr" checked> прозрачный фон бутылки</label>
+  <div class="acts"><button class="b" id="bk-go" type="button">Разобрать список</button></div>
+  <div class="fg-msg" id="bk-msg"></div>
+  <details id="bk-set" style="margin-top:10px;font-size:13px;color:var(--grey)"><summary style="cursor:pointer">API-ключ Fragella</summary>
+   <input id="bk-key" type="password" autocomplete="off" placeholder="Тот же ключ, что и на вкладке «Ароматы»" style="margin-top:8px">
+   <div class="hint">Каждый аромат из списка = 1 запрос Fragella. Ключ хранится только в этом браузере.</div>
+  </details>
+ </div>
+ <div class="box" id="bk-box" hidden>
+  <h2>Очередь <span id="bk-cnt" style="color:var(--grey);font-weight:400"></span></h2>
+  <div class="hint" style="margin:-4px 0 6px">Проверьте название и бренд, укажите цену и нажмите «Опубликовать» (в поле цены можно нажать Enter).</div>
+  <div id="bk-list"></div>
+  <div class="acts"><button class="b" id="bk-all" type="button">Опубликовать все</button><button class="b g" id="bk-clear" type="button">Очистить очередь</button></div>
+ </div>
+</section>
+<datalist id="bk-brands"></datalist>
 
 <!-- Группы -->
 <section class="panel" id="p-groups">
@@ -118,7 +206,7 @@ const COL="aroma";
 const $=i=>document.getElementById(i);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-let groups=[],brands=[],perfumes=[];
+let groups=[],brands=[],perfumes=[],bottles=[];
 let editP=null,editG=null,editB=null,imgData="";
 
 function status(t,c){const s=$("status");s.textContent=t;s.className=c||"";if(c=="ok")setTimeout(()=>{if(s.textContent==t){s.textContent="";s.className=""}},2500)}
@@ -132,7 +220,8 @@ $("tabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;
 // load
 async function loadAll(){
  const col=collection(db,COL);
- const [g,b,p,c]=await Promise.all([getDocs(query(col,where("kind","==","shop-group"))),getDocs(query(col,where("kind","==","shop-brand"))),getDocs(query(col,where("kind","==","shop-perfume"))),getDoc(doc(db,COL,"shop-contacts"))]);
+ const [g,b,p,c,bt]=await Promise.all([getDocs(query(col,where("kind","==","shop-group"))),getDocs(query(col,where("kind","==","shop-brand"))),getDocs(query(col,where("kind","==","shop-perfume"))),getDoc(doc(db,COL,"shop-contacts")),getDocs(query(col,where("kind","==","shop-bottle")))]);
+ bottles=bt.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
  groups=g.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
  brands=b.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name));
  perfumes=p.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -140,13 +229,16 @@ async function loadAll(){
  $("c-shop").value=C.shopName||"";$("c-phone").value=C.phone||"";$("c-wa").value=C.whatsapp||"";$("c-ig").value=C.instagram||"";$("c-addr").value=C.address||"";$("c-cur").value=C.currency||"";
  renderAll();
 }
-function renderAll(){renderGroups();renderBrands();renderPerfumes();fillSelects()}
+function renderAll(){renderGroups();renderBrands();renderPerfumes();renderBottles();fillSelects()}
 
 function fillSelects(){
  const bv=$("pf-brand").value,gv=$("pf-group").value;
  $("pf-brand").innerHTML='<option value="">— без бренда —</option>'+brands.map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join("");
  $("pf-group").innerHTML='<option value="">— без группы —</option>'+groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("");
  $("pf-brand").value=bv;$("pf-group").value=gv;
+ const bg=$("bk-group").value;
+ $("bk-group").innerHTML='<option value="">— без группы —</option>'+groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("");$("bk-group").value=bg;
+ $("bk-brands").innerHTML=brands.map(b=>`<option value="${esc(b.name)}">`).join("");
 }
 
 // ---------- Perfumes
@@ -158,7 +250,7 @@ function renderPerfumes(){
 }
 function prevImg(){$("pf-prev").innerHTML=imgData?`<img src="${imgData}" alt=""><button class="b d" id="pf-rmimg" type="button">Убрать картинку</button>`:""}
 $("pf-prev").onclick=e=>{if(e.target.id=="pf-rmimg"){imgData="";$("pf-file").value="";prevImg()}};
-function resetP(){editP=null;imgData="";$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
+function resetP(){editP=null;imgData="";fgBrandNew="";$("fg-res").innerHTML="";fgMsg("");$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
 $("pf-cancel").onclick=resetP;
 
 function compress(file,max=700,q=.78){return new Promise((res,rej)=>{
@@ -171,13 +263,95 @@ function compress(file,max=700,q=.78){return new Promise((res,rej)=>{
 $("pf-file").onchange=async e=>{const f=e.target.files[0];if(!f)return;
  try{imgData=await compress(f);prevImg()}catch(er){alert(er.message);e.target.value=""}};
 
+// ---------- Fragella
+const FG="https://api.fragella.com/api/v1/";
+let fgItems=[],fgBrandNew="";
+const fgMsg=(t,err)=>{$("fg-msg").textContent=t||"";$("fg-msg").className="fg-msg"+(err?" err":"")};
+const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+$("fg-key").value=lsGet("fragella-key");
+if(!$("fg-key").value)$("fg-set").open=true;
+$("bk-key").value=$("fg-key").value;if(!$("bk-key").value)$("bk-set").open=true;
+$("fg-key").onchange=()=>{lsSet("fragella-key",$("fg-key").value.trim());$("bk-key").value=$("fg-key").value};
+$("bk-key").onchange=()=>{$("fg-key").value=$("bk-key").value.trim();lsSet("fragella-key",$("fg-key").value)};
+const ascii=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=t=>ascii(t).replace(/[^a-z0-9а-яё]+/g,"");
+
+async function fgSearch(q){
+ const ck="fg:"+q.toLowerCase();
+ try{const c=sessionStorage.getItem(ck);if(c)return JSON.parse(c)}catch(e){}   // повторный поиск не тратит лимит
+ const key=$("fg-key").value.trim();
+ if(!key){$("fg-set").open=true;throw new Error("Вставьте API-ключ Fragella (раздел ниже)")}
+ lsSet("fragella-key",key);
+ let r;
+ try{r=await fetch(FG+"fragrances?"+new URLSearchParams({search:q,limit:8}),{headers:{"x-api-key":key}})}
+ catch(e){throw new Error("Не удалось связаться с Fragella (сеть или блокировка CORS)")}
+ if(r.status==404)return[];
+ if(r.status==401||r.status==403)throw new Error("Неверный API-ключ Fragella");
+ if(r.status==429)throw new Error("Лимит запросов Fragella на этот месяц исчерпан");
+ if(!r.ok)throw new Error("Fragella вернула ошибку "+r.status);
+ let d=await r.json();if(d&&d.data)d=d.data;
+ d=Array.isArray(d)?d:[];
+ try{sessionStorage.setItem(ck,JSON.stringify(d))}catch(e){}
+ return d}
+
+// скачать картинку и ужать до dataURL (как загрузка вручную); если CDN не отдаёт CORS — оставляем ссылку
+async function fgImage(url,transparent){
+ try{
+  const r=await fetch(url,{mode:"cors"});if(!r.ok)throw 0;
+  const b=await r.blob(),u=URL.createObjectURL(b);
+  const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});
+  const k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement("canvas");
+  c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+  const x=c.getContext("2d");
+  if(!transparent){x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height)}
+  x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
+  return transparent?c.toDataURL("image/webp",.85):c.toDataURL("image/jpeg",.8)
+ }catch(e){return url}}
+
+async function fgFind(){
+ const q=$("pf-name").value.trim();
+ if(q.length<3){fgMsg("Введите в поле «Название» минимум 3 буквы",true);return}
+ const btn=$("fg-go");btn.disabled=true;fgMsg("Ищем…");$("fg-res").innerHTML="";
+ try{
+  fgItems=await fgSearch(q);
+  if(!fgItems.length){fgMsg("Ничего не найдено. Попробуйте написать иначе (по-английски, как на флаконе).");return}
+  fgMsg("Выберите нужный аромат:");
+  $("fg-res").innerHTML=fgItems.map((f,i)=>{const im=f["Image URL"]||f["Image URL Transparent"]||"";
+   return `<button type="button" class="fg-c" data-i="${i}">${im?`<img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:""}<b>${esc(f.Name)}</b><span>${esc(f.Brand||"")}${f.Year?" · "+esc(f.Year):""}</span></button>`}).join("")
+ }catch(e){fgMsg(e.message,true)}finally{btn.disabled=false}}
+$("fg-go").onclick=fgFind;
+$("pf-name").addEventListener("keydown",e=>{if(e.key=="Enter"&&!editP&&$("pf-name").value.trim().length>=3){e.preventDefault();fgFind()}});
+
+$("fg-res").onclick=async e=>{
+ const c=e.target.closest(".fg-c");if(!c)return;
+ const f=fgItems[+c.dataset.i];if(!f)return;
+ $("pf-name").value=f.Name||$("pf-name").value;
+ // бренд: берём существующий или предлагаем новый (создастся при сохранении)
+ const sel=$("pf-brand");[...sel.querySelectorAll("option[value=__new__]")].forEach(o=>o.remove());fgBrandNew="";
+ if(f.Brand){const ex=brands.find(b=>norm(b.name)==norm(f.Brand));
+  if(ex)sel.value=ex.id;
+  else{fgBrandNew=f.Brand;const o=document.createElement("option");o.value="__new__";o.textContent="＋ "+f.Brand+" (новый бренд)";sel.appendChild(o);sel.value="__new__"}}
+ const tr=$("fg-tr").checked;
+ const url=(tr&&f["Image URL Transparent"])||f["Image URL"]||"";
+ if(url){fgMsg("Загружаем картинку…");
+  imgData=await fgImage(url,tr&&!!f["Image URL Transparent"]);prevImg();
+  fgMsg(imgData.startsWith("data:")?"Готово: название, бренд и картинка подставлены. Укажите группу и цену → «Сохранить».":"Картинка подставлена ссылкой (Fragella не отдала файл напрямую). Укажите группу и цену → «Сохранить».")}
+ else fgMsg("У этого аромата нет картинки в Fragella — можно загрузить свою.",true);
+ $("fg-res").innerHTML=""};
+
 $("pf-save").onclick=()=>{
  const name=$("pf-name").value.trim();if(!name){alert("Введите название аромата");return}
  const old=perfumes.find(x=>x.id==editP);
  const id=editP||uid("shop-perfume");
- const data={kind:"shop-perfume",name,brandId:$("pf-brand").value,groupId:$("pf-group").value,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",ts:old?old.ts:Date.now()};
+ const brandId=$("pf-brand").value,newBrand=brandId=="__new__"?fgBrandNew:"";
+ const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",ts:old?old.ts:Date.now()};
  const btn=$("pf-save");btn.disabled=true;
- run(async()=>{await setDoc(doc(db,COL,id),data);
+ run(async()=>{
+  if(newBrand){const ex=brands.find(b=>norm(b.name)==norm(newBrand));
+   if(ex)data.brandId=ex.id;
+   else{const bid=uid("shop-brand"),bd={kind:"shop-brand",name:newBrand};await setDoc(doc(db,COL,bid),bd);brands.push({id:bid,...bd});brands.sort((a,b)=>a.name.localeCompare(b.name));data.brandId=bid;renderBrands();fillSelects()}}
+  await setDoc(doc(db,COL,id),data);
   const i=perfumes.findIndex(x=>x.id==id);if(i>=0)perfumes[i]={id,...data};else perfumes.unshift({id,...data});
   resetP();renderPerfumes()}).finally(()=>btn.disabled=false)};
 $("pf-list").onclick=e=>{
@@ -187,6 +361,124 @@ $("pf-list").onclick=e=>{
   $("pf-title").textContent="Изменить аромат";$("pf-cancel").hidden=false;prevImg();scrollTo({top:0,behavior:"smooth"})}
  if(dl){const p=perfumes.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить «"+p.name+"»?"))return;
   run(async()=>{await deleteDoc(doc(db,COL,p.id));perfumes=perfumes.filter(x=>x.id!=p.id);if(editP==p.id)resetP();renderPerfumes()},"Удалено")}};
+
+// ---------- Массовая загрузка
+let bkRows=[];
+const toks=t=>ascii(t).split(/[^a-z0-9а-яё]+/).filter(Boolean);
+function bkScore(q,f){const a=new Set(toks(q)),b=new Set(toks((f.Brand||"")+" "+(f.Name||"")));let i=0;a.forEach(x=>{if(b.has(x))i++});const u=a.size+b.size-i;return u?i/u:0}
+function findBrand(name){const n=norm(name);if(!n)return null;
+ return brands.find(b=>norm(b.name)==n)||brands.find(b=>{const m=norm(b.name);return Math.min(m.length,n.length)>=4&&(m.includes(n)||n.includes(m))})||null}
+async function ensureBrand(name){name=String(name||"").trim();if(!name)return"";
+ const ex=findBrand(name);if(ex)return ex.id;
+ const bid=uid("shop-brand"),bd={kind:"shop-brand",name};await setDoc(doc(db,COL,bid),bd);
+ brands.push({id:bid,...bd});brands.sort((a,b)=>a.name.localeCompare(b.name));renderBrands();fillSelects();return bid}
+// запасной разбор без Fragella: бренд — по уже существующим брендам в начале строки
+function bkGuess(q){const l=ascii(q);let best=null;
+ brands.forEach(b=>{const n=ascii(b.name);if(l.startsWith(n+" ")&&(!best||n.length>ascii(best.name).length))best=b});
+ return best?{brand:best.name,name:q.slice(best.name.length).trim()}:{brand:"",name:q}}
+function bkApply(r,i){const f=r.items[i];if(!f)return;r.sel=i;r.name=f.Name||r.name;const eb=findBrand(f.Brand);r.brand=eb?eb.name:(f.Brand||"")}
+const bkQ=id=>document.querySelector('.bk[data-id="'+id+'"]');
+const bkCount=()=>{$("bk-cnt").textContent=bkRows.length?"("+bkRows.length+")":"";$("bk-box").hidden=!bkRows.length};
+function bkCreate(r){
+ const d=document.createElement("div");d.className="bk";d.dataset.id=r.id;
+ d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
+ $("bk-list").appendChild(d);bkUpdate(r,true)}
+function bkUpdate(r,force){
+ const d=bkQ(r.id);if(!d)return;
+ const nm=d.querySelector(".bk-name"),br=d.querySelector(".bk-brand");
+ if(force||!nm.dataset.dirty){nm.value=r.name;delete nm.dataset.dirty}
+ if(force||!br.dataset.dirty){br.value=r.brand;delete br.dataset.dirty}
+ const f=r.items[r.sel],im=f&&(f["Image URL"]||f["Image URL Transparent"]);
+ d.querySelector(".bk-img").innerHTML=im?`<img src="${esc(im)}" alt="" referrerpolicy="no-referrer">`:"";
+ const alt=d.querySelector(".bk-alt");
+ if(r.items.length>1){alt.hidden=false;alt.innerHTML=r.items.map((x,i)=>`<option value="${i}"${i==r.sel?" selected":""}>${esc(x.Name)} — ${esc(x.Brand||"")}${x.Year?" ("+esc(x.Year)+")":""}</option>`).join("")}else alt.hidden=true;
+ const T={wait:"Ищем в Fragella…",ok:"Найдено в Fragella — проверьте и укажите цену",none:"Не найдено в Fragella — проверьте название и бренд вручную",skip:"Не искали в Fragella: "+(r.err||"")};
+ let t=T[r.state]||"";const dup=perfumes.some(p=>norm(p.name)==norm(r.name));
+ const st=d.querySelector(".bk-st");st.textContent=t+(dup?" · ⚠ такой аромат уже есть в каталоге":"");st.className="bk-st"+(dup||r.state=="none"||r.state=="skip"?" warn":"")}
+
+async function bkParse(){
+ const parts=[...new Map($("bk-text").value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).map(x=>[norm(x),x])).values()];
+ if(!parts.length){$("bk-msg").textContent="Впишите хотя бы один аромат";$("bk-msg").className="fg-msg err";return}
+ $("bk-key").value&&($("fg-key").value=$("bk-key").value.trim());
+ bkRows=parts.map((q,i)=>({id:"bk"+Date.now().toString(36)+i,q,items:[],sel:-1,state:"wait",err:"",...bkGuess(q)}));
+ $("bk-list").innerHTML="";bkRows.forEach(bkCreate);bkCount();
+ $("bk-msg").className="fg-msg";$("bk-msg").textContent="Ищем в Fragella: 0 из "+bkRows.length;
+ $("bk-go").disabled=true;
+ let next=0,done=0,stop="";
+ const worker=async()=>{while(next<bkRows.length){
+  const r=bkRows[next++];
+  if(stop){r.state="skip";r.err=stop;bkUpdate(r);continue}
+  try{r.items=await fgSearch(r.q);
+   if(r.items.length){let b=0,bs=-1;r.items.forEach((f,i)=>{const sc=bkScore(r.q,f);if(sc>bs){bs=sc;b=i}});bkApply(r,b);r.state="ok"}else r.state="none"}
+  catch(e){stop=e.message;r.state="skip";r.err=stop}
+  done++;bkUpdate(r);$("bk-msg").textContent="Ищем в Fragella: "+done+" из "+bkRows.length}};
+ await Promise.all([worker(),worker(),worker()]);
+ $("bk-go").disabled=false;if(stop&&/ключ/i.test(stop))$("bk-set").open=true;
+ $("bk-msg").className="fg-msg"+(stop?" err":"");
+ $("bk-msg").textContent=stop?stop+". Остальные добавлены без поиска — исправьте название и бренд вручную.":"Готово. Пройдитесь по очереди: цена → «Опубликовать»."}
+$("bk-go").onclick=bkParse;
+$("bk-group").onchange=()=>document.querySelectorAll(".bk-grp").forEach(g=>g.value=$("bk-group").value);
+
+async function bkPublishOne(id){
+ const r=bkRows.find(x=>x.id==id),d=bkQ(id);if(!r||!d)return false;
+ const name=d.querySelector(".bk-name").value.trim();if(!name){alert("У одного из ароматов пустое название");return false}
+ const pv=d.querySelector(".bk-price").value,btn=d.querySelector(".bk-pub");btn.disabled=true;
+ try{
+  status("Публикуем…");
+  const brandId=await ensureBrand(d.querySelector(".bk-brand").value);
+  let img="";const f=r.items[r.sel];
+  if(f){const tr=$("bk-tr").checked&&!!f["Image URL Transparent"],u=tr?f["Image URL Transparent"]:(f["Image URL"]||f["Image URL Transparent"]);if(u)img=await fgImage(u,tr)}
+  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,price:pv===""?"":Number(pv),img,ts:Date.now()};
+  const pid=uid("shop-perfume");await setDoc(doc(db,COL,pid),data);perfumes.unshift({id:pid,...data});
+  bkRows.splice(bkRows.indexOf(r),1);d.remove();bkCount();renderPerfumes();renderBrands();status("Опубликовано: "+name,"ok");return true
+ }catch(e){btn.disabled=false;status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message);return false}}
+$("bk-list").onclick=async e=>{
+ const d=e.target.closest(".bk");if(!d)return;
+ if(e.target.closest(".bk-x")){bkRows=bkRows.filter(x=>x.id!=d.dataset.id);d.remove();bkCount();return}
+ if(e.target.closest(".bk-pub")){await bkPublishOne(d.dataset.id);const n=document.querySelector(".bk-price");if(n)n.focus()}};
+$("bk-list").onchange=e=>{
+ if(!e.target.classList.contains("bk-alt"))return;
+ const r=bkRows.find(x=>x.id==e.target.closest(".bk").dataset.id);if(!r)return;
+ bkApply(r,+e.target.value);r.state="ok";bkUpdate(r,true)};
+$("bk-list").oninput=e=>{if(e.target.classList.contains("bk-name")||e.target.classList.contains("bk-brand"))e.target.dataset.dirty=1};
+$("bk-list").addEventListener("keydown",async e=>{
+ if(e.key=="Enter"&&e.target.classList.contains("bk-price")){e.preventDefault();await bkPublishOne(e.target.closest(".bk").dataset.id);const n=document.querySelector(".bk-price");if(n)n.focus()}});
+$("bk-clear").onclick=()=>{if(bkRows.length&&!confirm("Убрать из очереди все "+bkRows.length+"?"))return;bkRows=[];$("bk-list").innerHTML="";bkCount()};
+$("bk-all").onclick=async()=>{
+ const ids=bkRows.map(x=>x.id),np=ids.filter(id=>bkQ(id)&&bkQ(id).querySelector(".bk-price").value==="").length;
+ if(!ids.length)return;
+ if(np&&!confirm("У "+np+" аромат(ов) не указана цена. Опубликовать всё равно?"))return;
+ $("bk-all").disabled=true;
+ for(const id of ids){if(!await bkPublishOne(id))break}
+ $("bk-all").disabled=false};
+
+// ---------- Флаконы
+let editT=null,btImg="";
+const nextBottleName=()=>{const n=bottles.map(b=>/^#(\d+)$/.exec(b.name||"")).filter(Boolean).map(m=>+m[1]);return"#"+((n.length?Math.max(...n):0)+1)};
+function renderBottles(){
+ $("bt-name").placeholder=editT?"Название":nextBottleName();
+ $("bt-cnt").textContent=bottles.length?"("+bottles.length+")":"";
+ $("bt-list").innerHTML=bottles.length?bottles.map(b=>`<div class="item">${b.img?`<img src="${b.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(b.name)}</b><span>${esc(b.volume)} мл · ${b.price!==""&&b.price!=null?esc(b.price):"бесплатно"}</span></div><div class="a"><button class="b g" data-e="${b.id}">Изменить</button><button class="b d" data-d="${b.id}">Удалить</button></div></div>`).join(""):'<div class="empty">Пока нет флаконов — на сайте выбор флакона не показывается</div>'}
+function btPrev(){$("bt-prev").innerHTML=btImg?`<img src="${btImg}" alt=""><button class="b d" id="bt-rmimg" type="button">Убрать фото</button>`:""}
+$("bt-prev").onclick=e=>{if(e.target.id=="bt-rmimg"){btImg="";$("bt-file").value="";btPrev()}};
+function resetT(){editT=null;btImg="";$("bt-name").value="";$("bt-vol").value="";$("bt-price").value="";$("bt-file").value="";$("bt-title").textContent="Добавить флакон";$("bt-cancel").hidden=true;btPrev();renderBottles()}
+$("bt-cancel").onclick=resetT;
+$("bt-file").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{btImg=await compress(f,600,.8);btPrev()}catch(er){alert(er.message);e.target.value=""}};
+$("bt-save").onclick=()=>{
+ const vol=$("bt-vol").value;if(vol===""||Number(vol)<=0){alert("Укажите объём флакона в мл");return}
+ const old=bottles.find(x=>x.id==editT),id=editT||uid("shop-bottle");
+ const name=$("bt-name").value.trim()||(old?old.name:nextBottleName());
+ const data={kind:"shop-bottle",name,volume:Number(vol),price:$("bt-price").value===""?"":Number($("bt-price").value),img:btImg||"",order:old?old.order:Date.now()};
+ const btn=$("bt-save");btn.disabled=true;
+ run(async()=>{await setDoc(doc(db,COL,id),data);const i=bottles.findIndex(x=>x.id==id);if(i>=0)bottles[i]={id,...data};else bottles.push({id,...data});resetT()}).finally(()=>btn.disabled=false)};
+$("bt-list").onclick=e=>{
+ const ed=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]");
+ if(ed){const b=bottles.find(x=>x.id==ed.dataset.e);editT=b.id;btImg=b.img||"";
+  $("bt-name").value=b.name;$("bt-vol").value=b.volume;$("bt-price").value=b.price??"";$("bt-file").value="";
+  $("bt-title").textContent="Изменить флакон";$("bt-cancel").hidden=false;btPrev();renderBottles();scrollTo({top:0,behavior:"smooth"})}
+ if(dl){const b=bottles.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить флакон «"+b.name+"» ("+b.volume+" мл)?"))return;
+  run(async()=>{await deleteDoc(doc(db,COL,b.id));bottles=bottles.filter(x=>x.id!=b.id);if(editT==b.id)resetT();else renderBottles()},"Удалено")}};
 
 // ---------- Groups
 function renderGroups(){
