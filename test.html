@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Подбор аромата — ALFIYA Perfume</title>
+<style>
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Reg.otf") format("opentype");font-weight:400;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bol.otf") format("opentype");font-weight:700;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bla.otf") format("opentype");font-weight:900;font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--ink:#111;--copper:#c58457;--light:#f3f3f5;--grey:#8a8a8f;--line:#e2e2e6;--ease:cubic-bezier(.22,.9,.28,1)}
+body{font-family:"Gotham Pro",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--light);line-height:1.45;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3{font-weight:900}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px;width:100%}
+.sp{flex:1}
+
+/* шапка — как в каталоге */
+header.top{position:sticky;top:0;z-index:30;background:var(--ink);border-bottom:1px solid rgba(197,132,87,.35)}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:68px}
+header.top img.lg{height:44px;width:auto;display:block}
+.hb{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border:1.5px solid var(--copper);border-radius:21px;color:var(--copper);text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.04em;transition:background .25s,color .25s}
+.hb:hover{background:var(--copper);color:var(--ink)}
+.hb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.prog{height:3px;background:rgba(197,132,87,.2)}
+.prog i{display:block;height:100%;width:0;background:var(--copper);transition:width .6s var(--ease)}
+
+/* hero с фирменным паттерном */
+.hero{position:relative;background:var(--ink) url("assets/bg-hero.jpg") 50% 0/cover;color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,17,17,.78),rgba(17,17,17,.35) 60%,rgba(17,17,17,.15))}
+.hero .wrap{position:relative;padding-top:38px;padding-bottom:calc(60px + 3vw);text-align:center}
+.kick{color:var(--copper);font-size:12px;letter-spacing:.34em;text-transform:uppercase}
+.hero h1{font-size:clamp(28px,4.6vw,48px);line-height:1.06;margin-top:12px}
+.hero h1 em{font-style:normal;color:var(--copper)}
+
+/* карточка вопроса, наезжающая на hero */
+main{flex:1}
+.stage{max-width:760px;margin:-46px auto 0;padding:0 16px;position:relative;z-index:2;width:100%}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px 24px 26px;box-shadow:0 18px 50px rgba(17,17,17,.12);border-top:3px solid var(--copper)}
+.step{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--grey)}
+.qt{font-size:clamp(22px,4.4vw,32px);font-weight:900;line-height:1.15;margin:8px 0 20px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:58px;padding:12px 18px;text-align:left;font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--light);border:1.5px solid var(--line);border-radius:16px;transition:border-color .2s,background .25s,color .25s,transform .2s}
+.opt b{flex:none;width:30px;height:30px;border-radius:15px;background:var(--ink);color:var(--copper);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;transition:background .25s,color .25s}
+.opt:hover{border-color:var(--copper);background:#fbf3ee;transform:translateX(3px)}
+.opt:hover b{background:var(--copper);color:var(--ink)}
+.opt:active{transform:scale(.985)}
+.opt:focus-visible,.nv:focus-visible,.card:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.nv{height:44px;padding:0 20px;border:1.5px solid var(--line);background:#fff;border-radius:22px;font-size:14px;font-weight:700;color:var(--ink);transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
+.nv:hover{border-color:var(--copper);color:var(--copper)}
+.nv.pri{background:var(--ink);border-color:var(--ink);color:var(--copper)}
+.nv.pri:hover{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.in{animation:in .5s var(--ease) both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.opt.in{animation-delay:calc(var(--i)*55ms+80ms)}
+
+/* результат */
+.res h2{font-size:clamp(24px,5vw,36px);line-height:1.1;margin-top:8px}
+.res h2::after{content:"";display:block;width:56px;height:3px;background:var(--copper);margin-top:14px;border-radius:2px}
+.res p.d{color:var(--grey);font-size:14px;margin-top:12px}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:22px}
+.card{background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line);text-decoration:none;color:inherit;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(17,17,17,.12);border-color:rgba(197,132,87,.5)}
+.im{aspect-ratio:1/1;background:var(--ink) url("assets/bg-stone-sm.jpg") 50% 50%/cover;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.im::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(17,17,17,.4),rgba(17,17,17,.1))}
+.im img{width:100%;height:100%;object-fit:cover;position:relative}
+.im img.tr{object-fit:contain;padding:7%}
+.im img.ph{width:64%;height:auto;object-fit:contain}
+.inf{padding:12px 14px 14px}
+.br{font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.18em}
+.nm{font-size:17px;font-weight:700;margin-top:3px;line-height:1.2}
+.nt{font-size:12px;color:var(--grey);margin-top:6px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.go{margin-top:10px;font-size:12px;font-weight:700;color:var(--copper);letter-spacing:.06em;text-transform:uppercase}
+.rl{margin-top:16px;display:grid;gap:8px}
+.rl div{padding:11px 16px;border:1px solid var(--line);border-radius:14px;background:var(--light);font-weight:700}
+.msg{text-align:center;padding:26px 8px;color:var(--grey)}
+.msg h3{color:var(--ink);font-size:20px;margin-bottom:6px}
+.spin{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--copper);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+footer{margin-top:60px;background:var(--ink) url("assets/bg-stone.jpg") 50% 50%/cover;color:rgba(243,243,245,.75);position:relative}
+footer::before{content:"";position:absolute;inset:0;background:rgba(17,17,17,.5)}
+footer .wrap{position:relative;padding:36px 20px;display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+footer img{height:50px}
+footer b{color:var(--copper);display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;font-weight:400}
+@media(max-width:520px){header.top img.lg{height:38px}.hb span{display:none}.hb{padding:0 12px}.panel{padding:22px 16px}.rg{grid-template-columns:repeat(2,1fr);gap:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="wrap">
+  <a href="index.html"><img class="lg" src="assets/logo-horizontal.png" alt="ALFIYA Perfume"></a>
+  <span class="sp"></span>
+  <a class="hb" href="index.html"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span>В каталог</span></a>
+ </div>
+ <div class="prog" aria-hidden="true"><i id="pb"></i></div>
+</header>
+
+<section class="hero"><div class="wrap">
+ <div class="kick">Perfume</div>
+ <h1>Подберём аромат<br><em>именно для вас</em></h1>
+</div></section>
+
+<main><div class="stage"><div class="panel" id="box" aria-live="polite">
+ <div class="msg"><div class="spin"></div>Загружаем тест…</div>
+</div></div></main>
+
+<footer><div class="wrap"><img src="assets/logo-horizontal.png" alt="ALFIYA Perfume"><div id="foot"></div></div></footer>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import{getFirestore,collection,doc,getDoc,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));
+const $=i=>document.getElementById(i),LT="АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ascii=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=t=>ascii(t).replace(/[^a-z0-9а-яё]+/g,"");
+const tr=u=>/^data:image\/(webp|png)/.test(u)||/\.(webp|png)(\?|$)/i.test(u)?' class="tr"':"";
+
+let Q=null,perfumes=[],brands={},path=[],hist=[];
+
+/* Узел: {question, options:[{text, next:{…}} | {text, result:[«Бренд — Название»,…]}]} */
+const node=()=>path.reduce((n,i)=>n.options[i].next,Q);
+const depth=n=>1+Math.max(0,...n.options.map(o=>o.next?depth(o.next):0));
+
+/* Поиск аромата в каталоге по строке «Бренд — Название» (регистр, дефисы и пробелы не важны) */
+function findPerfume(s){
+ const n=norm(s);if(!n)return null;
+ const full=p=>norm((brands[p.brandId]||"")+p.name);
+ return perfumes.find(p=>full(p)==n)||perfumes.find(p=>norm(p.name)==n)
+  ||perfumes.find(p=>{const f=full(p);return Math.min(f.length,n.length)>=5&&(f.includes(n)||n.includes(f))})||null}
+
+function card(p){const b=brands[p.brandId]||"";
+ return `<a class="card in" href="index.html?open=${encodeURIComponent(p.id)}"><div class="im">${p.img?`<img${tr(p.img)} src="${p.img}" alt="${esc(p.name)}">`:'<img class="ph" src="assets/logo-horizontal.png" alt="">'}</div><div class="inf">${b?`<div class="br">${esc(b)}</div>`:""}<div class="nm">${esc(p.name)}</div>${Array.isArray(p.notes)&&p.notes.length?`<div class="nt">${esc(p.notes.slice(0,6).join(", "))}</div>`:""}<div class="go">Смотреть →</div></div></a>`}
+
+function show(){
+ const n=node(),bk=hist.length?'<button class="nv" id="bk">← Назад</button>':"";
+ const h=`<div class="step in">Шаг ${hist.length+1}</div><h2 class="qt in">${esc(n.question||"Выберите вариант")}</h2><div class="opts">`
+   +n.options.map((o,i)=>`<button class="opt in" style="--i:${i}" data-i="${i}"><b>${LT[i]||"•"}</b><span>${esc(o.text)}</span></button>`).join("")+`</div>`+(bk?`<div class="nav">${bk}</div>`:"");
+ $("box").innerHTML=h;
+ $("pb").style.width=Math.min(100,100*hist.length/Math.max(1,hist.length+depth(n)-1))+"%";
+}
+function result(list){
+ const found=[],names=[];
+ (list||[]).forEach(s=>{const p=findPerfume(s);if(p){if(!found.includes(p))found.push(p)}else names.push(s)});
+ const bk=hist.length?'<button class="nv" id="bk">← Назад</button>':"";
+ const one=found.length==1&&!names.length;
+ $("box").innerHTML=`<div class="res"><div class="step in">Результат</div><h2 class="in">${one?"Ваш аромат":(found.length+names.length)>1?"Вам подойдёт":"Пока ничего не нашлось"}</h2>`
+  +((found.length+names.length)>1?'<p class="d in">Любой из этих ароматов подходит под ваши ответы.</p>':"")
+  +(found.length?`<div class="rg">${found.map(card).join("")}</div>`:"")
+  +(names.length?`<div class="rl">${names.map(x=>`<div class="in">${esc(x)}</div>`).join("")}</div>`:"")
+  +`<div class="nav">${bk}<button class="nv pri" id="rs">↻ Пройти заново</button></div></div>`;
+ $("pb").style.width="100%"}
+
+function pick(i){const n=node(),o=n.options[i];if(!o)return;
+ hist.push(i);path.push(i);
+ if(o.next&&o.next.options&&o.next.options.length)show();else result(o.result)}
+function back(){if(!hist.length)return;hist.pop();path.pop();show()}
+function start(){path=[];hist=[];show();scrollTo({top:0,behavior:"smooth"})}
+
+$("box").onclick=e=>{
+ const o=e.target.closest(".opt");if(o){pick(+o.dataset.i);return}
+ if(e.target.closest("#bk"))back();else if(e.target.closest("#rs"))start()};
+
+const fail=(h,t)=>{$("box").innerHTML=`<div class="msg"><h3>${h}</h3>${t}</div>`};
+(async()=>{
+ try{
+  const col=collection(db,"aroma");
+  const [qz,c,b,p]=await Promise.all([getDoc(doc(db,"aroma","quiz")),getDoc(doc(db,"aroma","shop-contacts")),
+   getDocs(query(col,where("kind","==","shop-brand"))),getDocs(query(col,where("kind","==","shop-perfume")))]);
+  if(c.exists()){const C=c.data();const f=[];if(C.address)f.push(`<b>Адрес</b>${esc(C.address)}`);if(C.phone)f.push(`<b style="margin-top:12px">Телефон</b>${esc(C.phone)}`);$("foot").innerHTML=f.join("")}
+  b.docs.forEach(d=>brands[d.id]=d.data().name);
+  perfumes=p.docs.map(d=>({id:d.id,...d.data()}));
+  if(!qz.exists())return fail("Тест пока не готов","Загляните позже или выберите аромат в <a href=\"index.html\" style=\"color:var(--copper)\">каталоге</a>.");
+  try{Q=JSON.parse(qz.data().json)}catch(e){Q=null}
+  if(!Q||!Array.isArray(Q.options)||!Q.options.length)return fail("Тест пока не готов","В базе лежит некорректный тест — обновите его в админке.");
+  start()
+ }catch(e){fail("Не удалось загрузить",esc(e.message))}
+})();
+</script>
+</body>
+</html>

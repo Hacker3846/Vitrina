@@ -84,6 +84,9 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
 .lblrow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:10px 0 4px}
 .lblrow label{margin:0}
 .lblrow button{height:30px;padding:0 12px;font-size:13px;border-radius:15px}
+.oilq{display:flex;align-items:center;gap:6px;margin:4px 0 0;font-size:13px;color:var(--ink)}
+.oilq input{width:auto}
+.bk-r .oilq{margin:0;flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -96,6 +99,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
  <button data-p="ai">ИИ и картинки</button>
  <button data-p="bottles">Флаконы</button>
  <button data-p="brands">Бренды</button>
+ <button data-p="quiz">Тест</button>
  <button data-p="contacts">Контакты</button>
 </nav>
 
@@ -121,6 +125,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
    <div><label>Группа</label><select id="pf-group"></select></div>
    <div><label>Цена</label><input id="pf-price" type="number" inputmode="decimal" min="0" placeholder="0"></div>
   </div>
+  <label class="chk2"><input type="checkbox" id="pf-oil"> Масляный аромат (если не отмечено — оригинальный)</label>
   <label>Ноты (через запятую)</label><input id="pf-notes" placeholder="Bergamot, Lavender, Ambroxan">
   <div class="lblrow"><label>Описание (показывается в карточке товара на сайте)</label><button class="b g" id="pf-ai" type="button">✨ Написать ИИ</button></div>
   <textarea id="pf-desc" placeholder="Коротко о аромате"></textarea>
@@ -163,6 +168,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <div class="row">
    <div><label>Группа для всех</label><select id="bk-group"></select></div>
   </div>
+  <label class="chk2"><input type="checkbox" id="bk-oil"> Масляные ароматы (ставит отметку всем в очереди, у каждого её можно поменять)</label>
   <label class="chk2"><input type="checkbox" id="bk-cut" checked> Прозрачный фон у картинок (убрать белый фон)</label>
   <div class="acts"><button class="b" id="bk-go" type="button">Разобрать список</button></div>
   <div class="fg-msg" id="bk-msg"></div>
@@ -195,7 +201,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <label>Модель</label>
   <div class="row"><select id="ai-model" class="g-model" style="flex:1 1 220px"></select><button class="b g" id="ai-refresh" type="button" style="flex:0 0 auto">Обновить список</button></div>
   <div class="fg-msg" id="ai-stat"></div>
-  <label class="chk2"><input type="checkbox" id="ai-en"> Писать заново и там, где описание без русских букв (например, английское с Fragrantica)</label>
+  <label class="chk2"><input type="checkbox" id="ai-en" checked> Писать заново и там, где описание без русских букв (например, английское с Fragrantica)</label>
   <div class="acts"><button class="b" id="ai-go" type="button">Сгенерировать описания</button><button class="b d" id="ai-stop" type="button" hidden>Остановить</button></div>
   <progress class="bar" id="ai-bar" value="0" max="1" hidden></progress>
   <div class="fg-msg" id="ai-msg"></div>
@@ -231,6 +237,25 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <div class="acts"><button class="b" id="br-save">Сохранить</button><button class="b g" id="br-cancel" hidden>Отмена</button></div>
  </div>
  <div class="box"><h2>Все бренды</h2><div id="br-list"></div></div>
+</section>
+
+<!-- Тест подбора аромата -->
+<section class="panel" id="p-quiz">
+ <div class="box">
+  <h2>Тест «Подбор аромата»</h2>
+  <p class="hint" style="margin:-6px 0 4px">1) Нажмите «Копировать для GPT» и вставьте текст в чат. 2) Скопируйте JSON-ответ и вставьте его в поле ниже. 3) «Сохранить» — тест появится на странице <b>test.html</b>.</p>
+  <label>Пожелания к тесту (необязательно)</label>
+  <input id="qz-wish" placeholder="Например: 4 вопроса, про сезон и настроение; без вопроса про пол">
+  <div class="acts"><button class="b" id="qz-copy" type="button">📋 Копировать для GPT</button></div>
+  <div class="fg-msg" id="qz-copymsg"></div>
+ </div>
+ <div class="box">
+  <label style="margin-top:0">JSON теста (ответ GPT)</label>
+  <textarea id="qz-json" spellcheck="false" style="min-height:260px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px" placeholder='{"question":"…","options":[{"text":"…","next":{…}},{"text":"…","result":["Бренд — Название"]}]}'></textarea>
+  <div class="acts"><button class="b g" id="qz-check" type="button">Проверить</button><button class="b" id="qz-save" type="button">Сохранить</button><a class="b g" id="qz-open" href="test.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Открыть тест ↗</a><button class="b d" id="qz-del" type="button">Удалить тест</button></div>
+  <div class="fg-msg" id="qz-msg"></div>
+  <div class="ailog" id="qz-log"></div>
+ </div>
 </section>
 
 <!-- Контакты -->
@@ -297,12 +322,12 @@ function renderPerfumes(){
  $("pf-cnt").textContent=perfumes.length?"("+perfumes.length+")":"";
  $("pf-list").innerHTML=perfumes.length?perfumes.map(p=>{
   const b=brands.find(x=>x.id==p.brandId),g=groups.find(x=>x.id==p.groupId);
-  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
+  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span><label class="oilq"><input type="checkbox" data-oil="${p.id}"${p.oil===true?" checked":""}> Масляный</label></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
  aiStat();
 }
 function prevImg(){$("pf-prev").innerHTML=imgData?`<img src="${imgData}" alt=""><button class="b d" id="pf-rmimg" type="button">Убрать картинку</button>`:""}
 $("pf-prev").onclick=e=>{if(e.target.id=="pf-rmimg"){imgData="";$("pf-file").value="";prevImg()}};
-function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
+function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-oil").checked=false;$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
 $("pf-cancel").onclick=resetP;
 
 // ---------- Картинки: сжатие и прозрачный фон
@@ -426,7 +451,7 @@ async function fgSearch(q){
   const nn=a=>(Array.isArray(a)?a:[]).map(x=>typeof x=="string"?x:x&&x.name).filter(Boolean);
   let notes=[...nn(it.notesTop),...nn(it.notesMiddle),...nn(it.notesBase)];
   if(!notes.length)notes=nn(it.notesUnsorted);if(!notes.length)notes=nn(it.allNotes);
-  out=[{Name:it.name,Brand:it.brand||"",Year:it.year||"",img:it.imageUrl||it.imageUrlLarge||"",img2:it.imageUrlLarge||"",notes:[...new Set(notes)],desc:String(it.descriptionText||"").replace(/\s+\n/g,"\n").trim().slice(0,900)}]}
+  out=[{Name:it.name,Brand:it.brand||"",Year:it.year||"",img:it.imageUrl||it.imageUrlLarge||"",img2:it.imageUrlLarge||"",notes:[...new Set(notes)]}]}
  try{sessionStorage.setItem(ck,JSON.stringify(out))}catch(e){}
  return out}
 
@@ -460,20 +485,21 @@ async function fgApply(f){
  if(f.Brand){const ex=brands.find(b=>norm(b.name)==norm(f.Brand));
   if(ex)sel.value=ex.id;
   else{fgBrandNew=f.Brand;const o=document.createElement("option");o.value="__new__";o.textContent="＋ "+f.Brand+" (новый бренд)";sel.appendChild(o);sel.value="__new__"}}
- $("pf-notes").value=(f.notes||[]).join(", ");$("pf-desc").value=f.desc||"";
+ $("pf-notes").value=(f.notes||[]).join(", ");$("pf-desc").value="";
  const head="Найдено: "+(f.Brand?f.Brand+" ":"")+f.Name+(f.Year?" ("+f.Year+")":"")+". ";
  if(f.img){fgMsg(head+"Загружаем картинку…");
   imgData=await fgImage(f.img,cutOn());prevImg();
   const tp=/^data:image\/(webp|png)/.test(imgData);
   fgMsg(head+(imgData.startsWith("data:")?"Название, бренд, ноты и картинка"+(tp?" (с прозрачным фоном)":"")+" подставлены.":"Картинка подставлена ссылкой (сервер не отдал файл напрямую, фон не убран).")+" Проверьте, укажите группу и цену → «Сохранить».")}
- else fgMsg(head+"Картинки нет — можно загрузить свою. Ноты и бренд подставлены.",true)}
+ else fgMsg(head+"Картинки нет — можно загрузить свою. Ноты и бренд подставлены.",true);
+ if(gKey())$("pf-ai").click()}
 
 $("pf-save").onclick=()=>{
  const name=$("pf-name").value.trim();if(!name){alert("Введите название аромата");return}
  const old=perfumes.find(x=>x.id==editP);
  const id=editP||uid("shop-perfume");
  const brandId=$("pf-brand").value,newBrand=brandId=="__new__"?fgBrandNew:"";
- const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
+ const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,oil:$("pf-oil").checked,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
  const btn=$("pf-save");btn.disabled=true;
  run(async()=>{
   if(newBrand){const ex=brands.find(b=>norm(b.name)==norm(newBrand));
@@ -485,10 +511,14 @@ $("pf-save").onclick=()=>{
 $("pf-list").onclick=e=>{
  const ed=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]");
  if(ed){const p=perfumes.find(x=>x.id==ed.dataset.e);editP=p.id;imgData=p.img||"";
-  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-file").value="";
+  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-oil").checked=p.oil===true;$("pf-file").value="";
   $("pf-title").textContent="Изменить аромат";$("pf-cancel").hidden=false;prevImg();scrollTo({top:0,behavior:"smooth"})}
  if(dl){const p=perfumes.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить «"+p.name+"»?"))return;
   run(async()=>{await deleteDoc(doc(db,COL,p.id));perfumes=perfumes.filter(x=>x.id!=p.id);if(editP==p.id)resetP();renderPerfumes()},"Удалено")}};
+
+$("pf-list").onchange=e=>{const c=e.target.closest("[data-oil]");if(!c)return;
+ const p=perfumes.find(x=>x.id==c.dataset.oil);if(!p)return;const v=c.checked;
+ run(async()=>{await setDoc(doc(db,COL,p.id),{oil:v},{merge:true});p.oil=v;if(editP==p.id)$("pf-oil").checked=v},v?"Отмечен как масляный":"Отмечен как оригинальный")};
 
 // ---------- Массовая загрузка
 let bkRows=[];
@@ -509,7 +539,7 @@ const bkQ=id=>document.querySelector('.bk[data-id="'+id+'"]');
 const bkCount=()=>{$("bk-cnt").textContent=bkRows.length?"("+bkRows.length+")":"";$("bk-box").hidden=!bkRows.length};
 function bkCreate(r){
  const d=document.createElement("div");d.className="bk";d.dataset.id=r.id;
- d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
+ d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><label class="oilq"><input type="checkbox" class="bk-oil"${$("bk-oil").checked?" checked":""}> Масляный</label><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
  $("bk-list").appendChild(d);bkUpdate(r,true)}
 function bkUpdate(r,force){
  const d=bkQ(r.id);if(!d)return;
@@ -545,6 +575,7 @@ async function bkParse(){
  $("bk-msg").className="fg-msg"+(stop?" err":"");
  $("bk-msg").textContent=stop?stop+". Остальные добавлены без поиска — исправьте название и бренд вручную.":"Готово. Пройдитесь по очереди: цена → «Опубликовать»."}
 $("bk-go").onclick=bkParse;
+$("bk-oil").onchange=()=>document.querySelectorAll(".bk-oil").forEach(c=>c.checked=$("bk-oil").checked);
 $("bk-group").onchange=()=>document.querySelectorAll(".bk-grp").forEach(g=>g.value=$("bk-group").value);
 
 async function bkPublishOne(id){
@@ -556,7 +587,9 @@ async function bkPublishOne(id){
   const brandId=await ensureBrand(d.querySelector(".bk-brand").value);
   let img="";const f=r.items[r.sel];
   if(f&&f.img)img=await fgImage(f.img,$("bk-cut").checked);
-  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc:(f&&f.desc)||"",ts:Date.now()};
+  let desc="";   // описание — только на русском, через Groq (если ключ введён)
+  if(gKey()){try{desc=await aiDescribe(mkCtl(t=>status(t)),gModel(),name,d.querySelector(".bk-brand").value.trim(),(f&&f.notes)||[],d.querySelector(".bk-oil").checked)}catch(e){}}
+  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,oil:d.querySelector(".bk-oil").checked,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc,ts:Date.now()};
   const pid=uid("shop-perfume");await setDoc(doc(db,COL,pid),data);perfumes.unshift({id:pid,...data});
   bkRows.splice(bkRows.indexOf(r),1);d.remove();bkCount();renderPerfumes();renderBrands();status("Опубликовано: "+name,"ok");return true
  }catch(e){btn.disabled=false;status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message);return false}}
@@ -712,10 +745,10 @@ async function groqChat(ctl,model,messages){
   return txt}}
 
 const cleanDesc=t=>String(t).replace(/<think>[\s\S]*?<\/think>/g,"").replace(/[*`#]+/g,"").replace(/^[\s"«“]+|[\s"»”]+$/g,"").replace(/\s*\n\s*/g," ").replace(/\s{2,}/g," ").trim().slice(0,800);
-async function aiDescribe(ctl,model,name,brand,notes){
- const sys="Ты копирайтер интернет-магазина парфюмерии. Пиши по-русски, живо и аккуратно, без markdown, списков и эмодзи. Опирайся только на то, что следует из названия, бренда и нот. Не выдумывай год выпуска, парфюмера, концентрацию, стойкость и факты о бренде. Названия аромата и бренда оставляй латиницей.";
+async function aiDescribe(ctl,model,name,brand,notes,oil){
+ const sys="Ты копирайтер интернет-магазина парфюмерии. Пиши ТОЛЬКО по-русски, даже если исходные данные на английском, живо и аккуратно, без markdown, списков и эмодзи. Опирайся только на то, что следует из названия, бренда и нот. Не выдумывай год выпуска, парфюмера, концентрацию, стойкость и факты о бренде. Названия аромата и бренда оставляй латиницей.";
  const usr="Напиши описание аромата для карточки товара: 2–3 предложения, 250–400 символов. Передай характер и настроение, как аромат раскрывается по нотам, и (только если это следует из нот) для какого сезона или случая он подходит.\n\n"
-  +"Бренд: "+(brand||"не указан")+"\nНазвание: "+name+"\nНоты: "+(notes.length?notes.join(", "):"не указаны — пиши осторожно, по названию и бренду, без перечисления конкретных нот")+"\n\nОтветь только текстом описания.";
+  +"Тип: "+(oil?"масляные духи (на масляной основе), упомяни это в тексте":"оригинальный парфюм")+"\nБренд: "+(brand||"не указан")+"\nНазвание: "+name+"\nНоты: "+(notes.length?notes.join(", "):"не указаны — пиши осторожно, по названию и бренду, без перечисления конкретных нот")+"\n\nОтветь только текстом описания на русском языке.";
  return cleanDesc(await groqChat(ctl,model,[{role:"system",content:sys},{role:"user",content:usr}]))}
 const brandName=p=>{const b=brands.find(x=>x.id==p.brandId);return b?b.name:""};
 
@@ -737,7 +770,7 @@ $("ai-go").onclick=async()=>{
  for(const p of q){
   msg("Пишу описание: "+(brandName(p)?brandName(p)+" ":"")+p.name+" ("+(ok+fail+1)+" из "+q.length+")…");
   try{
-   const text=await aiDescribe(aiCtl,model,p.name,brandName(p),Array.isArray(p.notes)?p.notes:[]);
+   const text=await aiDescribe(aiCtl,model,p.name,brandName(p),Array.isArray(p.notes)?p.notes:[],p.oil===true);
    if(!text)throw new Error("пустой текст");
    await setDoc(doc(db,COL,p.id),{desc:text},{merge:true});
    p.desc=text;ok++;aiLog("✔ "+(brandName(p)?brandName(p)+" ":"")+p.name+" — "+text.slice(0,90)+(text.length>90?"…":""))
@@ -763,7 +796,7 @@ $("pf-ai").onclick=async()=>{
  const sel=$("pf-brand"),brand=sel.value=="__new__"?fgBrandNew:(sel.value?sel.selectedOptions[0].textContent:"");
  const notes=$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),btn=$("pf-ai");
  pfCtl=mkCtl(m);btn.textContent="Стоп";m("Пишу описание…");
- try{$("pf-desc").value=await aiDescribe(pfCtl,gModel(),name,brand,notes);m("Готово — проверьте текст и нажмите «Сохранить»")}
+ try{$("pf-desc").value=await aiDescribe(pfCtl,gModel(),name,brand,notes,$("pf-oil").checked);m("Готово — проверьте текст и нажмите «Сохранить»")}
  catch(e){m(e instanceof Stopped?"Остановлено":"Ошибка: "+e.message)}
  finally{pfCtl=null;btn.textContent="✨ Написать ИИ"}};
 
@@ -792,6 +825,84 @@ $("cut-go").onclick=async()=>{
  const stopped=!cutRun;cutRun=false;$("cut-go").hidden=false;$("cut-stop").hidden=true;
  m((stopped?"Остановлено. ":"Готово. ")+"Фон убран: "+ok+(skip?", без изменений (белого фона нет): "+skip:"")+(fail?", с ошибкой: "+fail:"")+".",fail>0);
  renderPerfumes()};
+
+
+// ---------- Тест подбора аромата: JSON от GPT → aroma/quiz (читает страница test.html)
+const QZ=doc(db,COL,"quiz");
+const qzMsg=(t,e)=>{$("qz-msg").textContent=t||"";$("qz-msg").className="fg-msg"+(e?" err":"")};
+const pLine=p=>{const b=brandName(p),g=groups.find(x=>x.id==p.groupId);
+ return "- "+(b?b+" — ":"")+p.name+" | "+(p.oil===true?"масляный":"оригинал")+(g?" | группа: "+g.name:"")+(Array.isArray(p.notes)&&p.notes.length?" | ноты: "+p.notes.slice(0,8).join(", "):"")};
+const pName=p=>(brandName(p)?brandName(p)+" — ":"")+p.name;
+function qzPrompt(){
+ const L=perfumes.map(pLine).join("\n"),a=perfumes[0]?pName(perfumes[0]):"Бренд — Название",b=perfumes[1]?pName(perfumes[1]):a,c=perfumes[2]?pName(perfumes[2]):a,w=$("qz-wish").value.trim();
+ const ex={question:"Для кого подбираем аромат?",options:[
+  {text:"Для себя",next:{question:"Какое настроение вам ближе?",options:[{text:"Свежее и лёгкое",result:[a,b]},{text:"Тёплое и глубокое",result:[c]}]}},
+  {text:"В подарок",result:[b,c]}]};
+ return `Ты — консультант парфюмерного магазина. Составь тест «Подбор аромата» в виде дерева вопросов и ответов. В конце каждой ветки покупателю показываются подходящие ароматы ТОЛЬКО из списка ниже.
+
+ПРАВИЛА
+- Вопросы и варианты ответов — на русском, короткие и понятные обычному покупателю (без парфюмерного жаргона).
+- В каждом вопросе от 2 до 5 вариантов ответа. Глубина ветки — от 2 до 5 вопросов.
+- Каждый вариант ответа ведёт либо к следующему вопросу ("next"), либо к итогу ("result").
+- "result" — массив из 1–4 ароматов, строго в том виде, как они написаны в списке ниже: «Бренд — Название» (без пометок «масляный», групп и нот).
+- Используй только ароматы из списка, ничего не выдумывай. Старайся, чтобы каждый аромат встретился в тесте хотя бы раз.
+- Подбирай ароматы по нотам, группе и типу, чтобы ответы покупателя реально вели к подходящему результату.${w?"\n- Пожелания владельца магазина: "+w:""}
+- Верни ТОЛЬКО валидный JSON, без пояснений и без markdown-обёртки.
+
+ФОРМАТ ОТВЕТА (пример структуры)
+${JSON.stringify(ex,null,1)}
+
+СПИСОК АРОМАТОВ (${perfumes.length})
+${L||"(пока пусто — сначала добавьте ароматы в админке)"}`}
+async function copyText(t){
+ try{await navigator.clipboard.writeText(t);return true}catch(e){}
+ const ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();
+ let ok=false;try{ok=document.execCommand("copy")}catch(e){}ta.remove();return ok}
+$("qz-copy").onclick=async()=>{
+ const m=$("qz-copymsg");
+ if(!perfumes.length){m.textContent="Сначала добавьте ароматы в каталог";m.className="fg-msg err";return}
+ const ok=await copyText(qzPrompt());
+ m.className="fg-msg"+(ok?"":" err");m.textContent=ok?"Скопировано (ароматов в списке: "+perfumes.length+"). Вставьте в чат GPT и дождитесь JSON.":"Не удалось скопировать — разрешите доступ к буферу обмена"};
+
+// разбор ответа GPT: убираем ```json-обёртку и текст вокруг, проверяем структуру, сверяем ароматы с каталогом
+function qzParse(raw){
+ let t=String(raw||"").trim().replace(/^```[a-z]*\s*/i,"").replace(/```\s*$/,"").trim();
+ const i=t.indexOf("{"),j=t.lastIndexOf("}");if(i<0||j<i)throw new Error("Не нашёл JSON — вставьте ответ GPT целиком");
+ let q;try{q=JSON.parse(t.slice(i,j+1))}catch(e){throw new Error("JSON не читается: "+e.message+". Попросите GPT прислать исправленный JSON.")}
+ return q}
+function qzFind(s){const n=norm(s);if(!n)return null;const full=p=>norm(brandName(p)+p.name);
+ return perfumes.find(p=>full(p)==n)||perfumes.find(p=>norm(p.name)==n)||perfumes.find(p=>{const f=full(p);return Math.min(f.length,n.length)>=5&&(f.includes(n)||n.includes(f))})||null}
+function qzCheck(q){
+ const st={nodes:0,leaves:0,depth:0,used:new Set(),bad:[],err:[]};
+ (function walk(n,d,where){
+  if(!n||typeof n!="object"||!Array.isArray(n.options)||!n.options.length){st.err.push(where+": нет списка options");return}
+  st.nodes++;st.depth=Math.max(st.depth,d);
+  if(!String(n.question||"").trim())st.err.push(where+": нет текста вопроса");
+  n.options.forEach((o,k)=>{const w=where+" → "+(o&&o.text||"вариант "+(k+1));
+   if(!o||!String(o.text||"").trim()){st.err.push(where+": у варианта "+(k+1)+" нет text");return}
+   if(o.next)walk(o.next,d+1,w);
+   else if(Array.isArray(o.result)&&o.result.length){st.leaves++;o.result.forEach(r=>{const p=qzFind(r);if(p)st.used.add(p.id);else st.bad.push(String(r))})}
+   else st.err.push(w+": нет ни next, ни result")})
+ })(q,1,"Корень");
+ return st}
+function qzReport(st){
+ const L=$("qz-log");L.innerHTML="";
+ const add=(t,c)=>{const d=document.createElement("div");if(c)d.className=c;d.textContent=t;L.appendChild(d)};
+ st.err.forEach(e=>add("✖ "+e,"e"));
+ [...new Set(st.bad)].forEach(b=>add("⚠ Нет в каталоге: «"+b+"» — на сайте покажется просто текстом","w"));
+ const unused=perfumes.filter(p=>!st.used.has(p.id));
+ if(unused.length&&!st.err.length)add("ℹ В тест не попали ароматы ("+unused.length+"): "+unused.slice(0,12).map(pName).join("; ")+(unused.length>12?"…":""));
+ qzMsg(st.err.length?"Есть ошибки — тест сохранить нельзя":"Структура верна: вопросов "+st.nodes+", итогов "+st.leaves+", глубина "+st.depth+", ароматов в тесте "+st.used.size+" из "+perfumes.length+(st.bad.length?". Неизвестных названий: "+new Set(st.bad).size:"")+".",st.err.length>0)}
+$("qz-check").onclick=()=>{try{qzReport(qzCheck(qzParse($("qz-json").value)))}catch(e){qzMsg(e.message,true);$("qz-log").innerHTML=""}};
+$("qz-save").onclick=()=>{
+ let q,st;try{q=qzParse($("qz-json").value);st=qzCheck(q)}catch(e){qzMsg(e.message,true);return}
+ qzReport(st);if(st.err.length)return;
+ if(st.bad.length&&!confirm("Не найдено в каталоге ароматов: "+new Set(st.bad).size+". Они покажутся просто текстом. Сохранить всё равно?"))return;
+ const json=JSON.stringify(q,null,1);
+ run(async()=>{await setDoc(QZ,{json,ts:Date.now()});$("qz-json").value=json;qzMsg("Сохранено — тест доступен на странице test.html")},"Тест сохранён")};
+$("qz-del").onclick=()=>{if(!confirm("Удалить тест? На странице test.html появится «Тест пока не готов»."))return;
+ run(async()=>{await deleteDoc(QZ);$("qz-json").value="";$("qz-log").innerHTML="";qzMsg("Тест удалён")},"Тест удалён")};
+getDoc(QZ).then(x=>{if(x.exists()&&x.data().json){$("qz-json").value=x.data().json;qzMsg("Загружен сохранённый тест")}}).catch(()=>{});
 
 loadAll().then(()=>status("Готово","ok")).catch(e=>{status("Не удалось загрузить: "+e.message,"err")});
 </script>
