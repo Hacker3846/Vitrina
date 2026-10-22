@@ -16,7 +16,8 @@ header h1{font-size:18px}
 .sp{flex:1}
 #status{font-size:13px;color:var(--grey)}
 #status.ok{color:var(--ok)}#status.err{color:var(--red)}
-nav.tabs{display:flex;gap:6px;margin:16px 0;overflow-x:auto}
+nav.tabs{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+.gset{margin-top:10px;font-size:13px;color:var(--grey)}.gset summary{cursor:pointer}
 nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;height:40px;padding:0 18px;border-radius:20px;font-size:15px;cursor:pointer}
 nav.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .panel{display:none}.panel.on{display:block}
@@ -74,6 +75,15 @@ button.b:disabled{opacity:.5;cursor:wait}
 .bk-r select{flex:1 1 150px;min-width:0;padding:9px 10px;font-size:15px}
 .bk-r input{flex:0 0 110px;width:110px;padding:9px 10px;font-size:15px}
 .bk-r button{height:40px;padding:0 14px;font-size:14px}
+.ailog{max-height:280px;overflow:auto;font-size:13px;margin-top:10px}
+.ailog div{padding:6px 0;border-top:1px solid var(--line);color:var(--ink)}
+.ailog div.e{color:var(--red)}
+.ailog div.w{color:#b26a00}
+.ailog small{color:var(--grey)}
+progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
+.lblrow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:10px 0 4px}
+.lblrow label{margin:0}
+.lblrow button{height:30px;padding:0 12px;font-size:13px;border-radius:15px}
 </style>
 </head>
 <body>
@@ -83,6 +93,7 @@ button.b:disabled{opacity:.5;cursor:wait}
  <button data-p="perfumes" class="on">Ароматы</button>
  <button data-p="groups">Группы</button>
  <button data-p="bulk">Массовая загрузка</button>
+ <button data-p="ai">ИИ и картинки</button>
  <button data-p="bottles">Флаконы</button>
  <button data-p="brands">Бренды</button>
  <button data-p="contacts">Контакты</button>
@@ -95,15 +106,14 @@ button.b:disabled{opacity:.5;cursor:wait}
   <label>Название</label><input id="pf-name" placeholder="Например, Sauvage">
   <div class="fg">
    <div class="fgrow">
-    <button class="b g" id="fg-go" type="button">🔍 Найти в Fragella</button>
-    <label class="chk"><input type="checkbox" id="fg-tr" checked> прозрачный фон бутылки</label>
+    <button class="b g" id="fg-go" type="button">🔍 Найти по названию (Fragrantica)</button>
    </div>
-   <div class="hint">Введите название выше (от 3 букв) и нажмите «Найти» — выберите аромат, и название, бренд и картинка подставятся сами.</div>
+   <div class="hint">Введите название выше, например «Dior Sauvage», и нажмите «Найти». Поиск идёт через Apify и занимает 15–60 секунд. Название, бренд, ноты и картинка подставятся сами.</div>
+   <label class="chk2"><input type="checkbox" id="cut-on" checked> Прозрачный фон у картинки (убрать белый фон — и при поиске, и при загрузке файла)</label>
    <div class="fg-msg" id="fg-msg"></div>
-   <div class="fg-res" id="fg-res"></div>
-   <details id="fg-set"><summary>API-ключ Fragella</summary>
-    <input id="fg-key" type="password" autocomplete="off" placeholder="Вставьте ключ с api.fragella.com" style="margin-top:8px">
-    <div class="hint">Ключ хранится только в этом браузере (не в коде сайта и не в базе). Бесплатный тариф — 20 запросов в месяц, каждый поиск = 1 запрос.</div>
+   <details id="fg-set"><summary>Apify API-токен</summary>
+    <input id="fg-key" type="password" autocomplete="off" placeholder="Токен из Apify Console → Settings → API &amp; integrations" style="margin-top:8px">
+    <div class="hint">Токен хранится только в этом браузере (не в коде сайта и не в базе). Один поиск = один запуск актора, около $0.002.</div>
    </details>
   </div>
   <div class="row">
@@ -111,6 +121,15 @@ button.b:disabled{opacity:.5;cursor:wait}
    <div><label>Группа</label><select id="pf-group"></select></div>
    <div><label>Цена</label><input id="pf-price" type="number" inputmode="decimal" min="0" placeholder="0"></div>
   </div>
+  <label>Ноты (через запятую)</label><input id="pf-notes" placeholder="Bergamot, Lavender, Ambroxan">
+  <div class="lblrow"><label>Описание (показывается в карточке товара на сайте)</label><button class="b g" id="pf-ai" type="button">✨ Написать ИИ</button></div>
+  <textarea id="pf-desc" placeholder="Коротко о аромате"></textarea>
+  <div class="fg-msg" id="pf-ai-msg"></div>
+  <details class="gset" id="pf-gset"><summary>Groq API-ключ и модель (для ИИ-описаний)</summary>
+   <input class="g-key" type="password" autocomplete="off" placeholder="Groq API-ключ: gsk_…" style="margin-top:8px">
+   <select class="g-model" style="margin-top:8px"></select>
+   <div class="hint">Ключ хранится только в этом браузере. Те же поля есть на вкладках «Массовая загрузка» и «ИИ и картинки».</div>
+  </details>
   <label>Картинка аромата</label><input id="pf-file" type="file" accept="image/*">
   <div class="prev" id="pf-prev"></div>
   <div class="acts"><button class="b" id="pf-save">Сохранить</button><button class="b g" id="pf-cancel" hidden>Отмена</button></div>
@@ -144,12 +163,17 @@ button.b:disabled{opacity:.5;cursor:wait}
   <div class="row">
    <div><label>Группа для всех</label><select id="bk-group"></select></div>
   </div>
-  <label class="chk2"><input type="checkbox" id="bk-tr" checked> прозрачный фон бутылки</label>
+  <label class="chk2"><input type="checkbox" id="bk-cut" checked> Прозрачный фон у картинок (убрать белый фон)</label>
   <div class="acts"><button class="b" id="bk-go" type="button">Разобрать список</button></div>
   <div class="fg-msg" id="bk-msg"></div>
-  <details id="bk-set" style="margin-top:10px;font-size:13px;color:var(--grey)"><summary style="cursor:pointer">API-ключ Fragella</summary>
-   <input id="bk-key" type="password" autocomplete="off" placeholder="Тот же ключ, что и на вкладке «Ароматы»" style="margin-top:8px">
-   <div class="hint">Каждый аромат из списка = 1 запрос Fragella. Ключ хранится только в этом браузере.</div>
+  <details id="bk-set" style="margin-top:10px;font-size:13px;color:var(--grey)"><summary style="cursor:pointer">Apify API-токен</summary>
+   <input id="bk-key" type="password" autocomplete="off" placeholder="Тот же токен, что и на вкладке «Ароматы»" style="margin-top:8px">
+   <div class="hint">Каждый аромат из списка = 1 запуск Apify (≈ $0.002, 15–60 секунд). Токен хранится только в этом браузере.</div>
+  </details>
+  <details class="gset" id="bk-gset"><summary>Groq API-ключ и модель (для ИИ-описаний)</summary>
+   <input class="g-key" type="password" autocomplete="off" placeholder="Groq API-ключ: gsk_…" style="margin-top:8px">
+   <select class="g-model" style="margin-top:8px"></select>
+   <div class="hint">Описания для загруженных ароматов пишутся на вкладке «ИИ и картинки».</div>
   </details>
  </div>
  <div class="box" id="bk-box" hidden>
@@ -160,6 +184,33 @@ button.b:disabled{opacity:.5;cursor:wait}
  </div>
 </section>
 <datalist id="bk-brands"></datalist>
+
+<!-- ИИ и картинки -->
+<section class="panel" id="p-ai">
+ <div class="box">
+  <h2>ИИ-описания (Groq)</h2>
+  <label>Groq API-ключ</label>
+  <input id="ai-key" class="g-key" type="password" autocomplete="off" placeholder="gsk_…">
+  <div class="hint">Ключ хранится только в этом браузере. Взять его можно на console.groq.com → API Keys.</div>
+  <label>Модель</label>
+  <div class="row"><select id="ai-model" class="g-model" style="flex:1 1 220px"></select><button class="b g" id="ai-refresh" type="button" style="flex:0 0 auto">Обновить список</button></div>
+  <div class="fg-msg" id="ai-stat"></div>
+  <label class="chk2"><input type="checkbox" id="ai-en"> Писать заново и там, где описание без русских букв (например, английское с Fragrantica)</label>
+  <div class="acts"><button class="b" id="ai-go" type="button">Сгенерировать описания</button><button class="b d" id="ai-stop" type="button" hidden>Остановить</button></div>
+  <progress class="bar" id="ai-bar" value="0" max="1" hidden></progress>
+  <div class="fg-msg" id="ai-msg"></div>
+  <div class="ailog" id="ai-log"></div>
+  <p class="hint">Описание пишется по бренду, названию и нотам. Заполненные описания не трогаются. Если Groq отвечает «слишком много запросов», страница ждёт 63 секунды и пробует снова — столько раз, сколько нужно, пока всё не загрузится или вы не нажмёте «Остановить». Вкладку не закрывайте, пока идёт загрузка.</p>
+ </div>
+ <div class="box">
+  <h2>Прозрачный фон у уже загруженных картинок</h2>
+  <div class="fg-msg" id="cut-stat"></div>
+  <div class="acts"><button class="b g" id="cut-go" type="button">Убрать белый фон у старых картинок</button><button class="b d" id="cut-stop" type="button" hidden>Остановить</button></div>
+  <progress class="bar" id="cut-bar" value="0" max="1" hidden></progress>
+  <div class="fg-msg" id="cut-msg"></div>
+  <p class="hint">Новые картинки из поиска и массовой загрузки получают прозрачный фон сами. Эта кнопка обрабатывает уже сохранённые JPEG на белом фоне. Исходник заменяется, вернуть его нельзя.</p>
+ </div>
+</section>
 
 <!-- Группы -->
 <section class="panel" id="p-groups">
@@ -247,105 +298,182 @@ function renderPerfumes(){
  $("pf-list").innerHTML=perfumes.length?perfumes.map(p=>{
   const b=brands.find(x=>x.id==p.brandId),g=groups.find(x=>x.id==p.groupId);
   return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
+ aiStat();
 }
 function prevImg(){$("pf-prev").innerHTML=imgData?`<img src="${imgData}" alt=""><button class="b d" id="pf-rmimg" type="button">Убрать картинку</button>`:""}
 $("pf-prev").onclick=e=>{if(e.target.id=="pf-rmimg"){imgData="";$("pf-file").value="";prevImg()}};
-function resetP(){editP=null;imgData="";fgBrandNew="";$("fg-res").innerHTML="";fgMsg("");$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
+function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
 $("pf-cancel").onclick=resetP;
 
-function compress(file,max=700,q=.78){return new Promise((res,rej)=>{
+// ---------- Картинки: сжатие и прозрачный фон
+// Fragrantica отдаёт JPEG на белом фоне — прозрачности в источнике нет, поэтому белый фон,
+// связанный с краями картинки, убираем сами (и аккуратно «отмываем» белую кайму по контуру).
+const hasAlpha=c=>{const d=c.getContext("2d",{willReadFrequently:true}).getImageData(0,0,c.width,c.height).data;for(let i=3;i<d.length;i+=4)if(d[i]<250)return true;return false};
+const imgCanvas=(im,max)=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");
+ c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+ c.getContext("2d",{willReadFrequently:true}).drawImage(im,0,0,c.width,c.height);return c};
+function cutoutWhite(c){
+ const w=c.width,h=c.height,n=w*h,ctx=c.getContext("2d",{willReadFrequently:true}),im=ctx.getImageData(0,0,w,h),d=im.data;
+ let tp=0;for(let i=3;i<d.length;i+=4)if(d[i]<250)tp++;
+ if(tp>n*.01)return c;                                   // уже с прозрачностью — не трогаем
+ const lim=255-28,bg=new Uint8Array(n),st=new Int32Array(n);let sp=0,cnt=0;
+ const wh=i=>{const o=i*4;return d[o]>=lim&&d[o+1]>=lim&&d[o+2]>=lim};
+ const push=i=>{if(!bg[i]&&wh(i)){bg[i]=1;cnt++;st[sp++]=i}};
+ for(let x=0;x<w;x++){push(x);push(n-w+x)}
+ for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}
+ while(sp){const i=st[--sp],x=i%w;if(x>0)push(i-1);if(x<w-1)push(i+1);if(i>=w)push(i-w);if(i<n-w)push(i+w)}
+ if(cnt<n*.05||cnt>n*.97)return c;                       // белого фона по краям нет (или картинка почти вся белая)
+ // два слоя пикселей у границы фона: для них считаем плавную прозрачность
+ const ds=new Uint8Array(n),L1=[];
+ const near=(i,f)=>{const x=i%w,y=(i-x)/w;for(let dy=-1;dy<=1;dy++){const yy=y+dy;if(yy<0||yy>=h)continue;for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const xx=x+dx;if(xx<0||xx>=w)continue;if(f(yy*w+xx))return true}}return false};
+ for(let i=0;i<n;i++)if(!bg[i]&&near(i,j=>bg[j])){ds[i]=1;L1.push(i)}
+ for(const i of L1){const x=i%w,y=(i-x)/w;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=w||yy>=h)continue;const j=yy*w+xx;if(!bg[j]&&!ds[j])ds[j]=2}}
+ const R=3,out=new Uint8ClampedArray(d);
+ for(let i=0;i<n;i++){
+  const o=i*4;
+  if(bg[i]){out[o+3]=0;continue}
+  if(!ds[i])continue;
+  // цвет предмета — среднее по ближайшим «внутренним» пикселям
+  const x=i%w,y=(i-x)/w;let fr=0,fg=0,fb=0,k=0;
+  for(let yy=Math.max(0,y-R);yy<=Math.min(h-1,y+R);yy++)for(let xx=Math.max(0,x-R);xx<=Math.min(w-1,x+R);xx++){const j=yy*w+xx;if(!bg[j]&&!ds[j]){fr+=d[j*4];fg+=d[j*4+1];fb+=d[j*4+2];k++}}
+  if(!k)continue;
+  fr/=k;fg/=k;fb/=k;
+  const vr=255-fr,vg=255-fg,vb=255-fb,vv=vr*vr+vg*vg+vb*vb;
+  if(vv<2500)continue;                                   // предмет сам почти белый — оставляем как есть
+  let a=((255-d[o])*vr+(255-d[o+1])*vg+(255-d[o+2])*vb)/vv;
+  a=a<.05?0:a>1?1:a;
+  if(a<.97){out[o]=fr;out[o+1]=fg;out[o+2]=fb}
+  out[o+3]=Math.round(a*255)}
+ // обрезаем пустые поля вокруг предмета
+ let x0=w,y0=h,x1=-1,y1=-1;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(out[(y*w+x)*4+3]>16){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+ if(x1<0)return c;
+ ctx.putImageData(new ImageData(out,w,h),0,0);
+ const p=Math.round(Math.max(w,h)*.03);x0=Math.max(0,x0-p);y0=Math.max(0,y0-p);x1=Math.min(w-1,x1+p);y1=Math.min(h-1,y1+p);
+ const o2=document.createElement("canvas");o2.width=x1-x0+1;o2.height=y1-y0+1;
+ o2.getContext("2d",{willReadFrequently:true}).drawImage(c,x0,y0,o2.width,o2.height,0,0,o2.width,o2.height);return o2}
+// canvas → dataURL: с прозрачностью — WebP (если браузер не умеет, выйдет PNG), без неё — JPEG на белом
+function encodeCanvas(c,q,cut){
+ if(cut)c=cutoutWhite(c);
+ if(hasAlpha(c)){let cc=c,out="";
+  for(let t=0;t<6;t++){out=cc.toDataURL("image/webp",.85);if(out.length<=450000)break;
+   const k=.8,s=document.createElement("canvas");s.width=Math.round(cc.width*k);s.height=Math.round(cc.height*k);s.getContext("2d",{willReadFrequently:true}).drawImage(cc,0,0,s.width,s.height);cc=s}
+  return out}
+ const o=document.createElement("canvas");o.width=c.width;o.height=c.height;
+ const x=o.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,o.width,o.height);x.drawImage(c,0,0);
+ return o.toDataURL("image/jpeg",q)}
+function compress(file,max=700,q=.78,cut=false){return new Promise((res,rej)=>{
  const r=new FileReader();r.onerror=()=>rej(new Error("Не удалось прочитать файл"));
  r.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error("Это не картинка"));
-  im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");
-   c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
-   const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
-   res(c.toDataURL("image/jpeg",q))};im.src=r.result};r.readAsDataURL(file)})}
+  im.onload=()=>{try{res(encodeCanvas(imgCanvas(im,max),q,cut))}catch(e){rej(e)}};im.src=r.result};r.readAsDataURL(file)})}
+const cutOn=()=>$("cut-on").checked;
 $("pf-file").onchange=async e=>{const f=e.target.files[0];if(!f)return;
- try{imgData=await compress(f);prevImg()}catch(er){alert(er.message);e.target.value=""}};
+ try{imgData=await compress(f,700,.78,cutOn());prevImg()}catch(er){alert(er.message);e.target.value=""}};
 
-// ---------- Fragella
-const FG="https://api.fragella.com/api/v1/";
-let fgItems=[],fgBrandNew="";
+// ---------- Поиск через Apify: unfenced-group/fragrantica-perfume-scraper
+const APIFY="https://api.apify.com/v2/";
+const ACTOR="unfenced-group~fragrantica-perfume-scraper";   // в URL API вместо «/» ставится «~»
+const TOKEN_KEY="apify-token";
+let fgBrandNew="";
 const fgMsg=(t,err)=>{$("fg-msg").textContent=t||"";$("fg-msg").className="fg-msg"+(err?" err":"")};
 const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-$("fg-key").value=lsGet("fragella-key");
+// галочка «прозрачный фон» — одна на всю админку, запоминается в браузере
+{const on=lsGet("cut-bg")!="0";$("cut-on").checked=$("bk-cut").checked=on;
+ const sync=e=>{$("cut-on").checked=$("bk-cut").checked=e.target.checked;lsSet("cut-bg",e.target.checked?"1":"0")};
+ $("cut-on").onchange=$("bk-cut").onchange=sync}
+$("fg-key").value=lsGet(TOKEN_KEY);
 if(!$("fg-key").value)$("fg-set").open=true;
 $("bk-key").value=$("fg-key").value;if(!$("bk-key").value)$("bk-set").open=true;
-$("fg-key").onchange=()=>{lsSet("fragella-key",$("fg-key").value.trim());$("bk-key").value=$("fg-key").value};
-$("bk-key").onchange=()=>{$("fg-key").value=$("bk-key").value.trim();lsSet("fragella-key",$("fg-key").value)};
-const ascii=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+$("fg-key").onchange=()=>{lsSet(TOKEN_KEY,$("fg-key").value.trim());$("bk-key").value=$("fg-key").value};
+$("bk-key").onchange=()=>{$("fg-key").value=$("bk-key").value.trim();lsSet(TOKEN_KEY,$("fg-key").value)};
+const ascii=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const norm=t=>ascii(t).replace(/[^a-z0-9а-яё]+/g,"");
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-async function fgSearch(q){
- const ck="fg:"+q.toLowerCase();
- try{const c=sessionStorage.getItem(ck);if(c)return JSON.parse(c)}catch(e){}   // повторный поиск не тратит лимит
- const key=$("fg-key").value.trim();
- if(!key){$("fg-set").open=true;throw new Error("Вставьте API-ключ Fragella (раздел ниже)")}
- lsSet("fragella-key",key);
+async function apify(url,opts){
  let r;
- try{r=await fetch(FG+"fragrances?"+new URLSearchParams({search:q,limit:8}),{headers:{"x-api-key":key}})}
- catch(e){throw new Error("Не удалось связаться с Fragella (сеть или блокировка CORS)")}
- if(r.status==404)return[];
- if(r.status==401||r.status==403)throw new Error("Неверный API-ключ Fragella");
- if(r.status==429)throw new Error("Лимит запросов Fragella на этот месяц исчерпан");
- if(!r.ok)throw new Error("Fragella вернула ошибку "+r.status);
- let d=await r.json();if(d&&d.data)d=d.data;
- d=Array.isArray(d)?d:[];
- try{sessionStorage.setItem(ck,JSON.stringify(d))}catch(e){}
- return d}
+ try{r=await fetch(url,opts)}catch(e){throw new Error("Не удалось связаться с Apify (сеть или блокировка CORS)")}
+ if(r.status==401)throw new Error("Неверный Apify API-токен");
+ if(r.status==402)throw new Error("Apify: недостаточно средств или исчерпан лимит плана");
+ if(r.status==403)throw new Error("Apify: у токена нет доступа к этому актору");
+ if(r.status==404)throw new Error("Apify: актор или запуск не найден");
+ if(r.status==429)throw new Error("Apify: слишком много запросов, повторите через минуту");
+ if(!r.ok)throw new Error("Apify вернул ошибку "+r.status);
+ return r.json()}
 
-// скачать картинку и ужать до dataURL (как загрузка вручную); если CDN не отдаёт CORS — оставляем ссылку
-async function fgImage(url,transparent){
- try{
-  const r=await fetch(url,{mode:"cors"});if(!r.ok)throw 0;
-  const b=await r.blob(),u=URL.createObjectURL(b);
-  const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});
-  const k=Math.min(1,700/Math.max(im.width,im.height)),c=document.createElement("canvas");
-  c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
-  const x=c.getContext("2d");
-  if(!transparent){x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height)}
-  x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
-  return transparent?c.toDataURL("image/webp",.85):c.toDataURL("image/jpeg",.8)
- }catch(e){return url}}
+// запуск актора → опрос статуса → чтение датасета. Возвращает [] или [{Name,Brand,Year,img,img2,notes[]}]
+async function fgSearch(q){
+ const ck="ap:"+q.toLowerCase();
+ try{const c=sessionStorage.getItem(ck);if(c)return JSON.parse(c)}catch(e){}   // повтор того же запроса бесплатный
+ const token=$("fg-key").value.trim();
+ if(!token){$("fg-set").open=true;$("bk-set").open=true;throw new Error("Вставьте Apify API-токен (раздел «Apify API-токен»)")}
+ lsSet(TOKEN_KEY,token);
+ const tk="token="+encodeURIComponent(token);
+ // maxResults — настоящее имя поля актора (maxPerfumes он не знает); maxItems — страховка от лишних платных записей
+ const start=await apify(APIFY+"acts/"+ACTOR+"/runs?"+tk+"&maxItems=1&timeout=240",{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({searchQueries:[q],maxResults:1,includeCommunityVotes:false,includeReviews:false})});
+ let run=start.data;const t0=Date.now();
+ while(!["SUCCEEDED","FAILED","ABORTED","TIMED-OUT"].includes(run.status)){
+  if(Date.now()-t0>270000)throw new Error("Apify: поиск занял слишком долго, попробуйте ещё раз");
+  await sleep(2000);
+  run=(await apify(APIFY+"actor-runs/"+run.id+"?"+tk+"&waitForFinish=15")).data}
+ if(run.status!="SUCCEEDED")throw new Error("Apify: запуск завершился со статусом "+run.status+(run.statusMessage?" — "+run.statusMessage:""));
+ const items=await apify(APIFY+"datasets/"+run.defaultDatasetId+"/items?"+tk+"&format=json&clean=true&limit=3");
+ const it=(Array.isArray(items)?items:[]).find(x=>x&&x.name&&(!x.recordType||x.recordType=="perfume"||x.recordType=="perfume-listing"));
+ let out=[];
+ if(it){
+  const nn=a=>(Array.isArray(a)?a:[]).map(x=>typeof x=="string"?x:x&&x.name).filter(Boolean);
+  let notes=[...nn(it.notesTop),...nn(it.notesMiddle),...nn(it.notesBase)];
+  if(!notes.length)notes=nn(it.notesUnsorted);if(!notes.length)notes=nn(it.allNotes);
+  out=[{Name:it.name,Brand:it.brand||"",Year:it.year||"",img:it.imageUrl||it.imageUrlLarge||"",img2:it.imageUrlLarge||"",notes:[...new Set(notes)],desc:String(it.descriptionText||"").replace(/\s+\n/g,"\n").trim().slice(0,900)}]}
+ try{sessionStorage.setItem(ck,JSON.stringify(out))}catch(e){}
+ return out}
+
+// скачать картинку и ужать до dataURL (как загрузка вручную).
+// 1) напрямую, 2) через прокси картинок wsrv.nl (у CDN Fragrantica нет CORS), 3) иначе оставляем ссылку
+async function fgImage(url,cut){
+ const grab=async u=>{
+  const r=await fetch(u,{mode:"cors"});if(!r.ok)throw 0;
+  const o=URL.createObjectURL(await r.blob());
+  try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=o});
+   return encodeCanvas(imgCanvas(im,700),.8,cut)}finally{URL.revokeObjectURL(o)}};
+ for(const u of [url,"https://wsrv.nl/?url="+encodeURIComponent(url.replace(/^https?:\/\//,""))+"&w=700&output=jpg&q=80"]){
+  try{return await grab(u)}catch(e){}}
+ return url}
 
 async function fgFind(){
  const q=$("pf-name").value.trim();
  if(q.length<3){fgMsg("Введите в поле «Название» минимум 3 буквы",true);return}
- const btn=$("fg-go");btn.disabled=true;fgMsg("Ищем…");$("fg-res").innerHTML="";
+ const btn=$("fg-go");btn.disabled=true;fgMsg("Ищем на Fragrantica через Apify… обычно 15–60 секунд");
  try{
-  fgItems=await fgSearch(q);
-  if(!fgItems.length){fgMsg("Ничего не найдено. Попробуйте написать иначе (по-английски, как на флаконе).");return}
-  fgMsg("Выберите нужный аромат:");
-  $("fg-res").innerHTML=fgItems.map((f,i)=>{const im=f["Image URL"]||f["Image URL Transparent"]||"";
-   return `<button type="button" class="fg-c" data-i="${i}">${im?`<img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:""}<b>${esc(f.Name)}</b><span>${esc(f.Brand||"")}${f.Year?" · "+esc(f.Year):""}</span></button>`}).join("")
+  const r=await fgSearch(q);
+  if(!r.length){fgMsg("Ничего не найдено. Попробуйте написать иначе (бренд и название по-английски).",true);return}
+  await fgApply(r[0])
  }catch(e){fgMsg(e.message,true)}finally{btn.disabled=false}}
 $("fg-go").onclick=fgFind;
-$("pf-name").addEventListener("keydown",e=>{if(e.key=="Enter"&&!editP&&$("pf-name").value.trim().length>=3){e.preventDefault();fgFind()}});
 
-$("fg-res").onclick=async e=>{
- const c=e.target.closest(".fg-c");if(!c)return;
- const f=fgItems[+c.dataset.i];if(!f)return;
+async function fgApply(f){
  $("pf-name").value=f.Name||$("pf-name").value;
  // бренд: берём существующий или предлагаем новый (создастся при сохранении)
  const sel=$("pf-brand");[...sel.querySelectorAll("option[value=__new__]")].forEach(o=>o.remove());fgBrandNew="";
  if(f.Brand){const ex=brands.find(b=>norm(b.name)==norm(f.Brand));
   if(ex)sel.value=ex.id;
   else{fgBrandNew=f.Brand;const o=document.createElement("option");o.value="__new__";o.textContent="＋ "+f.Brand+" (новый бренд)";sel.appendChild(o);sel.value="__new__"}}
- const tr=$("fg-tr").checked;
- const url=(tr&&f["Image URL Transparent"])||f["Image URL"]||"";
- if(url){fgMsg("Загружаем картинку…");
-  imgData=await fgImage(url,tr&&!!f["Image URL Transparent"]);prevImg();
-  fgMsg(imgData.startsWith("data:")?"Готово: название, бренд и картинка подставлены. Укажите группу и цену → «Сохранить».":"Картинка подставлена ссылкой (Fragella не отдала файл напрямую). Укажите группу и цену → «Сохранить».")}
- else fgMsg("У этого аромата нет картинки в Fragella — можно загрузить свою.",true);
- $("fg-res").innerHTML=""};
+ $("pf-notes").value=(f.notes||[]).join(", ");$("pf-desc").value=f.desc||"";
+ const head="Найдено: "+(f.Brand?f.Brand+" ":"")+f.Name+(f.Year?" ("+f.Year+")":"")+". ";
+ if(f.img){fgMsg(head+"Загружаем картинку…");
+  imgData=await fgImage(f.img,cutOn());prevImg();
+  const tp=/^data:image\/(webp|png)/.test(imgData);
+  fgMsg(head+(imgData.startsWith("data:")?"Название, бренд, ноты и картинка"+(tp?" (с прозрачным фоном)":"")+" подставлены.":"Картинка подставлена ссылкой (сервер не отдал файл напрямую, фон не убран).")+" Проверьте, укажите группу и цену → «Сохранить».")}
+ else fgMsg(head+"Картинки нет — можно загрузить свою. Ноты и бренд подставлены.",true)}
 
 $("pf-save").onclick=()=>{
  const name=$("pf-name").value.trim();if(!name){alert("Введите название аромата");return}
  const old=perfumes.find(x=>x.id==editP);
  const id=editP||uid("shop-perfume");
  const brandId=$("pf-brand").value,newBrand=brandId=="__new__"?fgBrandNew:"";
- const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",ts:old?old.ts:Date.now()};
+ const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
  const btn=$("pf-save");btn.disabled=true;
  run(async()=>{
   if(newBrand){const ex=brands.find(b=>norm(b.name)==norm(newBrand));
@@ -357,7 +485,7 @@ $("pf-save").onclick=()=>{
 $("pf-list").onclick=e=>{
  const ed=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]");
  if(ed){const p=perfumes.find(x=>x.id==ed.dataset.e);editP=p.id;imgData=p.img||"";
-  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-file").value="";
+  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-file").value="";
   $("pf-title").textContent="Изменить аромат";$("pf-cancel").hidden=false;prevImg();scrollTo({top:0,behavior:"smooth"})}
  if(dl){const p=perfumes.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить «"+p.name+"»?"))return;
   run(async()=>{await deleteDoc(doc(db,COL,p.id));perfumes=perfumes.filter(x=>x.id!=p.id);if(editP==p.id)resetP();renderPerfumes()},"Удалено")}};
@@ -388,11 +516,11 @@ function bkUpdate(r,force){
  const nm=d.querySelector(".bk-name"),br=d.querySelector(".bk-brand");
  if(force||!nm.dataset.dirty){nm.value=r.name;delete nm.dataset.dirty}
  if(force||!br.dataset.dirty){br.value=r.brand;delete br.dataset.dirty}
- const f=r.items[r.sel],im=f&&(f["Image URL"]||f["Image URL Transparent"]);
+ const f=r.items[r.sel],im=f&&f.img;
  d.querySelector(".bk-img").innerHTML=im?`<img src="${esc(im)}" alt="" referrerpolicy="no-referrer">`:"";
  const alt=d.querySelector(".bk-alt");
  if(r.items.length>1){alt.hidden=false;alt.innerHTML=r.items.map((x,i)=>`<option value="${i}"${i==r.sel?" selected":""}>${esc(x.Name)} — ${esc(x.Brand||"")}${x.Year?" ("+esc(x.Year)+")":""}</option>`).join("")}else alt.hidden=true;
- const T={wait:"Ищем в Fragella…",ok:"Найдено в Fragella — проверьте и укажите цену",none:"Не найдено в Fragella — проверьте название и бренд вручную",skip:"Не искали в Fragella: "+(r.err||"")};
+ const T={wait:"Ищем на Fragrantica…",ok:"Найдено — проверьте и укажите цену",none:"Не найдено — проверьте название и бренд вручную",skip:"Не искали: "+(r.err||"")};
  let t=T[r.state]||"";const dup=perfumes.some(p=>norm(p.name)==norm(r.name));
  const st=d.querySelector(".bk-st");st.textContent=t+(dup?" · ⚠ такой аромат уже есть в каталоге":"");st.className="bk-st"+(dup||r.state=="none"||r.state=="skip"?" warn":"")}
 
@@ -402,7 +530,7 @@ async function bkParse(){
  $("bk-key").value&&($("fg-key").value=$("bk-key").value.trim());
  bkRows=parts.map((q,i)=>({id:"bk"+Date.now().toString(36)+i,q,items:[],sel:-1,state:"wait",err:"",...bkGuess(q)}));
  $("bk-list").innerHTML="";bkRows.forEach(bkCreate);bkCount();
- $("bk-msg").className="fg-msg";$("bk-msg").textContent="Ищем в Fragella: 0 из "+bkRows.length;
+ $("bk-msg").className="fg-msg";$("bk-msg").textContent="Ищем на Fragrantica (по 15–60 с на аромат): 0 из "+bkRows.length;
  $("bk-go").disabled=true;
  let next=0,done=0,stop="";
  const worker=async()=>{while(next<bkRows.length){
@@ -411,7 +539,7 @@ async function bkParse(){
   try{r.items=await fgSearch(r.q);
    if(r.items.length){let b=0,bs=-1;r.items.forEach((f,i)=>{const sc=bkScore(r.q,f);if(sc>bs){bs=sc;b=i}});bkApply(r,b);r.state="ok"}else r.state="none"}
   catch(e){stop=e.message;r.state="skip";r.err=stop}
-  done++;bkUpdate(r);$("bk-msg").textContent="Ищем в Fragella: "+done+" из "+bkRows.length}};
+  done++;bkUpdate(r);$("bk-msg").textContent="Ищем на Fragrantica: "+done+" из "+bkRows.length}};
  await Promise.all([worker(),worker(),worker()]);
  $("bk-go").disabled=false;if(stop&&/ключ/i.test(stop))$("bk-set").open=true;
  $("bk-msg").className="fg-msg"+(stop?" err":"");
@@ -427,8 +555,8 @@ async function bkPublishOne(id){
   status("Публикуем…");
   const brandId=await ensureBrand(d.querySelector(".bk-brand").value);
   let img="";const f=r.items[r.sel];
-  if(f){const tr=$("bk-tr").checked&&!!f["Image URL Transparent"],u=tr?f["Image URL Transparent"]:(f["Image URL"]||f["Image URL Transparent"]);if(u)img=await fgImage(u,tr)}
-  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,price:pv===""?"":Number(pv),img,ts:Date.now()};
+  if(f&&f.img)img=await fgImage(f.img,$("bk-cut").checked);
+  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc:(f&&f.desc)||"",ts:Date.now()};
   const pid=uid("shop-perfume");await setDoc(doc(db,COL,pid),data);perfumes.unshift({id:pid,...data});
   bkRows.splice(bkRows.indexOf(r),1);d.remove();bkCount();renderPerfumes();renderBrands();status("Опубликовано: "+name,"ok");return true
  }catch(e){btn.disabled=false;status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message);return false}}
@@ -517,6 +645,153 @@ $("br-list").onclick=e=>{
 $("c-save").onclick=()=>run(()=>setDoc(doc(db,COL,"shop-contacts"),{kind:"shop-contacts",shopName:$("c-shop").value.trim(),phone:$("c-phone").value.trim(),whatsapp:$("c-wa").value.trim(),instagram:$("c-ig").value.trim(),address:$("c-addr").value.trim(),currency:$("c-cur").value.trim()}));
 $("c-clear").onclick=()=>{if(!confirm("Очистить все контакты?"))return;
  run(async()=>{await deleteDoc(doc(db,COL,"shop-contacts"));["c-shop","c-phone","c-wa","c-ig","c-addr","c-cur"].forEach(i=>$(i).value="")},"Контакты очищены")};
+
+// ---------- ИИ-описания через Groq
+const GROQ="https://api.groq.com/openai/v1/",WAIT_429=63,DEF_MODEL="openai/gpt-oss-120b";
+const MODELS0=[DEF_MODEL,"openai/gpt-oss-20b","llama-3.3-70b-versatile","llama-3.1-8b-instant"];
+class Stopped extends Error{}      // нажали «Остановить»
+class Fatal extends Error{}        // дальше пытаться бессмысленно (неверный ключ, нет модели…)
+const hasRu=s=>/[а-яё]/i.test(s||"");
+const gKey=()=>$("ai-key").value.trim(),gModel=()=>$("ai-model").value||DEF_MODEL;
+let aiRun=false;
+const aiNeed=p=>!String(p.desc||"").trim()||($("ai-en").checked&&!hasRu(p.desc));
+function aiStat(){
+ const e=perfumes.filter(p=>!String(p.desc||"").trim()).length,en=perfumes.filter(p=>String(p.desc||"").trim()&&!hasRu(p.desc)).length,t=perfumes.filter(aiNeed).length;
+ $("ai-stat").textContent=perfumes.length?"Без описания: "+e+" из "+perfumes.length+(en?" · с описанием без русских букв: "+en:"")+" · будет обработано: "+t:"Ароматов пока нет";
+ const jp=perfumes.filter(p=>/^data:image\/jpe?g/.test(p.img||"")).length;
+ $("cut-stat").textContent=perfumes.length?"Картинок JPEG (с белым фоном): "+jp+" из "+perfumes.length:"Ароматов пока нет"}
+function aiModels(list){const cur=lsGet("groq-model")||DEF_MODEL,L=[...new Set(list)];if(!L.includes(cur))L.unshift(cur);
+ document.querySelectorAll(".g-model").forEach(s=>{s.innerHTML=L.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");s.value=cur})}
+async function gErr(r){try{const j=await r.json();return String((j.error&&j.error.message)||"HTTP "+r.status).slice(0,160)}catch(e){return"HTTP "+r.status}}
+async function aiLoadModels(){
+ const k=gKey();if(!k){$("ai-msg").textContent="Сначала вставьте Groq API-ключ";return}
+ try{const r=await fetch(GROQ+"models",{headers:{Authorization:"Bearer "+k}});
+  if(r.status==401)throw new Error("неверный ключ Groq");if(!r.ok)throw new Error(await gErr(r));
+  const L=((await r.json()).data||[]).map(m=>m.id).filter(id=>!/whisper|tts|guard|orpheus|embed|playai|safeguard/i.test(id))
+   .sort((a,b)=>(/gpt-oss-120b/.test(b)-/gpt-oss-120b/.test(a))||a.localeCompare(b));
+  if(L.length){aiModels(L);$("ai-msg").className="fg-msg";$("ai-msg").textContent="Моделей в списке: "+L.length}}
+ catch(e){$("ai-msg").className="fg-msg err";$("ai-msg").textContent="Не удалось получить список моделей ("+e.message+") — оставлен стандартный"}}
+// ключ и модель есть на трёх вкладках — значения держим одинаковыми
+document.querySelectorAll(".g-key").forEach(i=>{i.value=lsGet("groq-key");
+ i.onchange=()=>{const v=i.value.trim();document.querySelectorAll(".g-key").forEach(x=>x.value=v);lsSet("groq-key",v);aiLoadModels()}});
+aiModels(MODELS0);
+document.querySelectorAll(".g-model").forEach(s=>s.onchange=()=>{document.querySelectorAll(".g-model").forEach(x=>x.value=s.value);lsSet("groq-model",s.value)});
+if(!gKey()){$("pf-gset").open=true;$("bk-gset").open=true}
+$("ai-refresh").onclick=()=>{lsSet("groq-key",gKey());aiLoadModels()};
+$("ai-en").onchange=aiStat;
+if(gKey())aiLoadModels();
+
+// контроллер: «Остановить» + ожидание с обратным отсчётом
+function mkCtl(show){const ac=new AbortController();
+ return{signal:ac.signal,stop:()=>ac.abort(),
+  async wait(sec,text){for(let s=sec;s>0;s--){if(ac.signal.aborted)throw new Stopped();show(text+" — повтор через "+s+" с");await new Promise(r=>setTimeout(r,1000))}
+   if(ac.signal.aborted)throw new Stopped()}}}
+
+// один запрос к Groq. Лимит (429) → ждём 63 с и повторяем столько раз, сколько потребуется.
+// Сбой сети / 5xx → до 5 повторов через 10 с. Неверный ключ / нет модели → Fatal.
+async function groqChat(ctl,model,messages){
+ const key=gKey();if(!key)throw new Fatal("вставьте Groq API-ключ");
+ let tok=1500,bad=0;
+ for(;;){
+  if(ctl.signal.aborted)throw new Stopped();
+  const body={model,messages,temperature:.7,max_completion_tokens:tok};
+  if(/gpt-oss/i.test(model))body.reasoning_effort="low";
+  let r;
+  try{r=await fetch(GROQ+"chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body),signal:ctl.signal})}
+  catch(e){if(ctl.signal.aborted)throw new Stopped();if(++bad>5)throw new Error("нет связи с Groq");await ctl.wait(10,"Нет связи с Groq");continue}
+  if(r.status==429){const m=await gErr(r);await ctl.wait(WAIT_429,"Лимит Groq ("+m+")");continue}
+  if(r.status>=500){if(++bad>5)throw new Error("Groq вернул ошибку "+r.status);await ctl.wait(10,"Groq вернул ошибку "+r.status);continue}
+  if(!r.ok){const m=await gErr(r);
+   if(r.status==401)throw new Fatal("неверный Groq API-ключ");
+   if(r.status==403||r.status==404||/model/i.test(m)&&r.status==400)throw new Fatal(m);
+   throw new Error(m)}
+  const j=await r.json(),ch=j.choices&&j.choices[0],txt=ch&&ch.message&&ch.message.content;
+  if(!String(txt||"").trim()){   // модель «задумалась» и упёрлась в лимит токенов — даём больше
+   if(ch&&ch.finish_reason=="length"&&tok<8000){tok*=2;continue}
+   throw new Error("модель вернула пустой ответ")}
+  return txt}}
+
+const cleanDesc=t=>String(t).replace(/<think>[\s\S]*?<\/think>/g,"").replace(/[*`#]+/g,"").replace(/^[\s"«“]+|[\s"»”]+$/g,"").replace(/\s*\n\s*/g," ").replace(/\s{2,}/g," ").trim().slice(0,800);
+async function aiDescribe(ctl,model,name,brand,notes){
+ const sys="Ты копирайтер интернет-магазина парфюмерии. Пиши по-русски, живо и аккуратно, без markdown, списков и эмодзи. Опирайся только на то, что следует из названия, бренда и нот. Не выдумывай год выпуска, парфюмера, концентрацию, стойкость и факты о бренде. Названия аромата и бренда оставляй латиницей.";
+ const usr="Напиши описание аромата для карточки товара: 2–3 предложения, 250–400 символов. Передай характер и настроение, как аромат раскрывается по нотам, и (только если это следует из нот) для какого сезона или случая он подходит.\n\n"
+  +"Бренд: "+(brand||"не указан")+"\nНазвание: "+name+"\nНоты: "+(notes.length?notes.join(", "):"не указаны — пиши осторожно, по названию и бренду, без перечисления конкретных нот")+"\n\nОтветь только текстом описания.";
+ return cleanDesc(await groqChat(ctl,model,[{role:"system",content:sys},{role:"user",content:usr}]))}
+const brandName=p=>{const b=brands.find(x=>x.id==p.brandId);return b?b.name:""};
+
+// массовая генерация для ароматов без описания
+const aiLog=(t,cls)=>{const d=document.createElement("div");if(cls)d.className=cls;d.textContent=t;const L=$("ai-log");L.prepend(d);while(L.children.length>300)L.lastChild.remove()};
+let aiCtl=null;
+$("ai-stop").onclick=()=>{if(aiCtl)aiCtl.stop();$("ai-stop").disabled=true};
+$("ai-go").onclick=async()=>{
+ if(aiRun)return;
+ if(!gKey()){$("ai-msg").className="fg-msg err";$("ai-msg").textContent="Вставьте Groq API-ключ";$("ai-key").focus();return}
+ lsSet("groq-key",gKey());lsSet("groq-model",gModel());
+ const q=perfumes.filter(aiNeed);
+ if(!q.length){$("ai-msg").className="fg-msg";$("ai-msg").textContent="Все описания уже заполнены";return}
+ const model=gModel(),msg=t=>{$("ai-msg").className="fg-msg";$("ai-msg").textContent=t};
+ aiRun=true;aiCtl=mkCtl(msg);
+ $("ai-go").hidden=true;$("ai-stop").hidden=false;$("ai-stop").disabled=false;$("ai-log").innerHTML="";
+ const bar=$("ai-bar");bar.hidden=false;bar.max=q.length;bar.value=0;
+ let ok=0,fail=0,end="";
+ for(const p of q){
+  msg("Пишу описание: "+(brandName(p)?brandName(p)+" ":"")+p.name+" ("+(ok+fail+1)+" из "+q.length+")…");
+  try{
+   const text=await aiDescribe(aiCtl,model,p.name,brandName(p),Array.isArray(p.notes)?p.notes:[]);
+   if(!text)throw new Error("пустой текст");
+   await setDoc(doc(db,COL,p.id),{desc:text},{merge:true});
+   p.desc=text;ok++;aiLog("✔ "+(brandName(p)?brandName(p)+" ":"")+p.name+" — "+text.slice(0,90)+(text.length>90?"…":""))
+  }catch(e){
+   if(e instanceof Stopped){end="Остановлено";break}
+   if(e instanceof Fatal){end="Остановлено: "+e.message;aiLog("✖ "+e.message,"e");break}
+   fail++;aiLog("✖ "+p.name+" — "+e.message+" (пропущен)","e")}
+  bar.value=ok+fail}
+ aiRun=false;aiCtl=null;$("ai-go").hidden=false;$("ai-stop").hidden=true;
+ const left=perfumes.filter(aiNeed).length;
+ $("ai-msg").className="fg-msg"+(end&&end!="Остановлено"?" err":"");
+ $("ai-msg").textContent=(end||"Готово")+". Записано: "+ok+(fail?", с ошибкой: "+fail:"")+(left?", осталось без описания: "+left:"")+".";
+ aiStat();renderPerfumes()};
+addEventListener("beforeunload",e=>{if(aiRun||cutRun){e.preventDefault();e.returnValue=""}});
+
+// кнопка «✨ Написать ИИ» в форме аромата
+let pfCtl=null;
+$("pf-ai").onclick=async()=>{
+ const m=t=>{$("pf-ai-msg").textContent=t;$("pf-ai-msg").className="fg-msg"+(t&&/^Ошибка/.test(t)?" err":"")};
+ if(pfCtl){pfCtl.stop();return}
+ const name=$("pf-name").value.trim();if(!name){m("Ошибка: сначала введите название аромата");return}
+ if(!gKey()){$("pf-gset").open=true;m("Ошибка: вставьте Groq API-ключ в поле ниже");return}
+ const sel=$("pf-brand"),brand=sel.value=="__new__"?fgBrandNew:(sel.value?sel.selectedOptions[0].textContent:"");
+ const notes=$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),btn=$("pf-ai");
+ pfCtl=mkCtl(m);btn.textContent="Стоп";m("Пишу описание…");
+ try{$("pf-desc").value=await aiDescribe(pfCtl,gModel(),name,brand,notes);m("Готово — проверьте текст и нажмите «Сохранить»")}
+ catch(e){m(e instanceof Stopped?"Остановлено":"Ошибка: "+e.message)}
+ finally{pfCtl=null;btn.textContent="✨ Написать ИИ"}};
+
+// убрать белый фон у уже сохранённых JPEG-картинок
+let cutRun=false,cutCtl=null;
+const loadImg=u=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error("не удалось прочитать картинку"));i.src=u});
+$("cut-stop").onclick=()=>{cutRun=false;$("cut-stop").disabled=true};
+$("cut-go").onclick=async()=>{
+ if(cutRun||aiRun)return;
+ const q=perfumes.filter(p=>/^data:image\/jpe?g/.test(p.img||""));
+ const m=(t,e)=>{$("cut-msg").textContent=t;$("cut-msg").className="fg-msg"+(e?" err":"")};
+ if(!q.length){m("Нет картинок JPEG для обработки");return}
+ if(!confirm("Убрать белый фон у "+q.length+" картинок?\nИсходные картинки будут заменены, вернуть их нельзя. Картинки, у которых белого фона по краям нет, останутся как есть."))return;
+ cutRun=true;$("cut-go").hidden=true;$("cut-stop").hidden=false;$("cut-stop").disabled=false;
+ const bar=$("cut-bar");bar.hidden=false;bar.max=q.length;bar.value=0;
+ let ok=0,skip=0,fail=0,i=0;
+ for(const p of q){
+  if(!cutRun)break;
+  m("Обрабатываю: "+p.name+" ("+(++i)+" из "+q.length+")…");
+  try{
+   const c=cutoutWhite(imgCanvas(await loadImg(p.img),700));
+   if(!hasAlpha(c)){skip++}
+   else{const u=encodeCanvas(c,.8,false);await setDoc(doc(db,COL,p.id),{img:u},{merge:true});p.img=u;ok++}
+  }catch(e){fail++}
+  bar.value=i;await new Promise(r=>setTimeout(r,0))}
+ const stopped=!cutRun;cutRun=false;$("cut-go").hidden=false;$("cut-stop").hidden=true;
+ m((stopped?"Остановлено. ":"Готово. ")+"Фон убран: "+ok+(skip?", без изменений (белого фона нет): "+skip:"")+(fail?", с ошибкой: "+fail:"")+".",fail>0);
+ renderPerfumes()};
 
 loadAll().then(()=>status("Готово","ok")).catch(e=>{status("Не удалось загрузить: "+e.message,"err")});
 </script>
