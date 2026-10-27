@@ -95,13 +95,41 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
 <nav class="tabs" id="tabs">
  <button data-p="perfumes" class="on">Ароматы</button>
  <button data-p="groups">Группы</button>
- <button data-p="quiz">Тест</button>
  <button data-p="bulk">Массовая загрузка</button>
  <button data-p="ai">ИИ и картинки</button>
  <button data-p="bottles">Флаконы</button>
  <button data-p="brands">Бренды</button>
+ <button data-p="quiz">Тест</button>
  <button data-p="contacts">Контакты</button>
+ <button data-p="promotions">Скидки и акции</button>
 </nav>
+
+
+
+<!-- Скидки и акции -->
+<section class="panel" id="p-promotions">
+ <div class="box">
+  <h2 id="pr-title">Добавить акцию</h2>
+  <label>Название акции</label><input id="pr-name" placeholder="Например, Подарок к заказу">
+  <label>Описание для покупателей</label><textarea id="pr-desc" placeholder="При покупке 50 мл — получите аромат 10 мл в подарок"></textarea>
+  <div class="row">
+   <div><label>Тип предложения</label><select id="pr-type"><option value="gift">Подарок</option><option value="discount">Скидка в процентах</option></select></div>
+   <div><label>Объём покупки, мл</label><input id="pr-ml" type="number" min="1" placeholder="50"></div>
+  </div>
+  <div class="row">
+   <div><label>Подарок (название аромата/объём)</label><input id="pr-gift" placeholder="Например, Rose Noir 10 мл"></div>
+   <div><label>Скидка, %</label><input id="pr-percent" type="number" min="1" max="100" placeholder="10"></div>
+  </div>
+  <div class="row">
+   <div><label>Действует с (необязательно)</label><input id="pr-start" type="date"></div>
+   <div><label>Действует до (необязательно)</label><input id="pr-end" type="date"></div>
+  </div>
+  <label class="chk2"><input type="checkbox" id="pr-active" checked> Акция активна и отображается на сайте</label>
+  <div class="acts"><button class="b" id="pr-save">Сохранить акцию</button><button class="b g" id="pr-reset" type="button">Очистить форму</button></div>
+  <p class="hint">Акции сохраняются в общей базе сайта. Укажите порог объёма и либо подарок, либо процент скидки. Даты необязательны.</p>
+ </div>
+ <div class="box"><h2>Акции на сайте</h2><div id="pr-list" class="empty">Загрузка…</div></div>
+</section>
 
 <!-- Ароматы -->
 <section class="panel on" id="p-perfumes">
@@ -125,7 +153,10 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
    <div><label>Группа</label><select id="pf-group"></select></div>
    <div><label>Цена</label><input id="pf-price" type="number" inputmode="decimal" min="0" placeholder="0"></div>
   </div>
-  <label class="chk2"><input type="checkbox" id="pf-oil"> Масляный аромат (если не отмечено — оригинальный)</label>
+  <div class="lblrow" style="margin-bottom:0"><label>Варианты для заказа (отметьте один или оба)</label></div>
+  <label class="chk2"><input type="checkbox" id="pf-oil"> Масляный</label>
+  <label class="chk2" style="margin-top:6px"><input type="checkbox" id="pf-orig" checked> Оригинал</label>
+  <div class="hint">Если отмечен только один вариант — на сайте при заказе клиент увидит только его.</div>
   <label>Ноты (через запятую)</label><input id="pf-notes" placeholder="Bergamot, Lavender, Ambroxan">
   <div class="lblrow"><label>Описание (показывается в карточке товара на сайте)</label><button class="b g" id="pf-ai" type="button">✨ Написать ИИ</button></div>
   <textarea id="pf-desc" placeholder="Коротко о аромате"></textarea>
@@ -168,7 +199,8 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <div class="row">
    <div><label>Группа для всех</label><select id="bk-group"></select></div>
   </div>
-  <label class="chk2"><input type="checkbox" id="bk-oil"> Масляные ароматы (ставит отметку всем в очереди, у каждого её можно поменять)</label>
+  <label class="chk2"><input type="checkbox" id="bk-oil"> Масляный (ставит отметку всем в очереди, у каждого её можно поменять)</label>
+  <label class="chk2" style="margin-top:6px"><input type="checkbox" id="bk-orig" checked> Оригинал (так же — всем в очереди)</label>
   <label class="chk2"><input type="checkbox" id="bk-cut" checked> Прозрачный фон у картинок (убрать белый фон)</label>
   <div class="acts"><button class="b" id="bk-go" type="button">Разобрать список</button></div>
   <div class="fg-msg" id="bk-msg"></div>
@@ -318,16 +350,19 @@ function fillSelects(){
 }
 
 // ---------- Perfumes
+/* Варианты аромата: oil — масляный, orig — оригинал. У старых записей orig нет: тогда «оригинал» = не масляный */
+const origOf=p=>p.orig===undefined?p.oil!==true:p.orig===true;
+const typeText=p=>{const o=p.oil===true,g=origOf(p);return o&&g?"масляный и оригинал":o?"масляный":"оригинал"};
 function renderPerfumes(){
  $("pf-cnt").textContent=perfumes.length?"("+perfumes.length+")":"";
  $("pf-list").innerHTML=perfumes.length?perfumes.map(p=>{
   const b=brands.find(x=>x.id==p.brandId),g=groups.find(x=>x.id==p.groupId);
-  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span><label class="oilq"><input type="checkbox" data-oil="${p.id}"${p.oil===true?" checked":""}> Масляный</label></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
+  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span><span class="oilq"><label class="oilq" style="margin:0"><input type="checkbox" data-oil="${p.id}"${p.oil===true?" checked":""}> Масляный</label><label class="oilq" style="margin:0 0 0 12px"><input type="checkbox" data-orig="${p.id}"${origOf(p)?" checked":""}> Оригинал</label></span></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
  aiStat();
 }
 function prevImg(){$("pf-prev").innerHTML=imgData?`<img src="${imgData}" alt=""><button class="b d" id="pf-rmimg" type="button">Убрать картинку</button>`:""}
 $("pf-prev").onclick=e=>{if(e.target.id=="pf-rmimg"){imgData="";$("pf-file").value="";prevImg()}};
-function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-oil").checked=false;$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
+function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-oil").checked=false;$("pf-orig").checked=true;$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
 $("pf-cancel").onclick=resetP;
 
 // ---------- Картинки: сжатие и прозрачный фон
@@ -499,7 +534,8 @@ $("pf-save").onclick=()=>{
  const old=perfumes.find(x=>x.id==editP);
  const id=editP||uid("shop-perfume");
  const brandId=$("pf-brand").value,newBrand=brandId=="__new__"?fgBrandNew:"";
- const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,oil:$("pf-oil").checked,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
+ if(!$("pf-oil").checked&&!$("pf-orig").checked){alert("Отметьте хотя бы один вариант: «Масляный» или «Оригинал»");return}
+ const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,oil:$("pf-oil").checked,orig:$("pf-orig").checked,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
  const btn=$("pf-save");btn.disabled=true;
  run(async()=>{
   if(newBrand){const ex=brands.find(b=>norm(b.name)==norm(newBrand));
@@ -511,14 +547,17 @@ $("pf-save").onclick=()=>{
 $("pf-list").onclick=e=>{
  const ed=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]");
  if(ed){const p=perfumes.find(x=>x.id==ed.dataset.e);editP=p.id;imgData=p.img||"";
-  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-oil").checked=p.oil===true;$("pf-file").value="";
+  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-oil").checked=p.oil===true;$("pf-orig").checked=origOf(p);$("pf-file").value="";
   $("pf-title").textContent="Изменить аромат";$("pf-cancel").hidden=false;prevImg();scrollTo({top:0,behavior:"smooth"})}
  if(dl){const p=perfumes.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить «"+p.name+"»?"))return;
   run(async()=>{await deleteDoc(doc(db,COL,p.id));perfumes=perfumes.filter(x=>x.id!=p.id);if(editP==p.id)resetP();renderPerfumes()},"Удалено")}};
 
-$("pf-list").onchange=e=>{const c=e.target.closest("[data-oil]");if(!c)return;
- const p=perfumes.find(x=>x.id==c.dataset.oil);if(!p)return;const v=c.checked;
- run(async()=>{await setDoc(doc(db,COL,p.id),{oil:v},{merge:true});p.oil=v;if(editP==p.id)$("pf-oil").checked=v},v?"Отмечен как масляный":"Отмечен как оригинальный")};
+$("pf-list").onchange=e=>{const c=e.target.closest("[data-oil],[data-orig]");if(!c)return;
+ const isOil=c.hasAttribute("data-oil"),p=perfumes.find(x=>x.id==(isOil?c.dataset.oil:c.dataset.orig));if(!p)return;
+ const v=c.checked,oil=isOil?v:p.oil===true,orig=isOil?origOf(p):v;
+ if(!oil&&!orig){c.checked=true;alert("Должен быть отмечен хотя бы один вариант: «Масляный» или «Оригинал»");return}
+ run(async()=>{await setDoc(doc(db,COL,p.id),{oil,orig},{merge:true});p.oil=oil;p.orig=orig;if(editP==p.id){$("pf-oil").checked=oil;$("pf-orig").checked=orig}},
+  (isOil?"Масляный":"Оригинал")+(v?": включено":": выключено"))};
 
 // ---------- Массовая загрузка
 let bkRows=[];
@@ -539,7 +578,7 @@ const bkQ=id=>document.querySelector('.bk[data-id="'+id+'"]');
 const bkCount=()=>{$("bk-cnt").textContent=bkRows.length?"("+bkRows.length+")":"";$("bk-box").hidden=!bkRows.length};
 function bkCreate(r){
  const d=document.createElement("div");d.className="bk";d.dataset.id=r.id;
- d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><label class="oilq"><input type="checkbox" class="bk-oil"${$("bk-oil").checked?" checked":""}> Масляный</label><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
+ d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><label class="oilq"><input type="checkbox" class="bk-oil"${$("bk-oil").checked?" checked":""}> Масл.</label><label class="oilq"><input type="checkbox" class="bk-orig"${$("bk-orig").checked?" checked":""}> Ориг.</label><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
  $("bk-list").appendChild(d);bkUpdate(r,true)}
 function bkUpdate(r,force){
  const d=bkQ(r.id);if(!d)return;
@@ -576,11 +615,13 @@ async function bkParse(){
  $("bk-msg").textContent=stop?stop+". Остальные добавлены без поиска — исправьте название и бренд вручную.":"Готово. Пройдитесь по очереди: цена → «Опубликовать»."}
 $("bk-go").onclick=bkParse;
 $("bk-oil").onchange=()=>document.querySelectorAll(".bk-oil").forEach(c=>c.checked=$("bk-oil").checked);
+$("bk-orig").onchange=()=>document.querySelectorAll(".bk-orig").forEach(c=>c.checked=$("bk-orig").checked);
 $("bk-group").onchange=()=>document.querySelectorAll(".bk-grp").forEach(g=>g.value=$("bk-group").value);
 
 async function bkPublishOne(id){
  const r=bkRows.find(x=>x.id==id),d=bkQ(id);if(!r||!d)return false;
  const name=d.querySelector(".bk-name").value.trim();if(!name){alert("У одного из ароматов пустое название");return false}
+ if(!d.querySelector(".bk-oil").checked&&!d.querySelector(".bk-orig").checked){alert("У «"+name+"» отметьте хотя бы один вариант: «Масл.» или «Ориг.»");return false}
  const pv=d.querySelector(".bk-price").value,btn=d.querySelector(".bk-pub");btn.disabled=true;
  try{
   status("Публикуем…");
@@ -588,8 +629,8 @@ async function bkPublishOne(id){
   let img="";const f=r.items[r.sel];
   if(f&&f.img)img=await fgImage(f.img,$("bk-cut").checked);
   let desc="";   // описание — только на русском, через Groq (если ключ введён)
-  if(gKey()){try{desc=await aiDescribe(mkCtl(t=>status(t)),gModel(),name,d.querySelector(".bk-brand").value.trim(),(f&&f.notes)||[],d.querySelector(".bk-oil").checked)}catch(e){}}
-  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,oil:d.querySelector(".bk-oil").checked,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc,ts:Date.now()};
+  if(gKey()){try{desc=await aiDescribe(mkCtl(t=>status(t)),gModel(),name,d.querySelector(".bk-brand").value.trim(),(f&&f.notes)||[],typeWord(d.querySelector(".bk-oil").checked,d.querySelector(".bk-orig").checked))}catch(e){}}
+  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,oil:d.querySelector(".bk-oil").checked,orig:d.querySelector(".bk-orig").checked,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc,ts:Date.now()};
   const pid=uid("shop-perfume");await setDoc(doc(db,COL,pid),data);perfumes.unshift({id:pid,...data});
   bkRows.splice(bkRows.indexOf(r),1);d.remove();bkCount();renderPerfumes();renderBrands();status("Опубликовано: "+name,"ok");return true
  }catch(e){btn.disabled=false;status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message);return false}}
@@ -745,10 +786,11 @@ async function groqChat(ctl,model,messages){
   return txt}}
 
 const cleanDesc=t=>String(t).replace(/<think>[\s\S]*?<\/think>/g,"").replace(/[*`#]+/g,"").replace(/^[\s"«“]+|[\s"»”]+$/g,"").replace(/\s*\n\s*/g," ").replace(/\s{2,}/g," ").trim().slice(0,800);
-async function aiDescribe(ctl,model,name,brand,notes,oil){
+const typeWord=(oil,orig)=>oil&&orig?"both":oil?"oil":"orig";
+async function aiDescribe(ctl,model,name,brand,notes,type){
  const sys="Ты копирайтер интернет-магазина парфюмерии. Пиши ТОЛЬКО по-русски, даже если исходные данные на английском, живо и аккуратно, без markdown, списков и эмодзи. Опирайся только на то, что следует из названия, бренда и нот. Не выдумывай год выпуска, парфюмера, концентрацию, стойкость и факты о бренде. Названия аромата и бренда оставляй латиницей.";
  const usr="Напиши описание аромата для карточки товара: 2–3 предложения, 250–400 символов. Передай характер и настроение, как аромат раскрывается по нотам, и (только если это следует из нот) для какого сезона или случая он подходит.\n\n"
-  +"Тип: "+(oil?"масляные духи (на масляной основе), упомяни это в тексте":"оригинальный парфюм")+"\nБренд: "+(brand||"не указан")+"\nНазвание: "+name+"\nНоты: "+(notes.length?notes.join(", "):"не указаны — пиши осторожно, по названию и бренду, без перечисления конкретных нот")+"\n\nОтветь только текстом описания на русском языке.";
+  +"Тип: "+(type=="both"?"аромат доступен и в масляном варианте (на масляной основе), и как оригинальный парфюм — не делай акцент на одном из вариантов":type=="oil"?"масляные духи (на масляной основе), упомяни это в тексте":"оригинальный парфюм")+"\nБренд: "+(brand||"не указан")+"\nНазвание: "+name+"\nНоты: "+(notes.length?notes.join(", "):"не указаны — пиши осторожно, по названию и бренду, без перечисления конкретных нот")+"\n\nОтветь только текстом описания на русском языке.";
  return cleanDesc(await groqChat(ctl,model,[{role:"system",content:sys},{role:"user",content:usr}]))}
 const brandName=p=>{const b=brands.find(x=>x.id==p.brandId);return b?b.name:""};
 
@@ -770,7 +812,7 @@ $("ai-go").onclick=async()=>{
  for(const p of q){
   msg("Пишу описание: "+(brandName(p)?brandName(p)+" ":"")+p.name+" ("+(ok+fail+1)+" из "+q.length+")…");
   try{
-   const text=await aiDescribe(aiCtl,model,p.name,brandName(p),Array.isArray(p.notes)?p.notes:[],p.oil===true);
+   const text=await aiDescribe(aiCtl,model,p.name,brandName(p),Array.isArray(p.notes)?p.notes:[],typeWord(p.oil===true,origOf(p)));
    if(!text)throw new Error("пустой текст");
    await setDoc(doc(db,COL,p.id),{desc:text},{merge:true});
    p.desc=text;ok++;aiLog("✔ "+(brandName(p)?brandName(p)+" ":"")+p.name+" — "+text.slice(0,90)+(text.length>90?"…":""))
@@ -796,7 +838,7 @@ $("pf-ai").onclick=async()=>{
  const sel=$("pf-brand"),brand=sel.value=="__new__"?fgBrandNew:(sel.value?sel.selectedOptions[0].textContent:"");
  const notes=$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),btn=$("pf-ai");
  pfCtl=mkCtl(m);btn.textContent="Стоп";m("Пишу описание…");
- try{$("pf-desc").value=await aiDescribe(pfCtl,gModel(),name,brand,notes,$("pf-oil").checked);m("Готово — проверьте текст и нажмите «Сохранить»")}
+ try{$("pf-desc").value=await aiDescribe(pfCtl,gModel(),name,brand,notes,typeWord($("pf-oil").checked,$("pf-orig").checked));m("Готово — проверьте текст и нажмите «Сохранить»")}
  catch(e){m(e instanceof Stopped?"Остановлено":"Ошибка: "+e.message)}
  finally{pfCtl=null;btn.textContent="✨ Написать ИИ"}};
 
@@ -831,7 +873,7 @@ $("cut-go").onclick=async()=>{
 const QZ=doc(db,COL,"quiz");
 const qzMsg=(t,e)=>{$("qz-msg").textContent=t||"";$("qz-msg").className="fg-msg"+(e?" err":"")};
 const pLine=p=>{const b=brandName(p),g=groups.find(x=>x.id==p.groupId);
- return "- "+(b?b+" — ":"")+p.name+" | "+(p.oil===true?"масляный":"оригинал")+(g?" | группа: "+g.name:"")+(Array.isArray(p.notes)&&p.notes.length?" | ноты: "+p.notes.slice(0,8).join(", "):"")};
+ return "- "+(b?b+" — ":"")+p.name+" | "+typeText(p)+(g?" | группа: "+g.name:"")+(Array.isArray(p.notes)&&p.notes.length?" | ноты: "+p.notes.slice(0,8).join(", "):"")};
 const pName=p=>(brandName(p)?brandName(p)+" — ":"")+p.name;
 function qzPrompt(){
  const L=perfumes.map(pLine).join("\n"),a=perfumes[0]?pName(perfumes[0]):"Бренд — Название",b=perfumes[1]?pName(perfumes[1]):a,c=perfumes[2]?pName(perfumes[2]):a,w=$("qz-wish").value.trim();
@@ -905,6 +947,17 @@ $("qz-del").onclick=()=>{if(!confirm("Удалить тест? На страни
 getDoc(QZ).then(x=>{if(x.exists()&&x.data().json){$("qz-json").value=x.data().json;qzMsg("Загружен сохранённый тест")}}).catch(()=>{});
 
 loadAll().then(()=>status("Готово","ok")).catch(e=>{status("Не удалось загрузить: "+e.message,"err")});
+
+// Управление акциями: отдельные документы в общей коллекции Firestore
+let promoItems=[],promoEdit=null;
+const promoFields=["name","desc","type","ml","gift","percent","start","end"];
+function promoFormReset(){promoEdit=null;["name","desc","type","ml","gift","percent","start","end"].forEach(k=>{const e=$("pr-"+k);if(e)e.value=k==="type"?"gift":""});$("pr-active").checked=true;$("pr-title").textContent="Добавить акцию";$("pr-save").textContent="Сохранить акцию"}
+function promoRender(){const root=$("pr-list");if(!promoItems.length){root.className="empty";root.textContent="Акций пока нет. Добавьте первую выше.";return}root.className="";root.innerHTML=promoItems.map(p=>`<div class="item"><div class="t"><b>${esc(p.name||"Акция без названия")} ${p.active?"":"(выключена)"}</b><span>${esc(p.desc||"")} · ${p.ml?`от ${p.ml} мл`:"объём не указан"} · ${p.type==="discount"?(p.percent||0)+"% скидка":"подарок: "+(p.gift||"не указан")}</span></div><div class="a"><button class="b g" data-pr-edit="${esc(p.id)}">Изменить</button><button class="b d" data-pr-del="${esc(p.id)}">Удалить</button></div></div>`).join("")}
+async function promoLoad(){const snap=await getDocs(query(collection(db,COL),where("kind","==","shop-promotion")));promoItems=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));promoRender()}
+$("pr-reset").onclick=promoFormReset;
+$("pr-save").onclick=()=>run(async()=>{const name=$("pr-name").value.trim();if(!name)throw Error("Укажите название акции");const type=$("pr-type").value,ml=Number($("pr-ml").value)||0,percent=Number($("pr-percent").value)||0;if(!ml)throw Error("Укажите объём покупки в мл");if(type==="discount"&&(!percent||percent>100))throw Error("Укажите скидку от 1 до 100%");if(type==="gift"&&!$("pr-gift").value.trim())throw Error("Укажите подарок");const data={kind:"shop-promotion",name,desc:$("pr-desc").value.trim(),type,ml,gift:$("pr-gift").value.trim(),percent,start:$("pr-start").value,end:$("pr-end").value,active:$("pr-active").checked,ts:Date.now()};await setDoc(doc(db,COL,promoEdit||uid("shop-promotion")),data);await promoLoad();promoFormReset()},"Акция сохранена");
+$("pr-list").onclick=async e=>{const edit=e.target.closest("[data-pr-edit]"),del=e.target.closest("[data-pr-del]");if(edit){const p=promoItems.find(x=>x.id===edit.dataset.prEdit);if(!p)return;promoEdit=p.id;["name","desc","type","ml","gift","percent","start","end"].forEach(k=>$("pr-"+k).value=p[k]??(k==="type"?"gift":""));$("pr-active").checked=p.active!==false;$("pr-title").textContent="Изменить акцию";$("pr-save").textContent="Сохранить изменения";window.scrollTo({top:0,behavior:"smooth"})}if(del&&confirm("Удалить эту акцию?"))await run(async()=>{await deleteDoc(doc(db,COL,del.dataset.prDel));await promoLoad()},"Акция удалена")};
+promoLoad().catch(e=>status("Не удалось загрузить акции: "+e.message,"err"));
 </script>
 </body>
 </html>

@@ -115,14 +115,9 @@ section.grp{padding:42px 0 6px}
 .add:hover{background:var(--copper);border-color:var(--copper);color:var(--ink)}
 .add:active{transform:scale(.97)}
 .add.done{background:var(--copper);border-color:var(--copper);color:var(--ink)}
-.ctl{min-height:44px}
-.ctl>*{animation:ctlin .32s var(--ease) both}
-.stp{display:grid;grid-template-columns:46px 1fr 46px;align-items:center;height:44px;border-radius:12px;background:var(--ink);overflow:hidden;border:1.5px solid var(--ink)}
-.stp button{height:100%;border:0;background:transparent;color:var(--copper);font-size:22px;line-height:1;transition:background .2s,color .2s,transform .15s}
-.stp button:hover{background:var(--copper);color:var(--ink)}
-.stp button:active{transform:scale(.88)}
-.stp .q{text-align:center;font-weight:900;font-size:16px;color:#fff;display:block}
-.stp .q.bump{animation:qb .38s var(--ease)}
+.add .inc{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-left:8px;border-radius:10px;background:var(--copper);color:var(--ink);font-size:11px;font-style:normal;font-weight:900;letter-spacing:0;vertical-align:middle;transition:background .25s,color .25s}
+.add:hover .inc{background:var(--ink);color:var(--copper)}
+.add .inc.bump{animation:qb .38s var(--ease)}
 @keyframes ctlin{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 @keyframes qb{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
 
@@ -165,7 +160,7 @@ section.grp{padding:42px 0 6px}
 .sh-tot{font-size:13px;color:var(--grey);max-height:0;opacity:0;overflow:hidden;transition:max-height .4s var(--ease),opacity .4s,margin .4s}
 .sh-tot.on{max-height:30px;opacity:1;margin-top:3px}
 .sh-tot b{color:var(--copper);font-weight:900}
-.sh-foot .ctl{width:min(190px,48%);flex:none}
+.sh-foot .add{width:min(210px,52%);flex:none;height:48px;border-radius:24px}
 .sh-in .pk>:first-child{margin-top:0}
 .demo{margin-top:18px;font-size:13px;color:var(--grey);padding:10px 14px;background:#fff;border:1px dashed var(--copper);border-radius:12px;display:inline-block}
 .state{padding:80px 0;text-align:center;color:var(--grey)}
@@ -176,6 +171,67 @@ footer .wrap{position:relative;padding:44px 20px;display:flex;gap:30px;flex-wrap
 footer img{height:56px}
 footer b{color:var(--copper);display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;font-weight:400}
 
+/* ---------- Окно выбора: тип → объём (мл) → флакон ---------- */
+#oov{position:fixed;inset:0;background:rgba(17,17,17,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;z-index:80}
+#oov.open{opacity:1;visibility:visible}
+#osh{position:fixed;left:0;right:0;bottom:0;margin:0 auto;width:min(580px,100%);max-height:94vh;max-height:94dvh;background:var(--light);border-radius:26px 26px 0 0;z-index:81;display:flex;flex-direction:column;overflow:hidden;transform:translateY(105%);visibility:hidden;transition:transform .55s cubic-bezier(.16,1,.3,1),visibility 0s linear .55s;box-shadow:0 -20px 60px rgba(0,0,0,.4)}
+#osh.open{transform:none;visibility:visible;transition:transform .55s cubic-bezier(.16,1,.3,1),visibility 0s}
+#osh.drag{transition:none}
+.oh{position:relative;display:flex;align-items:center;gap:12px;padding:24px 16px 14px 18px;color:#fff;background:var(--ink) url("assets/bg-stone-sm.jpg") 50% 50%/cover;border-bottom:2px solid var(--copper);flex:none}
+.oh::before{content:"";position:absolute;inset:0;background:rgba(17,17,17,.45)}
+.oh>*{position:relative}
+.oh .gr{position:absolute;top:8px;left:50%;margin-left:-22px;width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.55)}
+.oh .th{width:52px;height:52px;border-radius:12px;background:var(--ink) url("assets/bg-stone-sm.jpg") 50% 50%/cover;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid rgba(197,132,87,.5)}
+.oh .th img{width:100%;height:100%;object-fit:cover;display:block}
+.oh .th img.ph{width:78%;height:auto;object-fit:contain}
+.oh .th img.tr{object-fit:contain;padding:3px}
+.oh .tt2{flex:1;min-width:0}
+.oh .tt2 .b{font-size:10px;color:var(--copper);letter-spacing:.18em;text-transform:uppercase}
+.oh .tt2 .n{font-size:18px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ob{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:2px 18px 12px}
+.otp{display:flex;gap:8px;flex-wrap:wrap}
+.ot{flex:1;min-width:120px;height:46px;border:1.5px solid var(--line);background:#fff;border-radius:23px;font-size:15px;font-weight:700;color:var(--ink);transition:all .2s}
+.ot:hover{border-color:var(--copper)}
+.ot.on{background:var(--ink);color:var(--copper);border-color:var(--ink)}
+.onote{font-size:12px;color:var(--grey);margin-top:8px}
+.ovl{display:flex;flex-wrap:wrap;gap:8px}
+.ovl .vb{height:42px;padding:0 20px;border-radius:21px;font-size:14px}
+.sx{animation:ctlin .35s var(--ease) both}
+.strip{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:4px 18px 10px;margin:0 -18px;scroll-snap-type:x proximity;scroll-padding:0 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.strip::-webkit-scrollbar{display:none}
+.bo{flex:0 0 clamp(88px,calc((100% - 30px)/3.4),128px);scroll-snap-align:start;position:relative;display:flex;flex-direction:column;gap:6px;padding:5px 5px 8px;border:2px solid var(--line);background:#fff;border-radius:15px;text-align:left;color:var(--ink);transition:border-color .2s,background .2s,transform .15s}
+.bo:active{transform:scale(.97)}
+.bo:hover{border-color:rgba(197,132,87,.6)}
+.bo.on{border-color:var(--copper);background:#fbf3ee}
+.bo .bim{aspect-ratio:1/1;border-radius:10px;background:var(--ink) url("assets/bg-stone-sm.jpg") 50% 50%/cover;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--copper);font-weight:900;font-size:15px}
+.bo .bim img{width:100%;height:100%;object-fit:cover;display:block}
+.bo .bim img.tr{object-fit:contain;padding:4px}
+.bo b{font-size:12px;line-height:1.2;font-weight:700;padding:0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+.bo span{display:block;font-size:11px;color:var(--grey);padding:0 3px;margin-top:-2px}
+.bo.on span{color:#8a5a3a}
+.bo .ck{position:absolute;top:9px;right:9px;width:22px;height:22px;border-radius:11px;background:var(--copper);color:var(--ink);display:none;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.bo.on .ck{display:flex}
+.bo .ck svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.of{flex:none;padding:12px 18px calc(14px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(17,17,17,.06)}
+.osum{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px;margin-bottom:10px}
+.osum .sm{font-size:12.5px;color:var(--grey);line-height:1.3;min-width:0}
+.osum .sm.hint{color:#8a5a3a}
+.osum .sm.nudge{animation:nudge .45s var(--ease)}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+.osum .pp{font-size:22px;font-weight:900;white-space:nowrap}
+.osum .pp.req{font-size:14px;font-weight:700;color:var(--grey)}
+.ob1,.ob2{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:50px;border-radius:25px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .25s,color .25s,opacity .25s,transform .15s;border:1.5px solid var(--ink)}
+.ob1{background:var(--ink);color:var(--copper)}
+.ob1:hover{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.ob2{margin-top:8px;background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.ob2:hover{background:var(--ink);border-color:var(--ink);color:var(--copper)}
+.ob1:active,.ob2:active{transform:scale(.98)}
+.ob2 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ob1[aria-disabled=true],.ob2[aria-disabled=true]{opacity:.38}
+.ocap{font-size:11.5px;color:var(--grey);text-align:center;margin-top:6px;line-height:1.35}
+#toast{position:fixed;top:78px;left:50%;z-index:95;display:flex;align-items:center;gap:14px;max-width:calc(100% - 28px);padding:11px 12px 11px 18px;background:var(--ink);color:#fff;border:1.5px solid var(--copper);border-radius:26px;font-size:14px;box-shadow:0 12px 34px rgba(0,0,0,.35);transform:translate(-50%,-18px);opacity:0;visibility:hidden;transition:transform .4s var(--ease),opacity .3s,visibility 0s linear .4s}
+#toast.on{transform:translate(-50%,0);opacity:1;visibility:visible;transition:transform .4s var(--ease),opacity .3s,visibility 0s}
+#toast button{height:32px;padding:0 14px;border:0;border-radius:16px;background:var(--copper);color:var(--ink);font-size:13px;font-weight:700}
 /* ---------- Корзина (выезжающее окно) ---------- */
 #ov{position:fixed;inset:0;background:rgba(17,17,17,.55);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;z-index:60}
 #ov.open{opacity:1;visibility:visible}
@@ -216,6 +272,10 @@ footer b{color:var(--copper);display:block;font-size:12px;letter-spacing:.2em;te
 .bbody img.tr{object-fit:contain;padding:3px}
 .bbody b{display:block;font-size:14px}
 .bbody span{display:block;font-size:12px;color:var(--grey);margin-top:2px}
+.ctp{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ctp button{height:28px;padding:0 12px;border:1.5px solid var(--line);background:#fff;border-radius:14px;font-size:12px;font-weight:700;color:var(--ink);transition:all .2s}
+.ctp button:hover{border-color:var(--copper)}
+.ctp button.on{background:var(--ink);color:var(--copper);border-color:var(--ink)}
 .qt{display:flex;align-items:center;gap:2px;margin-top:6px}
 .qt button{width:30px;height:30px;border-radius:15px;border:1.5px solid var(--line);background:#fff;font-size:16px;line-height:1;color:var(--ink);transition:all .2s}
 .qt button:hover{border-color:var(--copper);background:var(--copper)}
@@ -274,6 +334,7 @@ body.lock{overflow:hidden}
 <header class="top"><div class="wrap">
  <img class="lg" src="assets/logo-horizontal.png" alt="ALFIYA Perfume" id="hlogo">
  <span class="sp"></span>
+ <a class="quizbtn" href="promotions.html" style="height:42px;padding:0 14px">Акции</a>
  <button class="cartbtn" id="cartBtn" aria-label="Открыть корзину">
   <svg viewBox="0 0 24 24"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.500" cy="19.500" r="1.300"/><circle cx="17" cy="19.500" r="1.300"/></svg>
   <span class="w">Корзина</span><span class="n" id="cartN">0</span>
@@ -309,6 +370,19 @@ body.lock{overflow:hidden}
  <div class="sh-foot" id="pFoot"></div>
 </section>
 
+<div id="oov"></div>
+<section id="osh" role="dialog" aria-modal="true" aria-label="Выбор варианта аромата" aria-hidden="true">
+ <div class="oh" id="oHead"></div>
+ <div class="ob" id="oBody"></div>
+ <div class="of">
+  <div class="osum" id="oSum"></div>
+  <button type="button" class="ob1" id="oAdd">В корзину</button>
+  <a class="ob2" id="oNow" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.8A9 9 0 1 1 8 19.5L3 21z"/><path d="M9 8.500c0 4 2.500 6.500 6.500 6.500l1-1.500-2-1-1 .8c-1-.4-2-1.400-2.400-2.400l.8-1-1-2L9 8.500z"/></svg>Оформить сейчас</a>
+  <div class="ocap">Вас перекинет в WhatsApp с формой вашего заказа</div>
+ </div>
+</section>
+<div id="toast" role="status" aria-live="polite"><span id="toastT"></span><button type="button" id="toastB">Открыть</button></div>
+
 <div id="ov"></div>
 <aside id="drw" role="dialog" aria-modal="true" aria-label="Корзина" aria-hidden="true">
  <div class="dh"><h3>Корзина</h3><span class="cn" id="dCnt"></span><span class="sp"></span>
@@ -340,12 +414,15 @@ const DEMO_P=[
  {id:"d-p3",name:"Amber Wood",brandId:"d-b1",groupId:"d-g2",price:4900,img:""},
  {id:"d-p4",name:"Black Oud",brandId:"d-b2",groupId:"d-g2",price:6300,oil:true,img:""}];
 
-let groups=[],brands={},perfumes=[],bottles=[],bsel={},C={...DEMO_C},brandSel=new Set(),groupSel=new Set(),typeSel="",demo=false;
-/* Флаконы: ключ корзины = «id аромата|id флакона» (без флаконов — просто id аромата) */
+let groups=[],brands={},perfumes=[],bottles=[],C={...DEMO_C},brandSel=new Set(),groupSel=new Set(),typeSel="",demo=false;
+/* Варианты аромата: oil — «Масляный», orig — «Оригинал». У старых записей orig нет: тогда «оригинал» = не масляный */
+const TN={oil:"Масляный",orig:"Оригинал"};
+const hasOil=p=>p.oil===true,hasOrig=p=>p.orig===undefined?p.oil!==true:p.orig===true;
+const typesOf=p=>{const a=[];if(hasOil(p))a.push("oil");if(hasOrig(p))a.push("orig");return a.length?a:["orig"]};
+/* Ключ корзины = «id аромата|id флакона|тип» (oil / orig) */
 const bottleOf=id=>bottles.find(b=>b.id==id);
-const selB=pid=>bottles.length?(bottleOf(bsel[pid])?bsel[pid]:bottles[0].id):"";
-const ckey=(pid,bid)=>bid?pid+"|"+bid:pid;
-const parseKey=k=>{const a=String(k).split("|");return{pid:a[0],bid:a[1]||""}};
+const ckey=(pid,bid,t)=>[pid,bid||"",t||""].join("|");
+const parseKey=k=>{const a=String(k).split("|");return{pid:a[0],bid:a[1]||"",t:a[2]||""}};
 const hasP=v=>v!==""&&v!=null&&!isNaN(Number(v));
 let cart={};try{cart=JSON.parse(localStorage.getItem("alfiya-cart")||"{}")||{}}catch(e){}
 const saveCart=()=>{try{localStorage.setItem("alfiya-cart",JSON.stringify(cart))}catch(e){}};
@@ -382,28 +459,23 @@ const ph='<img class="ph" src="assets/logo-horizontal.png" alt="">';
 /* картинки с прозрачным фоном (webp/png, например из Fragella) показываем целиком */
 const tr=u=>/^data:image\/(webp|png)/.test(u)||/\.(webp|png)(\?|$)/i.test(u)?' class="tr"':"";
 const chip=(b,on)=>`<button type="button" class="bc${on?" on":""}${b.img?"":" noimg"}" data-bc="${esc(b.id)}" aria-pressed="${on}">${b.img?`<img${tr(b.img)} loading="lazy" src="${b.img}" alt="">`:""}<div><b>${esc(b.name)}</b><span>${esc(b.volume)} мл${hasP(b.price)&&Number(b.price)>0?" · +"+money(b.price):""}</span></div></button>`;
-/* Выбор флакона: сначала объём (5 мл / 10 мл), под ним — картинки флаконов этого объёма */
+/* Объёмы (мл), которые есть среди флаконов */
 const vols=()=>[...new Set(bottles.map(b=>Number(b.volume)))].sort((a,b)=>a-b);
-const pickerInner=pid=>{const sb=selB(pid),cb=bottleOf(sb),v=cb?Number(cb.volume):null,vs=vols();
- return (vs.length>1?`<div class="vl" role="group" aria-label="Объём">${vs.map(x=>`<button type="button" class="vb${x==v?" on":""}" data-vol="${x}" aria-pressed="${x==v}">${x} мл</button>`).join("")}</div>`:"")
-  +`<div class="bt" role="group" aria-label="Флакон">${bottles.filter(b=>Number(b.volume)==v).map(b=>chip(b,b.id==sb)).join("")}</div>`};
-const picker=pid=>bottles.length?`<div class="pk" data-bt="${esc(pid)}">${pickerInner(pid)}</div>`:"";
-/* кнопка «В корзину» → степпер «− N +», как только аромат (с выбранным флаконом) добавлен */
-/* на карточке каталога выбора флакона нет: там показывается общее количество аромата (по всем флаконам) */
-const qty=(pid,tot)=>tot?Object.keys(cart).reduce((n,k)=>n+(parseKey(k).pid==pid?cart[k]:0),0):(cart[ckey(pid,selB(pid))]||0);
-const ctlHtml=(pid,tot)=>{const q=qty(pid,tot);
- return q>0?`<div class="stp"><button type="button" data-dec aria-label="Меньше">−</button><span class="q">${q}</span><button type="button" data-inc aria-label="Больше">+</button></div>`:`<button type="button" class="add" data-add>В корзину</button>`};
-function syncCtl(el){const pid=el.dataset.ctl,tot=!!el.dataset.tot,q=qty(pid,tot),prev=+el.dataset.q||0;
- if(q===prev&&el.firstElementChild)return;
- el.dataset.q=q;
- if(q>0&&prev>0){const n=el.querySelector(".q");if(n){n.textContent=q;n.classList.remove("bump");void n.offsetWidth;n.classList.add("bump");return}}
- el.innerHTML=ctlHtml(pid,tot)}
+/* Сколько штук аромата уже в корзине (по всем флаконам и типам) */
+const qtyOf=pid=>Object.keys(cart).reduce((n,k)=>n+(parseKey(k).pid==pid?cart[k]:0),0);
+const incHtml=q=>q>0?`<i class="inc">${q}</i>`:"";
+/* на кнопке «В корзину» — маленький счётчик, сколько этого аромата уже в корзине */
+function syncAdd(){document.querySelectorAll("[data-add]").forEach(b=>{const q=qtyOf(b.dataset.add);let i=b.querySelector(".inc");
+ if(q>0){if(!i){i=document.createElement("i");i.className="inc";b.appendChild(i)}
+  if(i.textContent!=q){i.textContent=q;i.classList.remove("bump");void i.offsetWidth;i.classList.add("bump")}}
+ else if(i)i.remove()})}
+const tagHtml=p=>`<span class="tag${hasOil(p)?" oil":""}">${typesOf(p).map(t=>TN[t]).join(" · ")}</span>`;
 function cardHtml(p){const b=brands[p.brandId]||"",hp=p.price!==""&&p.price!=null;
- return `<article class="card" data-id="${esc(p.id)}" tabindex="0"><div class="im"><span class="tag${p.oil===true?" oil":""}">${p.oil===true?"Масляный":"Оригинал"}</span>${p.img?`<img${tr(p.img)} loading="lazy" src="${p.img}" alt="${esc(p.name)}">`:ph}</div><div class="inf">${b?`<div class="br">${esc(b)}</div>`:""}<div class="nm">${esc(p.name)}</div>${Array.isArray(p.notes)&&p.notes.length?`<div class="nt">${esc(p.notes.slice(0,8).join(", "))}</div>`:""}<div class="ab">${hp?`<div class="pr">${money(p.price)}</div>`:""}<div class="ctl" data-ctl="${esc(p.id)}" data-tot="1" data-q="${qty(p.id,true)}">${ctlHtml(p.id,true)}</div></div></div></article>`}
+ return `<article class="card" data-id="${esc(p.id)}" tabindex="0"><div class="im">${tagHtml(p)}${p.img?`<img${tr(p.img)} loading="lazy" src="${p.img}" alt="${esc(p.name)}">`:ph}</div><div class="inf">${b?`<div class="br">${esc(b)}</div>`:""}<div class="nm">${esc(p.name)}</div>${Array.isArray(p.notes)&&p.notes.length?`<div class="nt">${esc(p.notes.slice(0,8).join(", "))}</div>`:""}<div class="ab">${hp?`<div class="pr">${money(p.price)}</div>`:""}<button type="button" class="add" data-add="${esc(p.id)}">В корзину${incHtml(qtyOf(p.id))}</button></div></div></article>`}
 function render(){
  const s=$("q").value.trim().toLowerCase();
  const ok=p=>{
-  if(typeSel&&(typeSel=="oil")!==(p.oil===true))return false;
+  if(typeSel&&!(typeSel=="oil"?hasOil(p):hasOrig(p)))return false;
   if(brandSel.size&&!brandSel.has(String(p.brandId)))return false;
   if(groupSel.size&&!groupSel.has(gk(p)))return false;
   const lo=$("pmin").value,hi=$("pmax").value;
@@ -438,100 +510,144 @@ $("fbtn").onclick=()=>{const o=!$("flt").classList.contains("open");$("flt").cla
 
 $("freset").onclick=()=>{typeSel="";brandSel.clear();groupSel.clear();$("pmin").value=$("pmax").value="";$("q").value="";render()};
 function bumpCart(){const bt=$("cartBtn");bt.classList.remove("bump");void bt.offsetWidth;bt.classList.add("bump")}
-const lastB={};   // какой флакон выбирали в каждом объёме — при переключении 5↔10 мл он запоминается
-function setBottle(pid,bid){bsel[pid]=bid;const b=bottleOf(bid);if(b)lastB[pid+"|"+Number(b.volume)]=bid;const e=CSS.escape(pid);
- document.querySelectorAll('[data-bt="'+e+'"]').forEach(g=>{g.innerHTML=pickerInner(pid)});
- document.querySelectorAll('.ctl[data-ctl="'+e+'"]').forEach(syncCtl);syncSheet()}
-function setVol(pid,vol){const id=lastB[pid+"|"+vol];setBottle(pid,bottleOf(id)?id:(bottles.find(b=>Number(b.volume)==vol)||{}).id)}
+const lastB={};   // какой флакон выбирали в каждом объёме (для корзины)
 document.addEventListener("click",e=>{
- const vb=e.target.closest(".vb");
- if(vb){const g=vb.closest("[data-bt]");if(g)setVol(g.dataset.bt,+vb.dataset.vol);return}
- const c=e.target.closest(".bc");
- if(c){const g=c.closest("[data-bt]");if(g)setBottle(g.dataset.bt,c.dataset.bc);return}
- const ctl=e.target.closest(".ctl");
- if(ctl){const pid=ctl.dataset.ctl,k=ckey(pid,selB(pid));
-  if(e.target.closest("[data-add],[data-inc]")){cart[k]=(cart[k]||0)+1;bumpCart()}
-  else if(e.target.closest("[data-dec]")){
-   const kk=(cart[k]>0||!ctl.dataset.tot)?k:(Object.keys(cart).find(x=>parseKey(x).pid==pid&&cart[x]>0)||k);
-   cart[kk]=(cart[kk]||0)-1;if(cart[kk]<=0)delete cart[kk]}
-  else return;
-  saveCart();updateCart();return}
+ const add=e.target.closest("[data-add]");
+ if(add){openOrder(add.dataset.add);return}
  const card=e.target.closest("#list .card");
  if(card&&!e.target.closest("a"))openSheet(card.dataset.id)});
 $("list").addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.classList.contains("card"))openSheet(e.target.dataset.id)});
 
 /* ---------- Карточка товара (шторка) ---------- */
-let openId="";
-function countTo(el,to,fmt,from){
- from=from??(+el.dataset.v||0);el.dataset.v=to;cancelAnimationFrame(el._r);
- if(from===to){el.textContent=fmt(to);return}
- const t0=performance.now(),d=480;
- const step=t=>{const k=Math.min(1,(t-t0)/d),v=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));el.textContent=fmt(v);if(k<1)el._r=requestAnimationFrame(step)};
- el._r=requestAnimationFrame(step)}
+let openId="",orderOpen=false;
+const syncLock=()=>document.body.classList.toggle("lock",!!openId||orderOpen||$("drw").classList.contains("open"));
 function shBody(p){
  const b=brands[p.brandId]||"",im=p.img;let d=0;const dl=()=>"--d:"+(d+=70)+"ms";
  const imgHtml=im?`<img${tr(im)} src="${im}" alt="${esc(p.name)}">`:ph;
+ const ty=typesOf(p);
  return `<div class="sh-img ${im?(tr(im)?"tr":"ph0"):"none"}">${imgHtml}</div><div class="sh-in">`
   +(b?`<div class="sh-br rv" style="${dl()}">${esc(b)}</div>`:"")
   +`<h3 class="sh-nm rv" style="${dl()}">${esc(p.name)}</h3>`
-  +`<div class="rv" style="${dl()}"><span class="sh-ty${p.oil===true?" oil":""}">${p.oil===true?"Масляный аромат":"Оригинальный аромат"}</span></div>`
+  +`<div class="rv" style="${dl()}">${ty.map(t=>`<span class="sh-ty${t=="oil"?" oil":""}" style="margin-right:6px">${t=="oil"?"Масляный":"Оригинальный"} аромат</span>`).join("")}</div>`
   +(Array.isArray(p.notes)&&p.notes.length?`<div class="sh-t rv" style="${dl()}">Ноты</div><div class="sh-notes">${p.notes.map((n,i)=>`<span class="nc" style="--i:${i}">${esc(n)}</span>`).join("")}</div>`:"")
   +(p.desc?`<div class="sh-t rv" style="${dl()}">Описание</div><p class="sh-d rv" style="${dl()}">${esc(p.desc).replace(/\n+/g,"<br><br>")}</p>`:"")
-  +(bottles.length?`<div class="sh-t rv" style="${dl()}">Флакон</div><div class="rv" style="${dl()}">${picker(p.id)}</div>`:"")
   +`</div>`}
-function shFoot(p){return `<div class="sh-pp"><div class="sh-p" id="shP"></div><div class="sh-tot" id="shT"></div></div><div class="ctl" data-ctl="${esc(p.id)}" data-q="${cart[ckey(p.id,selB(p.id))]||0}">${ctlHtml(p.id)}</div>`}
-function syncSheet(){
- if(!openId)return;const p=perfumes.find(x=>x.id==openId);if(!p)return;
- const q=cart[ckey(p.id,selB(p.id))]||0,x={p,b:bottleOf(selB(p.id))},pr=priced(x),u=unit(x),P=$("shP"),T=$("shT");
- if(!P)return;
- if(pr){P.classList.remove("req");countTo(P,u,money)}else{P.classList.add("req");P.textContent="Цена по запросу"}
- const show=q>=2&&pr;T.classList.toggle("on",show);
- if(show){const sig=q+"|"+u;if(T.dataset.sig!=sig){const prev=+T.dataset.v||0;T.dataset.sig=sig;T.dataset.v=q*u;
-   T.innerHTML=q+" шт. · итого <b></b>";countTo(T.querySelector("b"),q*u,money,prev&&prev!=q*u?prev:0)}}
- else{T.dataset.sig="";T.dataset.v=0}}
+function shFoot(p){const hp=hasP(p.price);
+ return `<div class="sh-pp"><div class="sh-p${hp?"":" req"}">${hp?money(p.price):"Цена по запросу"}</div></div><button type="button" class="add" data-add="${esc(p.id)}">В корзину${incHtml(qtyOf(p.id))}</button>`}
 function openSheet(pid){
  const p=perfumes.find(x=>x.id==pid);if(!p)return;openId=pid;
  $("pBody").innerHTML=shBody(p);$("pFoot").innerHTML=shFoot(p);$("pBody").scrollTop=0;
- const sh=$("psh");sh.style.transform="";syncSheet();
+ const sh=$("psh");sh.style.transform="";
  requestAnimationFrame(()=>{sh.classList.add("open");$("pov").classList.add("open")});
- sh.setAttribute("aria-hidden","false");document.body.classList.add("lock");setTimeout(()=>$("pClose").focus({preventScroll:true}),400)}
-function closeSheet(){openId="";const sh=$("psh");sh.classList.remove("open");$("pov").classList.remove("open");sh.setAttribute("aria-hidden","true");document.body.classList.remove("lock");sh.style.transform=""}
+ sh.setAttribute("aria-hidden","false");syncLock();setTimeout(()=>$("pClose").focus({preventScroll:true}),400)}
+function closeSheet(){openId="";const sh=$("psh");sh.classList.remove("open");$("pov").classList.remove("open");sh.setAttribute("aria-hidden","true");syncLock();sh.style.transform=""}
 $("pClose").onclick=closeSheet;$("pov").onclick=closeSheet;
-(()=>{const sh=$("psh");let y0=null,dy=0;   // свайп вниз по картинке/ручке закрывает шторку
- sh.addEventListener("touchstart",e=>{if(!e.target.closest(".sh-grab,.sh-img"))return;y0=e.touches[0].clientY;dy=0;sh.classList.add("drag")},{passive:true});
+function swipeClose(sh,sel,close){let y0=null,dy=0;   // свайп вниз по ручке/шапке закрывает шторку
+ sh.addEventListener("touchstart",e=>{if(!e.target.closest(sel))return;y0=e.touches[0].clientY;dy=0;sh.classList.add("drag")},{passive:true});
  sh.addEventListener("touchmove",e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform="translateY("+dy+"px)"},{passive:true});
- sh.addEventListener("touchend",()=>{if(y0==null)return;sh.classList.remove("drag");const d=dy;y0=null;if(d>110)closeSheet();else sh.style.transform=""})})();
+ sh.addEventListener("touchend",()=>{if(y0==null)return;sh.classList.remove("drag");const d=dy;y0=null;if(d>110)close();else sh.style.transform=""})}
+swipeClose($("psh"),".sh-grab,.sh-img",closeSheet);
+
+/* ---------- Окно выбора: тип → объём (мл) → флакон → «В корзину» / «Оформить сейчас» ---------- */
+let os={pid:"",type:"",vol:null,bid:""};
+const ofLine=(x,i)=>`${i}. ${(brands[x.p.brandId]?brands[x.p.brandId]+" ":"")+x.p.name} (${x.t=="oil"?"масляный":"оригинал"})${x.b?", флакон: "+x.b.name+", "+x.b.volume+" мл":""} × ${x.q}${priced(x)?" — "+money(x.q*unit(x)):""}`;
+const waText=L=>"Здравствуйте! Хочу заказать:\n"+L.map((x,i)=>ofLine(x,i+1)).join("\n")+"\n\nИтого: "+money(L.reduce((s,x)=>s+x.q*unit(x),0));
+const osP=()=>perfumes.find(x=>x.id==os.pid);
+const andList=a=>a.length>1?a.slice(0,-1).join(", ")+" и "+a[a.length-1]:a.join("");
+function osMissing(){const m=[];if(!os.type)m.push("тип");
+ if(bottles.length){if(os.vol==null){m.push("объём");m.push("флакон")}else if(!os.bid)m.push("флакон")}
+ return m}
+const volBottles=()=>os.vol==null?[]:bottles.filter(b=>Number(b.volume)==os.vol);
+function stripHtml(){return `<div class="strip sx" id="strip" role="group" aria-label="Флакон">${volBottles().map(b=>`<button type="button" class="bo${b.id==os.bid?" on":""}" data-ob="${esc(b.id)}" aria-pressed="${b.id==os.bid}"><div class="bim">${b.img?`<img${tr(b.img)} loading="lazy" src="${b.img}" alt="">`:esc(b.volume)+" мл"}</div><b>${esc(b.name)}</b><span>${hasP(b.price)&&Number(b.price)>0?"+"+money(b.price):"без доплаты"}</span><i class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.500"/></svg></i></button>`).join("")}</div>`}
+function renderOrder(){
+ const p=osP();if(!p)return;const ty=typesOf(p),vs=vols(),b=brands[p.brandId]||"";
+ $("oHead").innerHTML=`<i class="gr"></i><div class="th">${p.img?`<img${tr(p.img)} src="${p.img}" alt="">`:ph}</div><div class="tt2">${b?`<div class="b">${esc(b)}</div>`:""}<div class="n">${esc(p.name)}</div></div><button class="xb" data-oclose aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+ let h=`<div class="sh-t">Тип</div><div class="otp" role="group" aria-label="Тип аромата">${ty.map(t=>`<button type="button" class="ot${os.type==t?" on":""}" data-ot="${t}" aria-pressed="${os.type==t}">${TN[t]}</button>`).join("")}</div>`
+  +(ty.length==1?`<div class="onote">Для этого аромата доступен только вариант «${TN[ty[0]]}»</div>`:"");
+ if(bottles.length){
+  h+=`<div class="sh-t">Объём, мл</div><div class="ovl" role="group" aria-label="Объём">${vs.map(x=>`<button type="button" class="vb${x==os.vol?" on":""}" data-ov="${x}" aria-pressed="${x==os.vol}">${x} мл</button>`).join("")}</div>`;
+  if(os.vol!=null)h+=`<div class="sh-t sx">Выберите флакон</div>`+stripHtml()}
+ $("oBody").innerHTML=h;renderOrderFoot()}
+const orderLines=()=>[{p:osP(),b:bottleOf(os.bid),t:os.type,q:1}];
+function renderOrderFoot(){
+ const m=osMissing(),ok=!m.length,sum=$("oSum"),add=$("oAdd"),now=$("oNow");
+ add.setAttribute("aria-disabled",ok?"false":"true");
+ if(!ok){sum.innerHTML=`<div class="sm hint">Осталось выбрать: ${andList(m)}</div>`;now.setAttribute("aria-disabled","true");now.href="#";return}
+ const x=orderLines()[0],pr=priced(x);
+ sum.innerHTML=`<div class="sm">${TN[os.type]}${x.b?" · "+esc(x.b.volume)+" мл · "+esc(x.b.name):""}</div><div class="pp${pr?"":" req"}">${pr?money(unit(x)):"Цена по запросу"}</div>`;
+ const can=!!C.whatsapp;now.setAttribute("aria-disabled",can?"false":"true");now.href=can?waUrl(waText(orderLines())):"#"}
+function nudgeOrder(){const h=$("oSum").querySelector(".sm");if(h){h.classList.remove("nudge");void h.offsetWidth;h.classList.add("nudge")}}
+function openOrder(pid){
+ const p=perfumes.find(x=>x.id==pid);if(!p)return;const ty=typesOf(p),vs=vols();
+ os={pid,type:ty.length==1?ty[0]:"",vol:vs.length==1?vs[0]:null,bid:""};
+ $("toast").classList.remove("on");
+ const vb=volBottles();if(vb.length==1)os.bid=vb[0].id;
+ renderOrder();$("oBody").scrollTop=0;
+ const sh=$("osh");sh.style.transform="";orderOpen=true;syncLock();
+ requestAnimationFrame(()=>{sh.classList.add("open");$("oov").classList.add("open")});
+ sh.setAttribute("aria-hidden","false");setTimeout(()=>{const x=sh.querySelector("[data-oclose]");x&&x.focus({preventScroll:true})},400)}
+function closeOrder(){orderOpen=false;const sh=$("osh");sh.classList.remove("open");$("oov").classList.remove("open");sh.setAttribute("aria-hidden","true");syncLock();sh.style.transform=""}
+$("oov").onclick=closeOrder;
+swipeClose($("osh"),".oh",closeOrder);
+$("osh").addEventListener("click",e=>{
+ if(e.target.closest("[data-oclose]")){closeOrder();return}
+ const ot=e.target.closest("[data-ot]");
+ if(ot){os.type=ot.dataset.ot;$("oBody").querySelectorAll(".ot").forEach(b=>{const on=b.dataset.ot==os.type;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});renderOrderFoot();return}
+ const ov=e.target.closest("[data-ov]");
+ if(ov){os.vol=+ov.dataset.ov;os.bid="";const vb=volBottles();if(vb.length==1)os.bid=vb[0].id;renderOrder();
+  const st=$("strip");if(st&&!os.bid)setTimeout(()=>st.scrollIntoView({block:"nearest",behavior:"smooth"}),60);return}
+ const ob=e.target.closest("[data-ob]");
+ if(ob){os.bid=ob.dataset.ob;$("strip").querySelectorAll(".bo").forEach(b=>{const on=b.dataset.ob==os.bid;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});renderOrderFoot();return}
+ if(e.target.closest("#oAdd")){
+  if(osMissing().length){nudgeOrder();return}
+  const k=ckey(os.pid,os.bid,os.type);cart[k]=(cart[k]||0)+1;saveCart();updateCart();bumpCart();closeOrder();toast("Добавлено в корзину");return}
+ const now=e.target.closest("#oNow");
+ if(now&&(osMissing().length||now.getAttribute("aria-disabled")=="true")){e.preventDefault();if(osMissing().length)nudgeOrder()}});
+let toastT=0;
+function toast(t){$("toastT").textContent=t;$("toast").classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>$("toast").classList.remove("on"),3200)}
+$("toastB").onclick=()=>{$("toast").classList.remove("on");drawer(true)};
 
 /* ---------- Корзина ---------- */
-function lines(){return Object.keys(cart).map(k=>{const{pid,bid}=parseKey(k);return{k,p:perfumes.find(x=>x.id==pid),b:bottleOf(bid),q:cart[k]}}).filter(x=>x.p&&x.q>0)}
+function lines(){return Object.keys(cart).map(k=>{const{pid,bid,t}=parseKey(k),p=perfumes.find(x=>x.id==pid);return{k,p,b:bottleOf(bid),t:p&&typesOf(p).includes(t)?t:(p?typesOf(p)[0]:"orig"),q:cart[k]}}).filter(x=>x.p&&x.q>0)}
 const unit=x=>(Number(x.p.price)||0)+(Number(x.b&&x.b.price)||0);
 const priced=x=>hasP(x.p.price)||(x.b&&hasP(x.b.price)&&Number(x.b.price)>0);
+/* старые позиции корзины (без типа) переводим на новый формат ключа */
+function normCart(){const n={};for(const k of Object.keys(cart)){const{pid,bid,t}=parseKey(k),p=perfumes.find(x=>x.id==pid);
+  if(!p){n[k]=(n[k]||0)+cart[k];continue}
+  const ty=typesOf(p),nk=ckey(pid,bid,ty.includes(t)?t:ty[0]);n[nk]=(n[nk]||0)+cart[k]}
+ cart=n;saveCart()}
+const cartTypes=(k,x)=>{const ty=typesOf(x.p);
+ return ty.length>1?`<div class="ctp" role="group" aria-label="Тип аромата">${ty.map(t=>`<button type="button" data-ct="${esc(k)}" data-t="${t}" aria-pressed="${t==x.t}" class="${t==x.t?"on":""}">${TN[t]}</button>`).join("")}</div>`:`<div class="bl">${TN[ty[0]]}</div>`};
 const cartPicker=(k,bt)=>{const v=Number(bt.volume),vs=vols();
  return (vs.length>1?`<div class="vl" role="group" aria-label="Объём">${vs.map(x=>`<button type="button" class="vb${x==v?" on":""}" data-cv="${x}" data-ck="${esc(k)}">${x} мл</button>`).join("")}</div>`:"")
   +`<div class="bt" role="group" aria-label="Флакон">${bottles.filter(b=>Number(b.volume)==v).map(b=>chip(b,b.id==bt.id).replace("<button ",`<button data-ck="${esc(k)}" `)).join("")}</div>`};
 /* смена флакона у позиции в корзине: количество переезжает на новый флакон (если такой уже есть — складывается) */
-function moveLine(k,bid){const{pid}=parseKey(k),nk=ckey(pid,bid);if(!bottleOf(bid)||nk==k||!cart[k])return;
+function moveLine(k,ch){const o=parseKey(k);if(!cart[k])return;
+ const bid=ch.bid!==undefined?ch.bid:o.bid,t=ch.t!==undefined?ch.t:o.t;if(bid&&!bottleOf(bid))return;
+ const nk=ckey(o.pid,bid,t);if(nk==k)return;
  cart[nk]=(cart[nk]||0)+cart[k];delete cart[k];if(cartOpen.has(k)){cartOpen.delete(k);cartOpen.add(nk)}
- const b=bottleOf(bid);lastB[pid+"|"+Number(b.volume)]=bid;saveCart();updateCart()}
+ const b=bottleOf(bid);if(b)lastB[o.pid+"|"+Number(b.volume)]=bid;saveCart();updateCart()}
 const cartOpen=new Set();   // какие флаконы в корзине раскрыты
 function updateCart(){
  const L=lines(),n=L.reduce((s,x)=>s+x.q,0),tot=L.reduce((s,x)=>s+x.q*unit(x),0);
  $("cartN").textContent=n;$("dCnt").textContent=n?n+" шт.":"";
  $("dTot").textContent=money(tot);
  $("dList").innerHTML=L.length?L.map(x=>{const{p,q,k}=x,bt=x.b,b=brands[p.brandId]||"";
-  return `<div class="ci"><div class="pi">${p.img?`<img${tr(p.img)} src="${p.img}" alt="">`:ph}</div><div class="tx">${b?`<div class="b">${esc(b)}</div>`:""}<div class="n">${esc(p.name)}</div>${bt?`<div class="bx${cartOpen.has(k)?" open":""}"><button type="button" class="bsum" data-bxt="${esc(k)}" aria-expanded="${cartOpen.has(k)}">Флакон ${esc(bt.name)} · ${esc(bt.volume)} мл<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="bbody"><div class="bi">${bt.img?`<img${tr(bt.img)} src="${bt.img}" alt="">`:""}<div><b>${esc(bt.name)}</b><span>${esc(bt.volume)} мл${hasP(bt.price)&&Number(bt.price)>0?" · +"+money(bt.price):" · без доплаты"}</span></div></div>${cartPicker(k,bt)}</div></div>`:""}<div class="p">${priced(x)?money(unit(x)):""}</div><div class="qt"><button data-m="${esc(k)}" aria-label="Меньше">−</button><span>${q}</span><button data-p="${esc(k)}" aria-label="Больше">+</button></div></div><button class="rm" data-r="${esc(k)}" aria-label="Удалить"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div>`}).join(""):
+  return `<div class="ci"><div class="pi">${p.img?`<img${tr(p.img)} src="${p.img}" alt="">`:ph}</div><div class="tx">${b?`<div class="b">${esc(b)}</div>`:""}<div class="n">${esc(p.name)}</div>${cartTypes(k,x)}${bt?`<div class="bx${cartOpen.has(k)?" open":""}"><button type="button" class="bsum" data-bxt="${esc(k)}" aria-expanded="${cartOpen.has(k)}">Флакон ${esc(bt.name)} · ${esc(bt.volume)} мл<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="bbody"><div class="bi">${bt.img?`<img${tr(bt.img)} src="${bt.img}" alt="">`:""}<div><b>${esc(bt.name)}</b><span>${esc(bt.volume)} мл${hasP(bt.price)&&Number(bt.price)>0?" · +"+money(bt.price):" · без доплаты"}</span></div></div>${cartPicker(k,bt)}</div></div>`:""}<div class="p">${priced(x)?money(unit(x)):""}</div><div class="qt"><button data-m="${esc(k)}" aria-label="Меньше">−</button><span>${q}</span><button data-p="${esc(k)}" aria-label="Больше">+</button></div></div><button class="rm" data-r="${esc(k)}" aria-label="Удалить"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button></div>`}).join(""):
   '<div class="emp"><img src="assets/logo-stack-black.png" alt=""><div class="b7">Корзина пуста</div>Добавьте ароматы из каталога</div>';
  const ob=$("ordBtn");ob.setAttribute("aria-disabled",L.length&&C.whatsapp?"false":"true");
- let t="Здравствуйте! Хочу заказать:\n"+L.map((x,i)=>`${i+1}. ${(brands[x.p.brandId]?brands[x.p.brandId]+" ":"")+x.p.name}${x.p.oil===true?" (масляный)":" (оригинал)"}${x.b?", флакон: "+x.b.name+", "+x.b.volume+" мл":""} × ${x.q}${priced(x)?" — "+money(x.q*unit(x)):""}`).join("\n")+"\n\nИтого: "+money(tot);
+ const t=waText(L);
  ob.href=L.length&&C.whatsapp?waUrl(t):"#";
  $("dClr").style.display=L.length?"":"none";
- document.querySelectorAll(".ctl").forEach(syncCtl);syncSheet();
+ syncAdd();if(orderOpen)renderOrderFoot();
 }
 $("dList").onclick=e=>{
  const cv=e.target.closest("[data-cv]"),cb=e.target.closest(".bc[data-ck]");
+ const ct=e.target.closest("[data-ct]");
+ if(ct){moveLine(ct.dataset.ct,{t:ct.dataset.t});return}
  if(cv){const k=cv.dataset.ck,pid=parseKey(k).pid,vol=+cv.dataset.cv,id=lastB[pid+"|"+vol];
-  moveLine(k,bottleOf(id)?id:(bottles.find(b=>Number(b.volume)==vol)||{}).id);return}
- if(cb){moveLine(cb.dataset.ck,cb.dataset.bc);return}
+  moveLine(k,{bid:bottleOf(id)?id:(bottles.find(b=>Number(b.volume)==vol)||{}).id});return}
+ if(cb){moveLine(cb.dataset.ck,{bid:cb.dataset.bc});return}
  const bx=e.target.closest("[data-bxt]");
  if(bx){const k=bx.dataset.bxt,box=bx.closest(".bx"),o=!box.classList.contains("open");box.classList.toggle("open",o);bx.setAttribute("aria-expanded",o);o?cartOpen.add(k):cartOpen.delete(k);return}
  const m=e.target.closest("[data-m]"),p=e.target.closest("[data-p]"),r=e.target.closest("[data-r]");
@@ -540,9 +656,9 @@ $("dList").onclick=e=>{
  else if(r)delete cart[r.dataset.r];else return;
  saveCart();updateCart()};
 $("dClr").onclick=()=>{cart={};saveCart();updateCart()};
-function drawer(o){$("drw").classList.toggle("open",o);$("ov").classList.toggle("open",o);$("drw").setAttribute("aria-hidden",!o);document.body.classList.toggle("lock",o);if(o)setTimeout(()=>$("dClose").focus(),300)}
+function drawer(o){$("drw").classList.toggle("open",o);$("ov").classList.toggle("open",o);$("drw").setAttribute("aria-hidden",!o);syncLock();if(o)setTimeout(()=>$("dClose").focus(),300)}
 $("cartBtn").onclick=()=>drawer(true);$("dClose").onclick=()=>drawer(false);$("ov").onclick=()=>drawer(false);
-addEventListener("keydown",e=>{if(e.key=="Escape"){if(openId)closeSheet();else drawer(false)}});
+addEventListener("keydown",e=>{if(e.key=="Escape"){if(orderOpen)closeOrder();else if(openId)closeSheet();else drawer(false)}});
 
 /* ---------- Загрузка данных ---------- */
 renderContacts();
@@ -557,6 +673,7 @@ renderContacts();
   perfumes=p.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
   bottles=bt.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));
   if(!perfumes.length){demo=true;groups=DEMO_G;brands=DEMO_B;perfumes=DEMO_P}
+  normCart();
  }catch(e){
   demo=true;groups=DEMO_G;brands=DEMO_B;perfumes=DEMO_P;
  }
