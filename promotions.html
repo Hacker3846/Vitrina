@@ -11,18 +11,68 @@ header{background:var(--ink);border-bottom:1px solid rgba(197,132,87,.4)}header 
 main{max-width:900px;margin:-28px auto 0;padding:0 16px 70px;position:relative}.intro{font-size:14px;color:var(--grey);text-align:center;margin:0 0 20px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}
 .card{background:white;border:1px solid var(--line);border-top:3px solid var(--copper);border-radius:18px;padding:24px;box-shadow:0 12px 35px #1111110c;min-height:220px;display:flex;flex-direction:column}.tag{display:inline-flex;align-self:flex-start;border-radius:20px;background:#fbf1e9;color:#8e5736;padding:6px 11px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.card h2{font-size:23px;line-height:1.2;margin:16px 0 10px;font-weight:900}.desc{color:#555;font-size:15px;white-space:pre-line}.offer{margin-top:auto;padding-top:20px;color:var(--ink);font-size:14px;font-weight:700}.offer strong{font-size:27px;color:var(--copper);display:block}.dates{font-size:12px;color:var(--grey);margin-top:8px}.empty{background:#fff;border:1px solid var(--line);border-radius:18px;text-align:center;padding:40px 20px}.empty b{font-size:20px;display:block;margin-bottom:8px}.empty p{color:var(--grey)}footer{text-align:center;color:var(--grey);font-size:12px;padding:24px 16px;border-top:1px solid var(--line)}
 @media(max-width:480px){header .wrap{height:62px}.back{padding:9px 12px;font-size:12px}.hero .wrap{padding-top:42px;padding-bottom:55px}.card{padding:20px}}
+.card.wide{grid-column:1/-1;min-height:0}
+.st{margin-top:18px}.st>small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);font-weight:700;margin-bottom:8px}
+.ar{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:8px 12px 8px 8px;background:#fff;transition:border-color .2s}.ar:hover{border-color:var(--copper)}
+.ar .im{width:56px;height:56px;border-radius:10px;background:var(--ink);flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center}.ar .im img{width:100%;height:100%;object-fit:contain}.ar .im img.ph{width:70%;opacity:.8}
+.ar small{display:block;color:var(--grey);font-size:12px}.ar b{font-size:15px;line-height:1.2}.ar em{display:block;font-style:normal;font-size:12px;color:#8e5736;font-weight:700;margin-top:2px}
+.ars{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
+.more{margin-top:10px}.more summary{cursor:pointer;color:var(--copper);font-weight:700;font-size:14px;padding:8px 0}.more .ars{margin-top:6px}
+.tiers{display:flex;flex-wrap:wrap;gap:8px}.tier{border:1.5px solid var(--copper);border-radius:14px;padding:8px 14px;background:#fbf1e9;text-align:center;min-width:92px}.tier span{display:block;font-size:12px;color:#8e5736;font-weight:700}.tier strong{font-size:22px;color:var(--ink)}
+.cap{font-size:13px;color:var(--grey);margin-top:6px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.pill{display:inline-flex;align-items:center;border-radius:20px;border:1.5px solid var(--copper);background:#fbf1e9;color:#8e5736;padding:6px 13px;font-size:13px;font-weight:700}
+.cn{border:1px solid var(--line);border-radius:14px;padding:12px 12px 14px;background:#fafafb}.cn .ars{margin-top:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.meta span{font-size:12px;font-weight:700;color:#555;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px 10px}
+.sep{text-align:center;font-size:12px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:10px 0}
+.tier{text-align:left;min-width:130px}.tier span{max-width:230px}
 </style></head><body>
 <header><div class="wrap"><a href="index.html" aria-label="На главную"><img src="assets/logo-horizontal.png" alt="ALFIYA Perfume"></a><span class="sp"></span><a class="back" href="index.html">← В каталог</a></div></header>
 <section class="hero"><div class="wrap"><div class="kick">ALFIYA Perfume</div><h1>Скидки и <span style="color:var(--copper)">акции</span></h1><p>Больше любимых ароматов — больше приятных бонусов. Выберите своё специальное предложение.</p></div></section>
 <main><p class="intro">Актуальные предложения магазина</p><div class="cards" id="promos"><div class="empty"><b>Загружаем акции…</b><p>Секунду, скоро всё будет готово.</p></div></div></main>
-<footer>ALFIYA Perfume · Предложения могут иметь ограничения по срокам и объёму покупки.</footer>
+<footer>ALFIYA Perfume · Предложения могут иметь ограничения по срокам и объёму покупки. Если подходит несколько акций, действует самая выгодная — скидки не суммируются.</footer>
+<script src="assets/pricing.js"></script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import{getFirestore,collection,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import{getFirestore,collection,doc,getDoc,getDocs,query,where}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 const db=getFirestore(initializeApp({apiKey:"AIzaSyBnHrPE4dLu1Hl_1wxm7nL9Iu2ZSty5hBY",authDomain:"messenjer8uchilisha.firebaseapp.com",projectId:"messenjer8uchilisha",storageBucket:"messenjer8uchilisha.firebasestorage.app",messagingSenderId:"323729368567",appId:"1:323729368567:web:67fff7eb9a659d55917af2"}));
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const today=new Date();today.setHours(0,0,0,0);const dateFmt=v=>v?new Date(v+"T00:00:00").toLocaleDateString("ru-RU"):"";
-function render(items){const root=document.getElementById("promos");if(!items.length){root.innerHTML='<div class="empty" style="grid-column:1/-1"><b>Сейчас специальных предложений нет</b><p>Загляните чуть позже — акции регулярно обновляются.</p></div>';return}
-root.innerHTML=items.map(p=>{const range=[p.start?"с "+dateFmt(p.start):"",p.end?"до "+dateFmt(p.end):""].filter(Boolean).join(" · ");return `<article class="card"><span class="tag">${p.type==="discount"?"Специальная скидка":"Подарок к покупке"}</span><h2>${esc(p.name||"Специальное предложение")}</h2><p class="desc">${esc(p.desc||"")}</p><div class="offer">${p.type==="discount"?`<strong>−${Number(p.percent)||0}%</strong>скидка при покупке от ${Number(p.ml)||0} мл`:`<strong>Подарок</strong>${esc(p.gift||"при покупке")} при покупке от ${Number(p.ml)||0} мл`}</div>${range?`<p class="dates">${esc(range)}</p>`:""}</article>`}).join("")}
-try{const snap=await getDocs(query(collection(db,"aroma"),where("kind","==","shop-promotion")));const now=new Date();now.setHours(0,0,0,0);const items=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.active!==false&&(!p.start||new Date(p.start+"T00:00:00")<=now)&&(!p.end||new Date(p.end+"T23:59:59")>=now)).sort((a,b)=>(b.ts||0)-(a.ts||0));render(items)}catch(e){document.getElementById("promos").innerHTML='<div class="empty" style="grid-column:1/-1"><b>Не удалось загрузить акции</b><p>Попробуйте обновить страницу позже.</p></div>'}
+const dateFmt=v=>v?new Date(v+"T00:00:00").toLocaleDateString("ru-RU"):"";
+let P={},B={},G={},CUR="₽";
+const cap=t=>t?t[0].toUpperCase()+t.slice(1):t;
+const aroma=(id,extra)=>{const p=P[id];if(!p)return"";const b=B[p.brandId]||"";
+ return`<a class="ar" href="index.html?open=${esc(id)}"><div class="im">${p.img?`<img src="${p.img}" loading="lazy" alt="">`:'<img class="ph" src="assets/logo-horizontal.png" alt="">'}</div><div>${b?`<small>${esc(b)}</small>`:""}<b>${esc(p.name)}</b>${extra?`<em>${extra}</em>`:""}</div></a>`};
+const aromas=ids=>{const a=ids.filter(i=>P[i]).map(i=>aroma(i));if(!a.length)return"";
+ return`<div class="ars">${a.slice(0,8).join("")}</div>`+(a.length>8?`<details class="more"><summary>Показать все (${a.length})</summary><div class="ars">${a.slice(8).join("")}</div></details>`:"")};
+/* Что выбрано: «любой аромат», бренды, группы и отдельные ароматы (с карточками) */
+function selHtml(sel){
+ if(sel.all)return'<div class="pills"><span class="pill">Любой аромат каталога</span></div>';
+ const pills=[...sel.brands.map(i=>`<span class="pill">Бренд · ${esc(B[i]||"…")}</span>`),...sel.groups.map(i=>`<span class="pill">Группа · ${esc(G[i]||"…")}</span>`)].join("");
+ return(pills?`<div class="pills">${pills}</div>`:"")+aromas(AlfPricing.resolve(sel,Object.values(P)).map(p=>p.id))}
+function condHtml(p){
+ const n=p.conds.length,all=p.condLogic==="all";
+ const head=n>1?(all?"Нужно купить всё сразу":"Достаточно купить что-то одно из этого"):"Что нужно купить";
+ return`<div class="st"><small>${head}</small>`+p.conds.map((c,i)=>{
+  const meta=[AlfPricing.typeLabel(c.types),c.minMl?"от "+c.minMl+" мл":"",c.minQty>1?"от "+c.minQty+" шт.":""].filter(Boolean);
+  return(i?`<div class="sep">${all?"и":"или"}</div>`:"")+`<div class="cn">${selHtml(c.sel)}${meta.length?`<div class="meta">${meta.map(m=>`<span>${esc(cap(m))}</span>`).join("")}</div>`:""}</div>`}).join("")+`</div>`}
+const tiers=p=>p.rows.length?`<div class="tiers">${p.rows.map(r=>{
+ const lab=[AlfPricing.typeLabel(r.types),AlfPricing.volText(r)].filter(Boolean).join(" · ")||"Любой вариант и объём";
+ return`<div class="tier"><span>${esc(cap(lab))}</span><strong>${esc(AlfPricing.valText(p,r.val,CUR))}</strong></div>`}).join("")}</div>`:"";
+const TAG={combo:"Скидка при покупке",discount:"Специальная скидка",gift:"Подарок к покупке"};
+function card(p){
+ const range=[p.start?"с "+dateFmt(p.start):"",p.end?"до "+dateFmt(p.end):""].filter(Boolean).join(" · ");
+ let body=p.desc?`<p class="desc st">${esc(p.desc)}</p>`:"";
+ if(p.mode!=="discount")body+=condHtml(p);
+ if(p.mode==="gift")body+=`<div class="offer"><strong>Подарок</strong>${esc(p.gift)}</div>`;
+ else body+=`<div class="st"><small>${p.mode==="combo"?"Скидка действует на":"Скидка на"}</small>${selHtml(p.scope)}</div><div class="st"><small>Размер скидки</small>${tiers(p)}</div>`;
+ return`<article class="card wide"><span class="tag">${TAG[p.mode]}</span><h2>${esc(p.name||"Специальное предложение")}</h2>${body}${range?`<p class="dates">${esc(range)}</p>`:""}</article>`}
+function render(items){const root=document.getElementById("promos");
+ if(!items.length){root.innerHTML='<div class="empty" style="grid-column:1/-1"><b>Сейчас специальных предложений нет</b><p>Загляните чуть позже — акции регулярно обновляются.</p></div>';return}
+ root.innerHTML=items.map(card).join("")}
+try{
+ const col=collection(db,"aroma");
+ const [pf,br,gr,ct,pm]=await Promise.all([getDocs(query(col,where("kind","==","shop-perfume"))),getDocs(query(col,where("kind","==","shop-brand"))),getDocs(query(col,where("kind","==","shop-group"))),getDoc(doc(db,"aroma","shop-contacts")),AlfPricing.load({getDocs,query,where},col)]);
+ pf.docs.forEach(d=>P[d.id]={id:d.id,...d.data()});br.docs.forEach(d=>B[d.id]=d.data().name);gr.docs.forEach(d=>G[d.id]=d.data().name);
+ if(ct.exists()&&ct.data().currency)CUR=ct.data().currency;
+ render(pm.filter(p=>AlfPricing.isLive(p)))
+}catch(e){document.getElementById("promos").innerHTML='<div class="empty" style="grid-column:1/-1"><b>Не удалось загрузить акции</b><p>Попробуйте обновить страницу позже.</p></div>'}
 </script></body></html>

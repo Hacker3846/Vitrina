@@ -6,127 +6,273 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Админка — Ароматы</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#111;--grey:#8a8a8a;--line:#e4e4e4;--soft:#f6f5f3;--red:#c62828;--ok:#1b7f3b}
-body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--soft);line-height:1.4}
-.wrap{max-width:900px;margin:0 auto;padding:0 16px 80px}
-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-header .wrap{display:flex;align-items:center;gap:12px;min-height:58px;padding-bottom:0}
-header h1{font-size:18px}
-.sp{flex:1}
-#status{font-size:13px;color:var(--grey)}
-#status.ok{color:var(--ok)}#status.err{color:var(--red)}
-nav.tabs{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
-.gset{margin-top:10px;font-size:13px;color:var(--grey)}.gset summary{cursor:pointer}
-nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;height:40px;padding:0 18px;border-radius:20px;font-size:15px;cursor:pointer}
-nav.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Reg.otf") format("opentype");font-weight:400;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bol.otf") format("opentype");font-weight:700;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("assets/fonts/GothaPro-Bla.otf") format("opentype");font-weight:900;font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--ink:#111;--copper:#c58457;--copper-d:#a96a41;--tint:#fbf3ec;--grey:#8a8a8f;--line:#e2e2e6;--soft:#f3f3f5;--red:#c62828;--ok:#1b7f3b;--warn:#b26a00;--ease:cubic-bezier(.22,.9,.28,1);--side:252px}
+html{scroll-behavior:smooth}
+body{font-family:"Gotham Pro",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--soft);line-height:1.45;-webkit-font-smoothing:antialiased}
+body.lock{overflow:hidden}
+:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+/* каркас */
+.app{display:flex;min-height:100vh}
+.side{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:22px 14px 18px;overflow:auto;z-index:50;border-right:1px solid rgba(197,132,87,.3)}
+.side .brand{padding:0 8px 18px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:10px}
+.side .brand img{height:38px;display:block}
+.side .brand small{display:block;margin-top:8px;color:var(--grey);font-size:13px}
+.ng{font-size:12px;color:var(--grey);padding:16px 12px 6px;font-weight:700}
+nav.tabs{display:flex;flex-direction:column;gap:2px}
+nav.tabs button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;color:#d8d8dc;height:42px;padding:0 12px;border-radius:10px;font:inherit;font-size:15px;cursor:pointer;position:relative;transition:background .15s,color .15s}
+nav.tabs button:hover{background:rgba(255,255,255,.07);color:#fff}
+nav.tabs button.on{background:rgba(197,132,87,.18);color:#fff;font-weight:700}
+nav.tabs button.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--copper)}
+.side .site{margin-top:auto;padding-top:18px}
+.side .site a{display:flex;align-items:center;justify-content:center;height:42px;border:1.5px solid rgba(197,132,87,.7);border-radius:21px;color:#fff;text-decoration:none;font-size:14px;font-weight:700;transition:background .2s,color .2s}
+.side .site a:hover{background:var(--copper);color:var(--ink)}
+.main{flex:1;margin-left:var(--side);min-width:0;padding:30px 32px 90px;max-width:calc(var(--side) + 1060px)}
+.top{display:none}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.pagehead h1{font-size:28px;font-weight:900;line-height:1.15}
+.pagehead p{color:var(--grey);font-size:15px;margin-top:4px}
+.scrim,.ov{position:fixed;inset:0;background:rgba(17,17,17,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
+.scrim{z-index:45}
+.scrim.open,.ov.open{opacity:1;pointer-events:auto}
 .panel{display:none}.panel.on{display:block}
-.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
-.box h2{font-size:17px;margin-bottom:12px}
-label{display:block;font-size:13px;color:var(--grey);margin:10px 0 4px}
-input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;font-size:16px;background:#fff;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--ink)}
-textarea{min-height:80px;resize:vertical}
-.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
-button.b{height:42px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:0 18px;font-size:15px;cursor:pointer}
-button.b.g{background:#fff;color:var(--ink);border-color:var(--line)}
-button.b.d{background:#fff;color:var(--red);border-color:#f0c4c4}
+/* карточки и формы */
+.box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px}
+.box h2{font-size:18px;font-weight:900;margin-bottom:14px}
+.box h2 span{color:var(--grey);font-weight:400;font-size:15px}
+label{display:block;font-size:13px;color:#5d5d63;font-weight:700;margin:14px 0 5px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;font-size:16px;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--copper);box-shadow:0 0 0 3px rgba(197,132,87,.18)}
+textarea{min-height:90px;resize:vertical}
+#pf-search{margin-bottom:6px;background:var(--soft)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+.hint{font-size:13px;color:var(--grey);margin-top:7px;line-height:1.5}
+.chk2,.oilq{display:flex;align-items:center;gap:9px;margin:12px 0 0;font-size:15px;color:var(--ink);font-weight:400}
+.chk2 input,.oilq input,.pk-i input,.fg .fgrow input[type=checkbox]{width:18px;height:18px;accent-color:var(--copper)}
+/* кнопки */
+button.b,a.b{height:42px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;border-radius:21px;padding:0 20px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+button.b:hover,a.b:hover{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+button.b.g,a.b.g{background:#fff;color:var(--ink);border-color:var(--line)}
+button.b.g:hover,a.b.g:hover{border-color:var(--copper);background:var(--tint);color:var(--ink)}
+button.b.d,a.b.d{background:#fff;color:var(--red);border-color:#efc6c6}
+button.b.d:hover{background:var(--red);border-color:var(--red);color:#fff}
 button.b:disabled{opacity:.5;cursor:wait}
-.acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.item:first-of-type{border-top:0}
+.acts{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+/* списки */
+.item{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}.item[hidden]{display:none}
 .item .t{flex:1;min-width:0}
-.item .t b{display:block;font-size:16px;overflow:hidden;text-overflow:ellipsis}
+.item .t b{display:block;font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis}
 .item .t span{font-size:13px;color:var(--grey);display:block}
-.item img,.item .ph{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--soft);flex:none}
-.item .a{display:flex;gap:6px;flex:none}
-.item .a button{height:36px;padding:0 12px;font-size:14px}
-.empty{color:var(--grey);font-size:14px;padding:6px 0}
-.prev{margin-top:10px}.prev img{width:120px;height:120px;object-fit:cover;border-radius:12px;display:block;border:1px solid var(--line)}
+.item .t span.oilq{display:flex;margin-top:6px;color:var(--ink);font-size:13px}
+.item img,.item .ph{width:60px;height:60px;border-radius:12px;object-fit:contain;background:#1a1a1a;flex:none}
+.item .ph{background:var(--soft)}
+.item .a{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.item .a button{height:36px;padding:0 14px;font-size:14px}
+.empty{color:var(--grey);font-size:15px;padding:8px 0}
+.prev{margin-top:10px}.prev img{width:130px;height:130px;object-fit:contain;background:#1a1a1a;border-radius:14px;display:block}
 .prev button{margin-top:8px;height:34px;font-size:13px}
-.hint{font-size:12px;color:var(--grey);margin-top:6px}
-.prev img{object-fit:contain!important;background:#1a1a1a}
-.fg{margin-top:12px;border:1px dashed #c9a27f;background:#fffaf5;border-radius:12px;padding:12px}
+.pr-st{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;background:var(--tint);color:var(--copper-d);margin-left:8px;vertical-align:middle;font-weight:700}
+/* боковая форма (добавить / изменить) */
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);margin:0;border:0;border-radius:0;z-index:60;overflow:auto;padding:24px 24px 0;transform:translateX(104%);visibility:hidden;transition:transform .3s var(--ease),visibility 0s .3s;box-shadow:-24px 0 60px rgba(17,17,17,.2)}
+.sheet.open{transform:none;visibility:visible;transition:transform .3s var(--ease)}
+.sheet h2{font-size:21px;padding-right:44px}
+.sheet .sx{position:absolute;top:18px;right:18px;width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:var(--ink)}
+.sheet .sx:hover{border-color:var(--copper);background:var(--tint)}
+.sheet>.acts{position:sticky;bottom:0;background:#fff;margin:20px -24px 0;padding:14px 24px;border-top:1px solid var(--line);z-index:2}
+/* блоки внутри форм */
+.fg,.pr-prev{margin-top:14px;border:1px dashed #d9b595;background:var(--tint);border-radius:14px;padding:14px}
 .fg .fgrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fg .fgrow label.chk{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);font-size:14px}
-.fg .fgrow input[type=checkbox]{width:auto}
-.fg details{margin-top:10px;font-size:13px;color:var(--grey)}
-.fg summary{cursor:pointer}
-.fg-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px}
-.fg-res:empty{display:none}
+.fg .fgrow label.chk{display:flex;align-items:center;gap:6px;margin:0;font-size:14px}
+details,.gset{margin-top:12px;font-size:13px;color:var(--grey)}
+details summary{cursor:pointer;font-weight:700}
+details[open]{padding-bottom:4px}
+.fg-msg{font-size:14px;margin-top:8px;color:var(--grey)}.fg-msg.err{color:var(--red)}
+.lblrow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:14px 0 5px}
+.lblrow label{margin:0}.lblrow button{height:32px;padding:0 14px;font-size:13px}
+.fg-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:12px}.fg-res:empty{display:none}
 .fg-c{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:6px}
-.fg-c:hover{border-color:#c58457}
-.fg-c img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#f1f1f1;border-radius:8px}
-.fg-c b{font-size:13px;line-height:1.2}
-.fg-c span{font-size:12px;color:var(--grey)}
-.fg-msg{font-size:13px;margin-top:8px;color:var(--grey)}
-.fg-msg.err{color:var(--red)}
-.chk2{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:14px;color:var(--ink)}
-.chk2 input{width:auto}
-.bk{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
-.bk:first-child{border-top:0}
-.bk-img{width:64px;height:64px;border-radius:10px;background:#1a1a1a;overflow:hidden}
-.bk-img img{width:100%;height:100%;object-fit:contain;display:block}
-.bk-f{display:flex;flex-direction:column;gap:6px;min-width:0}
-.bk-f input,.bk-f select{padding:8px 10px;font-size:15px}
-.bk-st{font-size:12px;color:var(--grey)}
-.bk-st.warn{color:#b26a00}
-.bk-r{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
-.bk-r select{flex:1 1 150px;min-width:0;padding:9px 10px;font-size:15px}
-.bk-r input{flex:0 0 110px;width:110px;padding:9px 10px;font-size:15px}
-.bk-r button{height:40px;padding:0 14px;font-size:14px}
-.ailog{max-height:280px;overflow:auto;font-size:13px;margin-top:10px}
-.ailog div{padding:6px 0;border-top:1px solid var(--line);color:var(--ink)}
-.ailog div.e{color:var(--red)}
-.ailog div.w{color:#b26a00}
-.ailog small{color:var(--grey)}
-progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
-.lblrow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:10px 0 4px}
-.lblrow label{margin:0}
-.lblrow button{height:30px;padding:0 12px;font-size:13px;border-radius:15px}
-.oilq{display:flex;align-items:center;gap:6px;margin:4px 0 0;font-size:13px;color:var(--ink)}
-.oilq input{width:auto}
-.bk-r .oilq{margin:0;flex:0 0 auto}
+.fg-c:hover{border-color:var(--copper)}.fg-c img{width:100%;aspect-ratio:1/1;object-fit:contain;background:var(--soft);border-radius:8px}
+.fg-c b{font-size:13px}.fg-c span{font-size:12px;color:var(--grey)}
+.bk{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.bk:first-child{border-top:0}
+.bk-img{width:64px;height:64px;border-radius:12px;background:#1a1a1a;overflow:hidden}.bk-img img{width:100%;height:100%;object-fit:contain;display:block}
+.bk-f{display:flex;flex-direction:column;gap:6px;min-width:0}.bk-f input,.bk-f select{padding:9px 10px;font-size:15px}
+.bk-st{font-size:12px;color:var(--grey)}.bk-st.warn{color:var(--warn)}
+.bk-r{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.bk-r select{flex:1 1 150px;min-width:0;padding:9px 10px;font-size:15px}
+.bk-r input{flex:0 0 110px;width:110px;padding:9px 10px;font-size:15px}.bk-r button{height:40px;padding:0 16px;font-size:14px}.bk-r .oilq{margin:0;flex:0 0 auto}
+.bk-r .oilq input{flex:none;width:18px;height:18px;padding:0}.bk-r .bk-sep{flex:0 0 100%;height:0}
+code.fmt{background:var(--soft);border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap}
+.ailog{max-height:280px;overflow:auto;font-size:13px;margin-top:10px}.ailog div{padding:6px 0;border-top:1px solid var(--line)}.ailog div.e{color:var(--red)}.ailog div.w{color:var(--warn)}.ailog small{color:var(--grey)}
+progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--copper)}
+.pr-sec[hidden],.pk[hidden]{display:none}
+.pk{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.pk-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pk-chip{display:inline-flex;align-items:center;gap:2px;background:var(--tint);border:1px solid #e8cdb6;border-radius:14px;padding:3px 4px 3px 10px;font-size:13px}
+.pk-chip button{border:0;background:transparent;font-size:17px;line-height:1;cursor:pointer;padding:0 6px;color:var(--grey)}
+.pk-q{padding:9px 12px;font-size:15px}.pk-l{max-height:200px;overflow:auto;margin-top:8px;border-top:1px solid var(--line)}
+.pk-i{display:flex;align-items:center;gap:8px;margin:0;padding:9px 2px;font-size:14px;color:var(--ink);font-weight:400;border-bottom:1px solid var(--line);cursor:pointer}
+.pk .acts{margin-top:8px}.pk .acts button{height:34px;font-size:13px;padding:0 14px}
+.pr-tr{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:14px}.pr-tr input{width:90px;padding:9px 10px;font-size:15px}.pr-tr button{height:38px;padding:0 14px}
+.pr-quick{display:flex;gap:6px;flex-wrap:wrap}.pr-quick button{height:34px;font-size:13px;padding:0 14px}
+.var{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}.var .chk2{margin:0}.var .vp{display:flex;align-items:center;gap:10px;margin-top:10px}.var .vp input{flex:1}.var .vp span{color:var(--grey);font-size:14px;white-space:nowrap}.var:has(input[type=checkbox]:not(:checked)) .vp{display:none}
+#pf-orig-modes[hidden]{display:none}.omodes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.omodes[hidden]{display:none}.omodes .vr{border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}.omodes .oilq{margin:0;font-size:12px}.omodes .pw{margin-top:6px}.omodes .pp{padding:7px 8px;font-size:13px}.omodes .pw i{font-size:11px}
+.vrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.vr{min-width:0}.vr .oilq{margin:0}
+.pw{display:flex;align-items:center;gap:6px;margin-top:6px}.pw .pp{flex:1;min-width:0;width:100%;padding:8px 10px;font-size:15px}.pw i{font-style:normal;font-size:12px;color:var(--grey);white-space:nowrap}
+.vr:has(input[type=checkbox]:not(:checked)) .pw{display:none}
+/* сообщение о сохранении */
+#status{position:fixed;left:50%;bottom:24px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:700;z-index:90;max-width:90vw;transition:opacity .2s,transform .25s var(--ease)}
+#status:not(:empty){opacity:1;transform:translate(-50%,0)}
+#status.ok{background:var(--ok)}#status.err{background:var(--red)}
+/* конструктор акций */
+#p-promotions>.box.sheet{width:min(780px,100vw)}
+.pr-form{counter-reset:stp}
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kd{display:flex;flex-direction:column;gap:4px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+.kd b{font-size:15px}.kd span{font-size:12px;color:var(--grey);line-height:1.35}
+.kd:hover{border-color:var(--copper)}.kd.on{border-color:var(--copper);background:var(--tint);box-shadow:0 0 0 3px rgba(197,132,87,.18)}
+.stp{margin-top:24px;counter-increment:stp}.stp[hidden]{display:none}
+.stp>h3{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:900;margin-bottom:6px}
+.stp>h3::before{content:counter(stp);flex:none;width:26px;height:26px;border-radius:13px;background:var(--ink);color:var(--copper);display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.cd,.rr{border:1px solid var(--line);border-radius:14px;padding:6px 14px 14px;margin-top:10px;background:#fff}
+.cd-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;font-size:13px;font-weight:700;color:var(--copper-d)}
+.cd-h .xdel{height:30px;width:30px;padding:0;font-size:18px;line-height:1;border-radius:15px}
+.cd-sep{text-align:center;font-size:12px;font-weight:900;letter-spacing:.2em;color:var(--copper-d);margin:12px 0 0}
+.tg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.tg button{height:34px;padding:0 13px;border:1.5px solid var(--line);background:#fff;border-radius:17px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
+.tg button:hover{border-color:var(--copper)}.tg button.on{border-color:var(--copper);background:var(--tint);font-weight:700}
+.tg .tg-h{font-size:12px;color:var(--grey);margin-left:2px}
+.rr-g{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#5d5d63}
+.rr-g input{width:84px;padding:9px 10px;font-size:15px}.rr-g b{color:var(--ink)}.rr-g .rr-s{margin-left:6px}
+.sl{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.sl-c{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:30px;align-items:center}
+.sl-c .hint{margin:0}
+.sl-c .pk-chip i{font-style:normal;font-size:11px;color:var(--copper-d);font-weight:700;margin-right:5px}
+.sl-bar{display:flex;gap:6px;flex-wrap:wrap}
+.sl-bar input{flex:1 1 170px;min-width:0;padding:9px 12px;font-size:15px}
+.sl-bar button{height:40px;padding:0 14px;font-size:13px}
+.sl-bar button.on{background:var(--copper);border-color:var(--copper);color:var(--ink)}
+.sl-l{max-height:240px;overflow:auto;margin-top:8px;border-top:1px solid var(--line)}.sl-l[hidden]{display:none}
+.sl-h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);font-weight:700;padding:10px 2px 2px}
+.pr-prev b{display:block;margin-bottom:6px}
+.pv{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:3px 0;font-size:14px;line-height:1.4}.pv>span{color:var(--grey);font-size:12px;padding-top:2px}
+.pv-sep{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--copper-d);margin:3px 0 3px 130px}
+.item .t b .pr-st{display:inline-block;color:var(--copper-d);font-size:11px}.pr-prev .pw-n{display:block;margin-top:8px;color:var(--warn);font-size:13px;line-height:1.45}
+@media(max-width:620px){.kinds{grid-template-columns:1fr}.pv{grid-template-columns:1fr;gap:0}.pv-sep{margin-left:0}}
+/* похожие названия / объединение карточек */
+.dgrp{border:1px solid var(--line);border-radius:14px;padding:4px 14px 14px;margin-top:12px;background:#fff}
+.dg-t{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--grey);font-weight:700}
+.dg-t .pr-st{margin-left:0}
+.dg-pick{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0;width:62px;flex:none;font-size:11px;line-height:1.2;color:var(--grey);font-weight:700;cursor:pointer;text-align:center}
+.dg-r{width:18px;height:18px;padding:0;accent-color:var(--copper);cursor:pointer}
+.dg-m{margin-top:8px;padding-top:2px}
+.dg-pv{background:var(--tint);border:1px dashed #d9b595;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:14px;line-height:1.5}
+.dg-pv .w{display:block;color:var(--warn);font-size:13px;margin-top:4px}
+#dup-box{border-color:#e8cdb6}
+/* телефон */
+@media(max-width:860px){
+ .side{transform:translateX(-102%);transition:transform .3s var(--ease);width:min(290px,86vw)}.side.open{transform:none}
+ .main{margin-left:0;padding:0 14px 90px}
+ .top{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;background:var(--ink);margin:0 -14px 18px;padding:10px 14px;border-bottom:1px solid rgba(197,132,87,.35)}
+ .top img{height:32px}.top .sp{flex:1}
+ .top button{height:40px;padding:0 16px;border:1.5px solid var(--copper);background:transparent;color:#fff;border-radius:20px;font:inherit;font-weight:700;cursor:pointer}
+ .pagehead h1{font-size:23px}.pagehead .b{width:100%}
+ .box{padding:16px}.item{flex-wrap:wrap}.item .a{width:100%;justify-content:flex-start}
+ .sheet{padding:20px 16px 0}.sheet>.acts{margin:20px -16px 0;padding:12px 16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header><div class="wrap"><h1>Админка</h1><span class="sp"></span><span id="status">Загрузка…</span></div></header>
-<div class="wrap">
-<nav class="tabs" id="tabs">
- <button data-p="perfumes" class="on">Ароматы</button>
- <button data-p="groups">Группы</button>
- <button data-p="bulk">Массовая загрузка</button>
- <button data-p="ai">ИИ и картинки</button>
- <button data-p="bottles">Флаконы</button>
- <button data-p="brands">Бренды</button>
- <button data-p="quiz">Тест</button>
- <button data-p="contacts">Контакты</button>
- <button data-p="promotions">Скидки и акции</button>
-</nav>
+<div class="app">
+<aside class="side" id="side">
+ <div class="brand"><img src="assets/logo-horizontal.png" alt="ALFIYA Perfume"><small>Управление сайтом</small></div>
+ <nav class="tabs" id="tabs">
+  <div class="ng">Каталог</div>
+  <button data-p="perfumes" class="on">Ароматы</button>
+  <button data-p="groups">Группы</button>
+  <button data-p="brands">Бренды</button>
+  <button data-p="bottles">Флаконы</button>
+  <div class="ng">Продажи</div>
+  <button data-p="promotions">Скидки и акции</button>
+  <button data-p="quiz">Тест подбора</button>
+  <div class="ng">Быстрое наполнение</div>
+  <button data-p="bulk">Массовая загрузка</button>
+  <button data-p="ai">ИИ и картинки</button>
+  <div class="ng">Магазин</div>
+  <button data-p="contacts">Контакты</button>
+ </nav>
+ <div class="site"><a href="index.html" target="_blank" rel="noopener">Открыть сайт ↗</a></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<main class="main">
+<div class="top"><button id="burger" type="button" aria-label="Меню">☰ Меню</button><span class="sp"></span><img src="assets/logo-horizontal.png" alt=""></div>
+<div class="pagehead" id="pagehead"></div>
+
 
 
 
 <!-- Скидки и акции -->
 <section class="panel" id="p-promotions">
- <div class="box">
+ <div class="box pr-form">
   <h2 id="pr-title">Добавить акцию</h2>
-  <label>Название акции</label><input id="pr-name" placeholder="Например, Подарок к заказу">
-  <label>Описание для покупателей</label><textarea id="pr-desc" placeholder="При покупке 50 мл — получите аромат 10 мл в подарок"></textarea>
-  <div class="row">
-   <div><label>Тип предложения</label><select id="pr-type"><option value="gift">Подарок</option><option value="discount">Скидка в процентах</option></select></div>
-   <div><label>Объём покупки, мл</label><input id="pr-ml" type="number" min="1" placeholder="50"></div>
+  <label>Название акции</label><input id="pr-name" placeholder="Например: BLACK ROCK −40%">
+
+  <label>Какая это акция</label>
+  <div class="kinds" id="pr-kinds" role="group" aria-label="Вид акции">
+   <button type="button" class="kd" data-k="discount"><b>Скидка</b><span>Просто скидка на выбранные ароматы, бренды или группы. Например: BLACK ROCK −40%</span></button>
+   <button type="button" class="kd" data-k="combo"><b>Скидка при покупке</b><span>Клиент купил одно — на другие ароматы скидка. Условий может быть несколько</span></button>
+   <button type="button" class="kd" data-k="gift"><b>Подарок</b><span>Подарок за покупку выбранных ароматов</span></button>
   </div>
-  <div class="row">
-   <div><label>Подарок (название аромата/объём)</label><input id="pr-gift" placeholder="Например, Rose Noir 10 мл"></div>
-   <div><label>Скидка, %</label><input id="pr-percent" type="number" min="1" max="100" placeholder="10"></div>
+  <div class="hint" id="pr-modehint"></div>
+
+  <!-- Условие -->
+  <div class="stp" data-m="combo gift">
+   <h3>Условие — что должен купить клиент</h3>
+   <div class="hint" style="margin-top:0">Можно добавить несколько условий и выбрать, достаточно ли одного из них (ИЛИ) или нужны все сразу (И).</div>
+   <div id="pr-logic" hidden><label>Когда акция срабатывает</label><select id="pr-lg"><option value="any">Достаточно любого одного условия (ИЛИ)</option><option value="all">Нужно выполнить все условия сразу (И)</option></select></div>
+   <div id="pr-conds"></div>
+   <div class="acts" style="margin-top:10px"><button type="button" class="b g" id="pr-addcond">+ Добавить условие</button></div>
   </div>
-  <div class="row">
-   <div><label>Действует с (необязательно)</label><input id="pr-start" type="date"></div>
-   <div><label>Действует до (необязательно)</label><input id="pr-end" type="date"></div>
+
+  <!-- На что скидка -->
+  <div class="stp" data-m="discount combo">
+   <h3>На что скидка</h3>
+   <div class="hint" style="margin-top:0">Выберите ароматы, целые бренды или группы — можно всё вместе. Либо «Все ароматы».</div>
+   <div id="pr-scope" style="margin-top:8px"></div>
   </div>
-  <label class="chk2"><input type="checkbox" id="pr-active" checked> Акция активна и отображается на сайте</label>
+
+  <!-- Размер скидки -->
+  <div class="stp" data-m="discount combo">
+   <h3>Размер скидки</h3>
+   <select id="pr-vt"><option value="percent">В процентах (%)</option><option value="amount">Суммой за 1 шт.</option></select>
+   <div id="pr-rows"></div>
+   <div class="pr-quick" id="pr-quick"></div>
+   <div class="hint">Каждая строка — своя скидка для своего варианта и объёма. Если клиенту подходит несколько строк, берётся самая выгодная. «Объём от» значит «от этого объёма и больше». Для запечатанных флаконов объёма нет — для них делайте отдельную строку.</div>
+  </div>
+
+  <!-- Подарок -->
+  <div class="stp" data-m="gift">
+   <h3>Подарок</h3>
+   <input id="pr-gift" placeholder="Например: пробник Rose Noir 5 мл">
+  </div>
+
+  <!-- Остальное -->
+  <div class="stp" data-m="discount combo gift">
+   <h3>Описание и сроки</h3>
+   <label>Описание для покупателей (необязательно)</label><textarea id="pr-desc" placeholder="Расскажите условия своими словами — покажется на странице акций"></textarea>
+   <div class="row">
+    <div><label>Действует с (необязательно)</label><input id="pr-start" type="date"></div>
+    <div><label>Действует до (необязательно)</label><input id="pr-end" type="date"></div>
+   </div>
+   <label class="chk2"><input type="checkbox" id="pr-active" checked> Акция включена</label>
+  </div>
+
+  <div class="pr-prev" id="pr-prev"></div>
   <div class="acts"><button class="b" id="pr-save">Сохранить акцию</button><button class="b g" id="pr-reset" type="button">Очистить форму</button></div>
-  <p class="hint">Акции сохраняются в общей базе сайта. Укажите порог объёма и либо подарок, либо процент скидки. Даты необязательны.</p>
+  <p class="hint">Скидка считается от цены аромата (доплата за флакон не уменьшается). Скидки не суммируются: на каждый аромат действует одна, самая выгодная. Акции «при покупке» действуют, когда условие выполняет другая позиция корзины, а не тот же аромат.</p>
  </div>
  <div class="box"><h2>Акции на сайте</h2><div id="pr-list" class="empty">Загрузка…</div></div>
 </section>
@@ -151,12 +297,15 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <div class="row">
    <div><label>Бренд</label><select id="pf-brand"></select></div>
    <div><label>Группа</label><select id="pf-group"></select></div>
-   <div><label>Цена</label><input id="pf-price" type="number" inputmode="decimal" min="0" placeholder="0"></div>
   </div>
-  <div class="lblrow" style="margin-bottom:0"><label>Варианты для заказа (отметьте один или оба)</label></div>
-  <label class="chk2"><input type="checkbox" id="pf-oil"> Масляный</label>
-  <label class="chk2" style="margin-top:6px"><input type="checkbox" id="pf-orig" checked> Оригинал</label>
-  <div class="hint">Если отмечен только один вариант — на сайте при заказе клиент увидит только его.</div>
+  <label>Варианты и цены (отметьте один или оба)</label>
+  <div class="var"><label class="chk2"><input type="checkbox" id="pf-oil"> Масляный (на разлив)</label><div class="vp"><input id="pf-oilp" type="number" inputmode="decimal" min="0" placeholder="Цена"><span>за 1 мл</span></div></div>
+  <div class="var"><label class="chk2"><input type="checkbox" id="pf-orig" checked> Оригинал</label><div class="vp"><input id="pf-origp" type="number" inputmode="decimal" min="0" placeholder="Цена"><span>за 1 шт.</span></div></div>
+  <div id="pf-orig-modes">
+   <div class="var"><label class="chk2"><input type="checkbox" id="pf-opour"> На разлив</label><div class="vp"><input id="pf-opourp" type="number" inputmode="decimal" min="0" placeholder="Цена на разлив"><span>за 1 мл</span></div></div>
+   <div class="var"><label class="chk2"><input type="checkbox" id="pf-osealed" checked> Запечатанный</label><div class="vp"><input id="pf-osealedp" type="number" inputmode="decimal" min="0" placeholder="Цена запечатанного"><span>за 1 шт.</span></div></div>
+  </div>
+  <div class="hint">При выборе «Оригинал» покупатель сможет выбрать «На разлив» (с объёмом и флаконом) и/или «Запечатанный» (целый флакон). Цена на разлив указывается за 1 мл, запечатанный — за 1 шт. Пустая цена — «Цена по запросу».</div>
   <label>Ноты (через запятую)</label><input id="pf-notes" placeholder="Bergamot, Lavender, Ambroxan">
   <div class="lblrow"><label>Описание (показывается в карточке товара на сайте)</label><button class="b g" id="pf-ai" type="button">✨ Написать ИИ</button></div>
   <textarea id="pf-desc" placeholder="Коротко о аромате"></textarea>
@@ -170,7 +319,13 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <div class="prev" id="pf-prev"></div>
   <div class="acts"><button class="b" id="pf-save">Сохранить</button><button class="b g" id="pf-cancel" hidden>Отмена</button></div>
  </div>
- <div class="box"><h2>Все ароматы <span id="pf-cnt" style="color:var(--grey);font-weight:400"></span></h2><div id="pf-list"></div></div>
+ <div class="box" id="dup-box" hidden>
+  <h2>Похожие названия <span id="dup-cnt"></span></h2>
+  <p class="hint" style="margin:-6px 0 4px">Эти ароматы вынесены из общего списка: названия совпадают или отличаются на пару букв (опечатка, «100 мл» в конце). Отметьте карточку, которую оставить, поправьте название и нажмите «Объединить»: варианты, цены, картинка, ноты и описание соберутся в одной карточке, вторая удалится (акции переедут на оставленную). Если ароматы действительно разные — «Это разные ароматы».</p>
+  <div id="dup-list"></div>
+  <button class="b g" id="dup-back" type="button" style="margin-top:12px" hidden></button>
+ </div>
+ <div class="box"><h2>Все ароматы <span id="pf-cnt" style="color:var(--grey);font-weight:400"></span></h2><input id="pf-search" type="search" placeholder="Найти аромат по названию, бренду или группе"><div id="pf-list"></div></div>
 </section>
 
 <!-- Флаконы -->
@@ -185,7 +340,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <label>Фото флакона</label><input id="bt-file" type="file" accept="image/*">
   <div class="prev" id="bt-prev"></div>
   <div class="acts"><button class="b" id="bt-save">Сохранить</button><button class="b g" id="bt-cancel" hidden>Отмена</button></div>
-  <p class="hint">Без цены флакон бесплатный: стоимость заказа не меняется. Если цена указана, она прибавляется к цене аромата за каждую штуку.</p>
+  <p class="hint">Без цены флакон бесплатный. Его цена прибавляется к масляному аромату и оригиналу на разлив (цена за мл × объём). Для запечатанного оригинала флакон отдельно не выбирается.</p>
  </div>
  <div class="box"><h2>Все флаконы <span id="bt-cnt" style="color:var(--grey);font-weight:400"></span></h2><div id="bt-list"></div></div>
 </section>
@@ -194,13 +349,18 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
 <section class="panel" id="p-bulk">
  <div class="box">
   <h2>Массовая загрузка ароматов</h2>
-  <label>Список: бренд и название, через запятую (или с новой строки)</label>
-  <textarea id="bk-text" placeholder="Bvlgari Le Gemme Tygar, Louis Vuitton L'Immensite"></textarea>
+  <label>Список ароматов: основной список с ценами или просто названия</label>
+  <textarea id="bk-text" placeholder="[О]Amouage Guidance edp 100мл[р-500][з-38500]&#10;[М]Oud Satin Mood[р-200]&#10;или просто: Bvlgari Le Gemme Tygar, Louis Vuitton L'Immensite"></textarea>
+  <div class="row"><div><label>Или загрузите файл списка (.txt)</label><input type="file" id="bk-file" accept=".txt,text/plain"></div></div>
+  <div class="hint">Формат основного списка, одна строка = один аромат: <code class="fmt">[О]название[р-350][з-5000]</code> — оригинал (р — цена на разлив за мл, з — цена запечатанного за шт.) и <code class="fmt">[М]название[р-400]</code> — масляный (р — цена за мл). Цена 0 = «цена по запросу». Строки без <code class="fmt">[О]</code>/<code class="fmt">[М]</code> разбираются как раньше: бренд и название через запятую.</div>
   <div class="row">
    <div><label>Группа для всех</label><select id="bk-group"></select></div>
   </div>
-  <label class="chk2"><input type="checkbox" id="bk-oil"> Масляный (ставит отметку всем в очереди, у каждого её можно поменять)</label>
-  <label class="chk2" style="margin-top:6px"><input type="checkbox" id="bk-orig" checked> Оригинал (так же — всем в очереди)</label>
+  <label class="chk2"><input type="checkbox" id="bk-oil"> Масляный (для строк без [О]/[М]; у каждого в очереди можно поменять)</label>
+  <label class="chk2" style="margin-top:6px"><input type="checkbox" id="bk-orig" checked> Оригинал (так же — для строк без [О]/[М])</label>
+  <label class="chk2"><input type="checkbox" id="bk-merge" checked> Если аромат есть и масляным, и оригиналом — собрать одну карточку с обоими вариантами</label>
+  <label class="chk2"><input type="checkbox" id="bk-skip" checked> Пропускать ароматы, которые уже есть в каталоге</label>
+  <label class="chk2"><input type="checkbox" id="bk-search" checked> Искать картинку и ноты на Fragrantica (Apify), описание писать через Groq при публикации</label>
   <label class="chk2"><input type="checkbox" id="bk-cut" checked> Прозрачный фон у картинок (убрать белый фон)</label>
   <div class="acts"><button class="b" id="bk-go" type="button">Разобрать список</button></div>
   <div class="fg-msg" id="bk-msg"></div>
@@ -216,7 +376,7 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
  </div>
  <div class="box" id="bk-box" hidden>
   <h2>Очередь <span id="bk-cnt" style="color:var(--grey);font-weight:400"></span></h2>
-  <div class="hint" style="margin:-4px 0 6px">Проверьте название и бренд, укажите цену и нажмите «Опубликовать» (в поле цены можно нажать Enter).</div>
+  <div class="hint" style="margin:-4px 0 6px">Проверьте название и бренд, цены (масляный — за мл; оригинал: на разлив — за мл, запечатанный — за шт.) и нажмите «Опубликовать» (в поле цены можно нажать Enter). Картинка и описание подтянутся при публикации.</div>
   <div id="bk-list"></div>
   <div class="acts"><button class="b" id="bk-all" type="button">Опубликовать все</button><button class="b g" id="bk-clear" type="button">Очистить очередь</button></div>
  </div>
@@ -304,8 +464,11 @@ progress.bar{width:100%;height:8px;margin-top:12px;accent-color:var(--ink)}
   <p class="hint">Пустое поле = иконка на сайте не показывается.</p>
  </div>
 </section>
+</main>
 </div>
-
+<div class="ov" id="ov"></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script src="assets/pricing.js"></script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import{getFirestore,collection,doc,getDoc,getDocs,setDoc,deleteDoc,query,where}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -317,7 +480,7 @@ const uid=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)
 let groups=[],brands=[],perfumes=[],bottles=[];
 let editP=null,editG=null,editB=null,imgData="";
 
-function status(t,c){const s=$("status");s.textContent=t;s.className=c||"";if(c=="ok")setTimeout(()=>{if(s.textContent==t){s.textContent="";s.className=""}},2500)}
+function status(t,c){const s=$("status");s.textContent=t;s.className=c||"";if(c=="ok")document.dispatchEvent(new Event("admin-ok"));if(c=="ok")setTimeout(()=>{if(s.textContent==t){s.textContent="";s.className=""}},2500)}
 async function run(fn,msg){try{status("Сохраняем…");await fn();status(msg||"Сохранено","ok")}catch(e){status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message)}}
 
 // tabs
@@ -337,7 +500,7 @@ async function loadAll(){
  $("c-shop").value=C.shopName||"";$("c-phone").value=C.phone||"";$("c-wa").value=C.whatsapp||"";$("c-ig").value=C.instagram||"";$("c-addr").value=C.address||"";$("c-cur").value=C.currency||"";
  renderAll();
 }
-function renderAll(){renderGroups();renderBrands();renderPerfumes();renderBottles();fillSelects()}
+function renderAll(){renderGroups();renderBrands();renderPerfumes();renderBottles();fillSelects();prRefresh()}
 
 function fillSelects(){
  const bv=$("pf-brand").value,gv=$("pf-group").value;
@@ -352,17 +515,30 @@ function fillSelects(){
 // ---------- Perfumes
 /* Варианты аромата: oil — масляный, orig — оригинал. У старых записей orig нет: тогда «оригинал» = не масляный */
 const origOf=p=>p.orig===undefined?p.oil!==true:p.orig===true;
+const hv=v=>v!==""&&v!=null&&!isNaN(Number(v));
+const origModesConfigured=p=>p.origPour!==undefined||p.origSealed!==undefined;
+const origPourOn=p=>origModesConfigured(p)?p.origPour===true:false;
+const origSealedOn=p=>origModesConfigured(p)?p.origSealed===true:origOf(p);
+const origPv=p=>p.origPrice!==undefined?p.origPrice:(origOf(p)?(p.price??""):"");
+const origPourPv=p=>p.origPourPrice??"";
+const origSealedPv=p=>p.origSealedPrice!==undefined?p.origSealedPrice:(origSealedOn(p)?origPv(p):"");
+const priceTxt=p=>{const a=[],gp=origPv(p);if(p.oil===true&&hv(p.oilPrice))a.push(p.oilPrice+"/мл");if(origOf(p)&&hv(gp))a.push(gp+"/шт");if(origPourOn(p)&&hv(origPourPv(p)))a.push("разлив "+origPourPv(p)+"/мл");if(origSealedOn(p)&&hv(origSealedPv(p)))a.push("запечатанный "+origSealedPv(p)+"/шт");return a.length?" · "+a.join(" · "):""};
 const typeText=p=>{const o=p.oil===true,g=origOf(p);return o&&g?"масляный и оригинал":o?"масляный":"оригинал"};
 function renderPerfumes(){
- $("pf-cnt").textContent=perfumes.length?"("+perfumes.length+")":"";
- $("pf-list").innerHTML=perfumes.length?perfumes.map(p=>{
+ const dups=dupRender(),main=perfumes.filter(p=>!dups.has(p.id));
+ $("pf-cnt").textContent=main.length?"("+main.length+")":"";
+ $("pf-list").innerHTML=main.length?main.map(p=>{
   const b=brands.find(x=>x.id==p.brandId),g=groups.find(x=>x.id==p.groupId);
-  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}${p.price!==""&&p.price!=null?" · "+esc(p.price):""}</span><span class="oilq"><label class="oilq" style="margin:0"><input type="checkbox" data-oil="${p.id}"${p.oil===true?" checked":""}> Масляный</label><label class="oilq" style="margin:0 0 0 12px"><input type="checkbox" data-orig="${p.id}"${origOf(p)?" checked":""}> Оригинал</label></span></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">Пока нет ароматов</div>';
+  return `<div class="item">${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b?b.name:"без бренда")} · ${esc(g?g.name:"без группы")}</span><div class="vrow"><div class="vr"><label class="oilq"><input type="checkbox" data-oil="${p.id}"${p.oil===true?" checked":""}> Масляный</label><div class="pw"><input class="pp" type="number" inputmode="decimal" min="0" placeholder="цена" data-pp="oilPrice" data-pid="${p.id}" value="${esc(p.oilPrice??"")}"><i>за мл</i></div></div><div class="vr"><label class="oilq"><input type="checkbox" data-orig="${p.id}"${origOf(p)?" checked":""}> Оригинал</label><div class="pw"><input class="pp" type="number" inputmode="decimal" min="0" placeholder="цена" data-pp="origPrice" data-pid="${p.id}" value="${esc(origPv(p))}"><i>за шт.</i></div></div></div><div class="omodes" data-omodes="${p.id}"${origOf(p)?"":" hidden"}><div class="vr"><label class="oilq"><input type="checkbox" data-opour="${p.id}"${origPourOn(p)?" checked":""}> На разлив</label><div class="pw"><input class="pp" type="number" inputmode="decimal" min="0" placeholder="цена" data-pp="origPourPrice" data-pid="${p.id}" value="${esc(origPourPv(p))}"><i>за мл</i></div></div><div class="vr"><label class="oilq"><input type="checkbox" data-osealed="${p.id}"${origSealedOn(p)?" checked":""}> Запечатанный</label><div class="pw"><input class="pp" type="number" inputmode="decimal" min="0" placeholder="цена" data-pp="origSealedPrice" data-pid="${p.id}" value="${esc(origSealedPv(p))}"><i>за шт.</i></div></div></div></div><div class="a"><button class="b g" data-e="${p.id}">Изменить</button><button class="b d" data-d="${p.id}">Удалить</button></div></div>`}).join(""):'<div class="empty">'+(perfumes.length?"Все ароматы сейчас в блоке «Похожие названия» выше":"Пока нет ароматов")+'</div>';
  aiStat();
 }
 function prevImg(){$("pf-prev").innerHTML=imgData?`<img src="${imgData}" alt=""><button class="b d" id="pf-rmimg" type="button">Убрать картинку</button>`:""}
 $("pf-prev").onclick=e=>{if(e.target.id=="pf-rmimg"){imgData="";$("pf-file").value="";prevImg()}};
-function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-oil").checked=false;$("pf-orig").checked=true;$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-price").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;prevImg()}
+function syncOrigModeForm(){$("pf-orig-modes").hidden=!$("pf-orig").checked}
+function resetP(){editP=null;imgData="";fgBrandNew="";fgMsg("");$("pf-notes").value="";$("pf-desc").value="";$("pf-oil").checked=false;$("pf-orig").checked=true;$("pf-opour").checked=false;$("pf-osealed").checked=true;$("pf-brand").querySelectorAll("option[value=__new__]").forEach(o=>o.remove());$("pf-name").value="";$("pf-oilp").value="";$("pf-origp").value="";$("pf-opourp").value="";$("pf-osealedp").value="";$("pf-file").value="";$("pf-title").textContent="Добавить аромат";$("pf-cancel").hidden=true;syncOrigModeForm();prevImg()}
+$("pf-orig").onchange=()=>{if($("pf-orig").checked&&!$("pf-opour").checked&&!$("pf-osealed").checked){$("pf-osealed").checked=true;if($("pf-osealedp").value==="")$("pf-osealedp").value=$("pf-origp").value}syncOrigModeForm()};
+$("pf-origp").addEventListener("change",()=>{if($("pf-osealed").checked&&$("pf-osealedp").value==="")$("pf-osealedp").value=$("pf-origp").value});
+$("pf-osealed").onchange=()=>{if($("pf-osealed").checked&&$("pf-osealedp").value==="")$("pf-osealedp").value=$("pf-origp").value};
 $("pf-cancel").onclick=resetP;
 
 // ---------- Картинки: сжатие и прозрачный фон
@@ -535,7 +711,10 @@ $("pf-save").onclick=()=>{
  const id=editP||uid("shop-perfume");
  const brandId=$("pf-brand").value,newBrand=brandId=="__new__"?fgBrandNew:"";
  if(!$("pf-oil").checked&&!$("pf-orig").checked){alert("Отметьте хотя бы один вариант: «Масляный» или «Оригинал»");return}
- const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,oil:$("pf-oil").checked,orig:$("pf-orig").checked,price:$("pf-price").value===""?"":Number($("pf-price").value),img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
+ if($("pf-orig").checked&&!$("pf-opour").checked&&!$("pf-osealed").checked){alert("Для варианта «Оригинал» выберите «На разлив» и/или «Запечатанный»");return}
+ const origPrice=$("pf-orig").checked&&$("pf-origp").value!==""?Number($("pf-origp").value):"";
+ const sealedPrice=$("pf-orig").checked&&$("pf-osealed").checked?($("pf-osealedp").value!==""?Number($("pf-osealedp").value):origPrice):"";
+ const data={kind:"shop-perfume",name,brandId:newBrand?"":brandId,groupId:$("pf-group").value,oil:$("pf-oil").checked,orig:$("pf-orig").checked,oilPrice:$("pf-oil").checked&&$("pf-oilp").value!==""?Number($("pf-oilp").value):"",origPrice,origPour:$("pf-orig").checked&&$("pf-opour").checked,origSealed:$("pf-orig").checked&&$("pf-osealed").checked,origPourPrice:$("pf-orig").checked&&$("pf-opour").checked&&$("pf-opourp").value!==""?Number($("pf-opourp").value):"",origSealedPrice:sealedPrice,img:imgData||"",notes:$("pf-notes").value.split(",").map(x=>x.trim()).filter(Boolean),desc:$("pf-desc").value.trim(),ts:old?old.ts:Date.now()};
  const btn=$("pf-save");btn.disabled=true;
  run(async()=>{
   if(newBrand){const ex=brands.find(b=>norm(b.name)==norm(newBrand));
@@ -544,20 +723,148 @@ $("pf-save").onclick=()=>{
   await setDoc(doc(db,COL,id),data);
   const i=perfumes.findIndex(x=>x.id==id);if(i>=0)perfumes[i]={id,...data};else perfumes.unshift({id,...data});
   resetP();renderPerfumes()}).finally(()=>btn.disabled=false)};
-$("pf-list").onclick=e=>{
+const pfListClick=$("pf-list").onclick=e=>{
  const ed=e.target.closest("[data-e]"),dl=e.target.closest("[data-d]");
  if(ed){const p=perfumes.find(x=>x.id==ed.dataset.e);editP=p.id;imgData=p.img||"";
-  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-price").value=p.price??"";$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-oil").checked=p.oil===true;$("pf-orig").checked=origOf(p);$("pf-file").value="";
+  $("pf-name").value=p.name;$("pf-brand").value=p.brandId||"";$("pf-group").value=p.groupId||"";$("pf-oilp").value=p.oilPrice??"";$("pf-origp").value=origPv(p);$("pf-opour").checked=origPourOn(p);$("pf-osealed").checked=origSealedOn(p);$("pf-opourp").value=origPourPv(p);$("pf-osealedp").value=origSealedPv(p);$("pf-notes").value=(p.notes||[]).join(", ");$("pf-desc").value=p.desc||"";$("pf-oil").checked=p.oil===true;$("pf-orig").checked=origOf(p);syncOrigModeForm();$("pf-file").value="";
   $("pf-title").textContent="Изменить аромат";$("pf-cancel").hidden=false;prevImg();scrollTo({top:0,behavior:"smooth"})}
  if(dl){const p=perfumes.find(x=>x.id==dl.dataset.d);if(!confirm("Удалить «"+p.name+"»?"))return;
   run(async()=>{await deleteDoc(doc(db,COL,p.id));perfumes=perfumes.filter(x=>x.id!=p.id);if(editP==p.id)resetP();renderPerfumes()},"Удалено")}};
 
-$("pf-list").onchange=e=>{const c=e.target.closest("[data-oil],[data-orig]");if(!c)return;
- const isOil=c.hasAttribute("data-oil"),p=perfumes.find(x=>x.id==(isOil?c.dataset.oil:c.dataset.orig));if(!p)return;
- const v=c.checked,oil=isOil?v:p.oil===true,orig=isOil?origOf(p):v;
+$("pf-list").onchange=e=>{const c=e.target.closest("[data-oil],[data-orig],[data-opour],[data-osealed]");if(!c)return;
+ const isOil=c.hasAttribute("data-oil"),isOrig=c.hasAttribute("data-orig"),isPour=c.hasAttribute("data-opour"),isSealed=c.hasAttribute("data-osealed");
+ const id=isOil?c.dataset.oil:isOrig?c.dataset.orig:isPour?c.dataset.opour:c.dataset.osealed;
+ const p=perfumes.find(x=>x.id==id);if(!p)return;
+ let oil=isOil?c.checked:p.oil===true,orig=isOrig?c.checked:origOf(p);
+ let pour=isPour?c.checked:origPourOn(p),sealed=isSealed?c.checked:origSealedOn(p);
+ if(isOrig&&c.checked&&!pour&&!sealed){sealed=true}
+ if(orig&&!pour&&!sealed){c.checked=true;alert("У оригинала должен быть выбран хотя бы один вариант: «На разлив» или «Запечатанный»");return}
  if(!oil&&!orig){c.checked=true;alert("Должен быть отмечен хотя бы один вариант: «Масляный» или «Оригинал»");return}
- run(async()=>{await setDoc(doc(db,COL,p.id),{oil,orig},{merge:true});p.oil=oil;p.orig=orig;if(editP==p.id){$("pf-oil").checked=oil;$("pf-orig").checked=orig}},
-  (isOil?"Масляный":"Оригинал")+(v?": включено":": выключено"))};
+ const patch={oil,orig,origPour:pour,origSealed:sealed};
+ run(async()=>{await setDoc(doc(db,COL,p.id),patch,{merge:true});Object.assign(p,patch);if(editP==p.id){$("pf-oil").checked=oil;$("pf-orig").checked=orig;$("pf-opour").checked=pour;$("pf-osealed").checked=sealed;syncOrigModeForm()}renderPerfumes()},
+  (isOil?"Масляный":isOrig?"Оригинал":isPour?"Оригинал на разлив":"Оригинал запечатанный")+(c.checked?": включено":": выключено"))};
+
+// быстрая правка цены прямо в списке
+$("pf-list").addEventListener("change",e=>{const i=e.target.closest("[data-pp]");if(!i)return;
+ const p=perfumes.find(x=>x.id==i.dataset.pid);if(!p)return;const f=i.dataset.pp,v=i.value===""?"":Number(i.value);
+ if(v!==""&&(isNaN(v)||v<0)){i.value=f=="oilPrice"?(p.oilPrice??""):f=="origPrice"?origPv(p):f=="origPourPrice"?origPourPv(p):origSealedPv(p);return}
+ run(async()=>{await setDoc(doc(db,COL,p.id),{[f]:v},{merge:true});p[f]=v;if(editP==p.id){const map={oilPrice:"pf-oilp",origPrice:"pf-origp",origPourPrice:"pf-opourp",origSealedPrice:"pf-osealedp"};$(map[f]).value=v}},"Цена сохранена")});
+$("pf-list").addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.dataset.pp){e.preventDefault();e.target.blur()}});
+
+// ---------- Похожие названия: отдельный список + объединение двух карточек в одну
+const DUP_KEY="dup-ignore",DUP_NOISE=new Set(["edp","edt","edc","tester","тестер","оригинал","original","масляный","масло","духи"]);
+let dupIgn=new Set();try{dupIgn=new Set(JSON.parse(lsGet(DUP_KEY)||"[]"))}catch(e){}
+let dupCache={sig:null,v:[]};
+const hasVolTxt=s=>/\d\s*(?:мл|ml)(?![а-яёa-z])/i.test(s||"");
+const stripVol=n=>String(n||"").replace(/\(?\s*\d{1,4}\s*(?:мл|ml)(?![а-яёa-z])\s*\)?/gi," ").replace(/\s+/g," ").replace(/^[\s,;:.\-–]+|[\s,;:.\-–]+$/g,"");
+// «ключ» названия: без объёма, скобок, пометок (edp, тестер…) и без бренда в начале
+function dupInfo(p){
+ let b=toks(brandName(p));
+ let t=toks(String(p.name||"").replace(/\([^)]*\)/g," ").replace(/\d{1,4}\s*(?:мл|ml)(?![а-яёa-z])/gi," ")).filter(x=>!DUP_NOISE.has(x));
+ if(!b.length)brands.forEach(x=>{const y=toks(x.name);if(y.length>b.length&&y.length<t.length&&y.every((w,i)=>t[i]===w))b=y});
+ if(b.length&&t.length>b.length&&b.every((w,i)=>t[i]===w))t=t.slice(b.length);
+ return{k:t.join(""),b:b.join("")}}
+function lev(a,b,lim){
+ if(Math.abs(a.length-b.length)>lim)return lim+1;
+ let prev=Array.from({length:b.length+1},(_,i)=>i);
+ for(let i=1;i<=a.length;i++){const cur=[i];let mn=i;
+  for(let j=1;j<=b.length;j++){const v=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));cur[j]=v;if(v<mn)mn=v}
+  if(mn>lim)return lim+1;prev=cur}
+ return prev[b.length]}
+function dupSim(a,c){
+ if(a.b&&c.b&&a.b!==c.b)return false;            // явно разные бренды — не дубль
+ if(a.k===c.k)return true;
+ const m=Math.min(a.k.length,c.k.length);if(m<5)return false;
+ const lim=m>=8?2:1;return lev(a.k,c.k,lim)<=lim}
+function dupClusters(){
+ const sig=perfumes.map(p=>p.id+"|"+p.name+"|"+p.brandId).join("\n")+"#"+brands.map(b=>b.id+b.name).join(",");
+ if(dupCache.sig===sig)return dupCache.v;
+ const A=perfumes.map(p=>({p,...dupInfo(p)})).filter(x=>x.k.length>=3);
+ const par=A.map((_,i)=>i),f=i=>par[i]==i?i:(par[i]=f(par[i]));
+ for(let i=0;i<A.length;i++)for(let j=i+1;j<A.length;j++){if(f(i)==f(j))continue;if(dupSim(A[i],A[j]))par[f(j)]=f(i)}
+ const G=new Map();A.forEach((x,i)=>{const r=f(i);if(!G.has(r))G.set(r,[]);G.get(r).push(x)});
+ const v=[...G.values()].filter(g=>g.length>1).map(g=>({items:g.map(x=>x.p),same:g.every(x=>x.k===g[0].k),k:g[0].k,key:g.map(x=>x.p.id).sort().join("|")})).sort((a,b)=>a.k.localeCompare(b.k));
+ dupCache={sig,v};return v}
+// какую карточку предложить оставить: где больше данных
+const dupScore=p=>(p.img?4:0)+(String(p.desc||"").trim()?2:0)+(brandName(p)?1:0)+(hasVolTxt(p.name)?0:1)+(Array.isArray(p.notes)&&p.notes.length?1:0);
+function dupBest(items){let b=items[0];items.forEach(p=>{if(dupScore(p)>dupScore(b))b=p});return b}
+
+// слияние: основа — выбранная карточка, пустое добирается из остальных
+function dupMerge(t,others,name){
+ const all=[t,...others],notes=[];
+ const num=(label,on,get)=>{const c=all.filter(on).map(get).filter(hv).map(Number);if(!c.length)return"";
+  const u=[...new Set(c)];if(u.length>1)notes.push("Цена «"+label+"» разная: "+u.join(" и ")+" — останется "+c[0]);return c[0]};
+ const first=k=>{for(const x of all){if(x[k])return x[k]}return""};
+ const oil=all.some(x=>x.oil===true),orig=all.some(origOf);
+ const pour=orig&&all.some(x=>origOf(x)&&origPourOn(x));
+ let sealed=orig&&all.some(x=>origOf(x)&&origSealedOn(x));if(orig&&!pour&&!sealed)sealed=true;
+ const oilPrice=oil?num("масляный",x=>x.oil===true,x=>x.oilPrice):"";
+ const pourPrice=pour?num("на разлив",x=>origOf(x)&&origPourOn(x),origPourPv):"";
+ const sealedPrice=sealed?num("запечатанный",x=>origOf(x)&&origSealedOn(x),origSealedPv):"";
+ const data={kind:"shop-perfume",name,brandId:first("brandId"),groupId:first("groupId"),oil,orig,oilPrice,
+  origPrice:sealedPrice,origPour:pour,origSealed:sealed,origPourPrice:pourPrice,origSealedPrice:sealedPrice,
+  img:first("img"),notes:all.map(x=>x.notes).find(a=>Array.isArray(a)&&a.length)||[],
+  desc:all.map(x=>String(x.desc||"").trim()).find(Boolean)||"",ts:t.ts||Date.now()};
+ return{data,notes}}
+
+function dupCard(p,name,checked){
+ const b=brandName(p),g=groups.find(x=>x.id==p.groupId);
+ return `<div class="item"><label class="dg-pick" title="Оставить эту карточку"><input type="radio" class="dg-r" name="${name}" value="${esc(p.id)}"${checked?" checked":""}><span>Оставить эту</span></label>${p.img?`<img src="${p.img}" alt="">`:'<div class="ph"></div>'}<div class="t"><b>${esc(p.name)}</b><span>${esc(b||"без бренда")} · ${esc(g?g.name:"без группы")}</span><span>${esc(typeText(p)+priceTxt(p))}</span><span>${String(p.desc||"").trim()?"есть описание":"нет описания"}${Array.isArray(p.notes)&&p.notes.length?" · нот: "+p.notes.length:""}</span></div><div class="a"><button class="b g" data-e="${esc(p.id)}">Изменить</button><button class="b d" data-d="${esc(p.id)}">Удалить</button></div></div>`}
+function dupPrev(g){
+ const ck=g.querySelector(".dg-r:checked");if(!ck)return;
+ const t=perfumes.find(x=>x.id==ck.value);if(!t)return;
+ const others=[...g.querySelectorAll(".dg-r")].map(r=>r.value).filter(i=>i!=t.id).map(i=>perfumes.find(x=>x.id==i)).filter(Boolean);
+ const nm=g.querySelector(".dg-name").value.trim()||t.name,r=dupMerge(t,others,nm),d=r.data;
+ g.querySelector(".dg-pv").innerHTML="<b>Получится одна карточка:</b> "+esc(nm)+"<br>"+esc(typeText(d)+priceTxt(d))+" · "+(d.img?"картинка есть":"без картинки")+" · "+(d.desc?"описание есть":"без описания")+r.notes.map(n=>`<span class="w">⚠ ${esc(n)}</span>`).join("")}
+// рисует блок и возвращает id ароматов, которые из общего списка убираем
+function dupRender(){
+ const all=dupClusters(),vis=all.filter(c=>!dupIgn.has(c.key)),hid=all.length-vis.length;
+ $("dup-box").hidden=!vis.length&&!hid;
+ $("dup-cnt").textContent=vis.length?"(групп: "+vis.length+")":"";
+ $("dup-back").hidden=!hid;$("dup-back").textContent="Показать скрытые («Это разные ароматы»): "+hid;
+ const html=vis.map((c,n)=>{const best=dupBest(c.items),nm="dg"+n;
+  return `<div class="dgrp" data-key="${esc(c.key)}"><div class="dg-t"><span>Похожих карточек: ${c.items.length}</span><span class="pr-st">${c.same?"одно название, разный «хвост»":"возможная опечатка"}</span></div>${c.items.map(p=>dupCard(p,nm,p.id==best.id)).join("")}<div class="dg-m"><label>Название после объединения</label><input class="dg-name" value="${esc(stripVol(best.name))}"><div class="dg-pv"></div><div class="acts"><button class="b" data-merge type="button">Объединить в одну карточку</button><button class="b g" data-ign type="button">Это разные ароматы</button></div></div></div>`}).join("");
+ const L=$("dup-list");
+ if(L.dataset.h!==html){L.innerHTML=html;L.dataset.h=html;L.querySelectorAll(".dgrp").forEach(dupPrev)}
+ return new Set(vis.flatMap(c=>c.items.map(p=>p.id)))}
+
+function dupDoMerge(g,btn){
+ const ids=[...g.querySelectorAll(".dg-r")].map(r=>r.value),ck=g.querySelector(".dg-r:checked");
+ const t=ck&&perfumes.find(x=>x.id==ck.value);if(!t)return;
+ const others=ids.filter(i=>i!=t.id).map(i=>perfumes.find(x=>x.id==i)).filter(Boolean);
+ const name=g.querySelector(".dg-name").value.trim();if(!name){alert("Введите название аромата");return}
+ const{data}=dupMerge(t,others,name);
+ if(!confirm("Объединить в одну карточку «"+name+"»?\nБудут удалены: "+others.map(o=>"«"+o.name+"»").join(", ")+".\nАкции с ними перейдут на оставленную карточку. Отменить это нельзя."))return;
+ const gone=new Set(others.map(o=>o.id));
+ btn.disabled=true;
+ run(async()=>{
+  await setDoc(doc(db,COL,t.id),data);                                  // 1) сначала сохраняем объединённую
+  await promoLoad();                                                    // 2) переносим акции на неё
+  for(const r of promoItems){const{id,...d}=r;if(dupRemap(d,gone,t.id))await setDoc(doc(db,COL,id),d)}
+  for(const o of others)await deleteDoc(doc(db,COL,o.id));              // 3) удаляем лишние
+  const i=perfumes.findIndex(x=>x.id==t.id);if(i>=0)perfumes[i]={id:t.id,...data};
+  perfumes=perfumes.filter(x=>!gone.has(x.id));
+  if(gone.has(editP))resetP();
+  renderPerfumes();renderBrands()},"Карточки объединены").finally(()=>{btn.disabled=false})}
+// в акциях заменяем удалённые id ароматов на оставленный (любой уровень вложенности, ключ «perfumes»)
+function dupRemap(o,gone,tid){let ch=false;
+ if(Array.isArray(o)){o.forEach(x=>{if(dupRemap(x,gone,tid))ch=true});return ch}
+ if(o&&typeof o=="object")for(const k of Object.keys(o)){const v=o[k];
+  if(k=="perfumes"&&Array.isArray(v)&&v.some(i=>gone.has(i))){o[k]=[...new Set(v.map(i=>gone.has(i)?tid:i))];ch=true}
+  else if(dupRemap(v,gone,tid))ch=true}
+ return ch}
+
+$("dup-list").addEventListener("click",e=>{
+ if(e.target.closest("[data-e],[data-d]")){pfListClick(e);return}
+ const g=e.target.closest(".dgrp");if(!g)return;
+ const m=e.target.closest("[data-merge]");if(m){dupDoMerge(g,m);return}
+ if(e.target.closest("[data-ign]")){dupIgn.add(g.dataset.key);lsSet(DUP_KEY,JSON.stringify([...dupIgn]));renderPerfumes()}});
+$("dup-list").addEventListener("change",e=>{const r=e.target.closest(".dg-r");if(!r)return;
+ const g=r.closest(".dgrp"),n=g.querySelector(".dg-name");
+ if(!n.dataset.dirty){const p=perfumes.find(x=>x.id==r.value);if(p)n.value=stripVol(p.name)}
+ dupPrev(g)});
+$("dup-list").addEventListener("input",e=>{const n=e.target.closest(".dg-name");if(!n)return;n.dataset.dirty=1;dupPrev(n.closest(".dgrp"))});
+$("dup-back").onclick=()=>{dupIgn=new Set();lsSet(DUP_KEY,"[]");renderPerfumes()};
 
 // ---------- Массовая загрузка
 let bkRows=[];
@@ -573,12 +880,13 @@ async function ensureBrand(name){name=String(name||"").trim();if(!name)return"";
 function bkGuess(q){const l=ascii(q);let best=null;
  brands.forEach(b=>{const n=ascii(b.name);if(l.startsWith(n+" ")&&(!best||n.length>ascii(best.name).length))best=b});
  return best?{brand:best.name,name:q.slice(best.name.length).trim()}:{brand:"",name:q}}
-function bkApply(r,i){const f=r.items[i];if(!f)return;r.sel=i;r.name=f.Name||r.name;const eb=findBrand(f.Brand);r.brand=eb?eb.name:(f.Brand||"")}
+function bkApply(r,i){const f=r.items[i];if(!f)return;r.sel=i;r.name=f.Name?f.Name+(r.sfx?" "+r.sfx:"")+(r.volTag?" "+r.volTag:""):r.name;const eb=findBrand(f.Brand);r.brand=eb?eb.name:(f.Brand||"")}
 const bkQ=id=>document.querySelector('.bk[data-id="'+id+'"]');
 const bkCount=()=>{$("bk-cnt").textContent=bkRows.length?"("+bkRows.length+")":"";$("bk-box").hidden=!bkRows.length};
 function bkCreate(r){
- const d=document.createElement("div");d.className="bk";d.dataset.id=r.id;
- d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><input class="bk-price" type="number" inputmode="decimal" min="0" placeholder="Цена"><label class="oilq"><input type="checkbox" class="bk-oil"${$("bk-oil").checked?" checked":""}> Масл.</label><label class="oilq"><input type="checkbox" class="bk-orig"${$("bk-orig").checked?" checked":""}> Ориг.</label><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
+ const d=document.createElement("div");d.className="bk";d.dataset.id=r.id;if(!r.list)d.dataset.plain="1";
+ const ck=v=>v?" checked":"",num=(c,ph,v)=>`<input class="${c}" type="number" inputmode="decimal" min="0" placeholder="${ph}" value="${esc(v)}">`;
+ d.innerHTML=`<div class="bk-img"></div><div class="bk-f"><input class="bk-name" placeholder="Название"><input class="bk-brand" list="bk-brands" placeholder="Бренд"><select class="bk-alt" hidden></select><div class="bk-st"></div></div><div class="bk-r"><select class="bk-grp">${'<option value="">— без группы —</option>'+groups.map(g=>`<option value="${esc(g.id)}"${g.id==$("bk-group").value?" selected":""}>${esc(g.name)}</option>`).join("")}</select><span class="bk-sep"></span><label class="oilq"><input type="checkbox" class="bk-oil"${ck(r.oil)}> Масл.</label>${num("bk-oilp","₽ за мл",r.oilp)}<span class="bk-sep"></span><label class="oilq"><input type="checkbox" class="bk-orig"${ck(r.orig)}> Ориг.</label><label class="oilq"><input type="checkbox" class="bk-pour"${ck(r.pour)}> Разлив</label>${num("bk-pourp","₽ за мл",r.pourp)}<label class="oilq"><input type="checkbox" class="bk-sealed"${ck(r.sealed)}> Запеч.</label>${num("bk-sealedp","₽ за шт.",r.sealedp)}<span class="bk-sep"></span><button class="b bk-pub" type="button">Опубликовать</button><button class="b g bk-x" type="button" aria-label="Убрать из очереди">✕</button></div>`;
  $("bk-list").appendChild(d);bkUpdate(r,true)}
 function bkUpdate(r,force){
  const d=bkQ(r.id);if(!d)return;
@@ -589,17 +897,69 @@ function bkUpdate(r,force){
  d.querySelector(".bk-img").innerHTML=im?`<img src="${esc(im)}" alt="" referrerpolicy="no-referrer">`:"";
  const alt=d.querySelector(".bk-alt");
  if(r.items.length>1){alt.hidden=false;alt.innerHTML=r.items.map((x,i)=>`<option value="${i}"${i==r.sel?" selected":""}>${esc(x.Name)} — ${esc(x.Brand||"")}${x.Year?" ("+esc(x.Year)+")":""}</option>`).join("")}else alt.hidden=true;
- const T={wait:"Ищем на Fragrantica…",ok:"Найдено — проверьте и укажите цену",none:"Не найдено — проверьте название и бренд вручную",skip:"Не искали: "+(r.err||"")};
+ const T={wait:"Ищем на Fragrantica…",ok:r.list?"Найдено на Fragrantica — проверьте название и бренд":"Найдено — проверьте и укажите цену",none:"Не найдено — проверьте название и бренд вручную",skip:"Не искали: "+(r.err||"")};
  let t=T[r.state]||"";const dup=perfumes.some(p=>norm(p.name)==norm(r.name));
- const st=d.querySelector(".bk-st");st.textContent=t+(dup?" · ⚠ такой аромат уже есть в каталоге":"");st.className="bk-st"+(dup||r.state=="none"||r.state=="skip"?" warn":"")}
+ const st=d.querySelector(".bk-st");st.textContent=t+(r.nop?" · нет цены: "+r.nop+" (будет «по запросу»)":"")+(r.merged?" · масляный + оригинал в одной карточке":"")+(dup?" · ⚠ такой аромат уже есть в каталоге":"");st.className="bk-st"+(dup||r.nop||r.state=="none"||r.state=="skip"?" warn":"")}
+
+// ---- основной список: [О]название[р-350][з-5000] / [М]название[р-400]
+const BK_LINE=/^\s*\[([ОоOoМмMm])\]\s*(.*?)\s*((?:\[[рРpPзЗzZ]-[^\]]*\]\s*)*)$/;
+const bkNum=v=>{const n=parseInt(String(v).replace(/\D/g,""),10);return n>0?n:""};   // 0, «?» и пусто → "" (цена по запросу)
+function bkTags(t){const o={};String(t||"").replace(/\[([рРpPзЗzZ])-([^\]]*)\]/g,(m,k,v)=>{o[/[рРpP]/.test(k)?"p":"z"]=bkNum(v);return m});return o}
+// убираем объём (100мл) и служебные пометки поставщика у масляных (TOP, Luzi, Seluz, Eps, 1 Qual, Q1, 100%)
+function bkClean(raw,isOil){
+ let s=String(raw).replace(/\s+/g," ").trim(),vol="";
+ s=s.replace(/(\d{1,4})\s*(?:мл|ml)(?![а-яёa-z])/i,(m,n)=>{vol=n+" мл";return " "});
+ if(isOil)s=s.replace(/\b(?:top|luzi|seluz|eps)\b/gi," ").replace(/\b1\s*qual\b/gi," ").replace(/\bqual\b/gi," ").replace(/\bq1\b/gi," ").replace(/\b100%/g," ");
+ s=s.replace(/\s+/g," ").replace(/^[\s,;:.\-–]+|[\s,;:.\-–]+$/g,"");
+ return{name:s,vol}}
+// запрос для Fragrantica: без скобок и без русских слов (если остаются хотя бы 2 латинских); убранное возвращаем в название как хвост
+function bkQuery(name){
+ const par=[...name.matchAll(/\([^)]*\)/g)].map(m=>m[0]);
+ let toks=name.replace(/\([^)]*\)/g," ").split(/\s+/).filter(Boolean),cyr=[];
+ const lat=toks.filter(t=>!/[а-яё]/i.test(t));
+ if(lat.length>=2){cyr=toks.filter(t=>/[а-яё]/i.test(t));toks=lat}
+ return{q:toks.join(" ").trim()||name,sfx:[...cyr,...par].join(" ")}}
+function bkReadList(text){
+ const items=[],plain=[];
+ text.split(/\r?\n/).forEach(line=>{
+  const m=BK_LINE.exec(line);
+  if(!m){line.split(/[,;]+/).map(x=>x.trim()).filter(Boolean).forEach(x=>plain.push(x));return}
+  const oil=/[МмMm]/.test(m[1]),t=bkTags(m[3]),c=bkClean(m[2],oil);
+  if(c.name)items.push({oil,name:c.name,vol:c.vol,p:t.p||"",z:t.z||""})});
+ const G=new Map();
+ items.forEach(it=>{const k=norm(it.name);if(!G.has(k))G.set(k,{O:[],M:[]});G.get(k)[it.oil?"M":"O"].push(it)});
+ const merge=$("bk-merge").checked,out=[];let merged=0;
+ G.forEach(g=>{
+  if(merge&&g.O.length==1&&g.M.length==1){const o=g.O[0],m=g.M[0];merged++;
+   out.push({base:o,vol:"",oil:true,oilp:m.p,orig:true,pour:true,sealed:true,pourp:o.p,sealedp:o.z,merged:true});return}
+  g.O.forEach(o=>out.push({base:o,vol:g.O.length>1?o.vol:"",oil:false,orig:true,pour:true,sealed:true,pourp:o.p,sealedp:o.z}));
+  g.M.forEach(m=>out.push({base:m,vol:"",oil:true,oilp:m.p,orig:false,pour:false,sealed:false}))});
+ return{out,plain,lines:items.length,merged}}
 
 async function bkParse(){
- const parts=[...new Map($("bk-text").value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).map(x=>[norm(x),x])).values()];
- if(!parts.length){$("bk-msg").textContent="Впишите хотя бы один аромат";$("bk-msg").className="fg-msg err";return}
+ const text=$("bk-text").value,L=bkReadList(text);
+ const have=new Set([...perfumes.map(p=>norm(p.name)),...perfumes.map(p=>norm(brandName(p)+p.name))]);
+ let skipped=0;
+ const rows=[];
+ L.out.forEach(x=>{
+  if($("bk-skip").checked&&!x.vol&&have.has(norm(x.base.name))){skipped++;return}
+  const qq=bkQuery(x.base.name),g=bkGuess(x.base.name),miss=[];
+  if(x.oil&&!x.oilp)miss.push("масл.");if(x.orig&&x.pour&&!x.pourp)miss.push("разлив");if(x.orig&&x.sealed&&!x.sealedp)miss.push("запеч.");
+  rows.push({q:qq.q,sfx:qq.sfx,volTag:x.vol,items:[],sel:-1,state:"wait",err:"",brand:g.brand,name:g.name+(x.vol?" "+x.vol:""),list:true,
+   oil:x.oil,orig:x.orig,pour:x.pour,sealed:x.sealed,oilp:x.oilp||"",pourp:x.pourp||"",sealedp:x.sealedp||"",nop:miss.join(", "),merged:!!x.merged})});
+ [...new Map(L.plain.map(x=>[norm(x),x])).values()].forEach(q=>{
+  if($("bk-skip").checked&&have.has(norm(q))){skipped++;return}
+  rows.push({q,items:[],sel:-1,state:"wait",err:"",...bkGuess(q),list:false,oil:$("bk-oil").checked,orig:$("bk-orig").checked,pour:false,sealed:$("bk-orig").checked,oilp:"",pourp:"",sealedp:"",nop:""})});
+ if(!rows.length){$("bk-msg").textContent=skipped?"Все ароматы из списка уже есть в каталоге ("+skipped+")":"Впишите хотя бы один аромат";$("bk-msg").className="fg-msg err";return}
  $("bk-key").value&&($("fg-key").value=$("bk-key").value.trim());
- bkRows=parts.map((q,i)=>({id:"bk"+Date.now().toString(36)+i,q,items:[],sel:-1,state:"wait",err:"",...bkGuess(q)}));
+ const stamp=Date.now().toString(36);rows.forEach((r,i)=>r.id="bk"+stamp+i);
+ bkRows=rows;
  $("bk-list").innerHTML="";bkRows.forEach(bkCreate);bkCount();
- $("bk-msg").className="fg-msg";$("bk-msg").textContent="Ищем на Fragrantica (по 15–60 с на аромат): 0 из "+bkRows.length;
+ const info="В очереди: "+rows.length+(L.merged?" (объединено масляный+оригинал: "+L.merged+")":"")+(skipped?", пропущено — уже в каталоге: "+skipped:"");
+ const noSearch=!$("bk-search").checked;
+ if(noSearch){bkRows.forEach(r=>{r.state="skip";r.err="поиск на Fragrantica отключён";bkUpdate(r)});
+  $("bk-msg").className="fg-msg";$("bk-msg").textContent=info+". Поиск картинок отключён — карточки будут без картинок.";return}
+ $("bk-msg").className="fg-msg";$("bk-msg").textContent=info+". Ищем на Fragrantica (по 15–60 с на аромат): 0 из "+bkRows.length;
  $("bk-go").disabled=true;
  let next=0,done=0,stop="";
  const worker=async()=>{while(next<bkRows.length){
@@ -612,44 +972,57 @@ async function bkParse(){
  await Promise.all([worker(),worker(),worker()]);
  $("bk-go").disabled=false;if(stop&&/ключ/i.test(stop))$("bk-set").open=true;
  $("bk-msg").className="fg-msg"+(stop?" err":"");
- $("bk-msg").textContent=stop?stop+". Остальные добавлены без поиска — исправьте название и бренд вручную.":"Готово. Пройдитесь по очереди: цена → «Опубликовать»."}
+ $("bk-msg").textContent=stop?stop+". Остальные добавлены без поиска — исправьте название и бренд вручную.":"Готово. Пройдитесь по очереди: проверьте цены → «Опубликовать» (или «Опубликовать все»)."}
 $("bk-go").onclick=bkParse;
-$("bk-oil").onchange=()=>document.querySelectorAll(".bk-oil").forEach(c=>c.checked=$("bk-oil").checked);
-$("bk-orig").onchange=()=>document.querySelectorAll(".bk-orig").forEach(c=>c.checked=$("bk-orig").checked);
+$("bk-file").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{const t=await f.text();$("bk-text").value=t;const n=t.split(/\r?\n/).filter(x=>x.trim()).length;
+  $("bk-msg").className="fg-msg";$("bk-msg").textContent="Файл «"+f.name+"» загружен: строк "+n+". Нажмите «Разобрать список»."}
+ catch(x){$("bk-msg").className="fg-msg err";$("bk-msg").textContent="Не удалось прочитать файл"}
+ e.target.value=""};
+$("bk-oil").onchange=()=>document.querySelectorAll('.bk[data-plain="1"] .bk-oil').forEach(c=>c.checked=$("bk-oil").checked);
+$("bk-orig").onchange=()=>document.querySelectorAll('.bk[data-plain="1"] .bk-orig,.bk[data-plain="1"] .bk-sealed').forEach(c=>c.checked=$("bk-orig").checked);
 $("bk-group").onchange=()=>document.querySelectorAll(".bk-grp").forEach(g=>g.value=$("bk-group").value);
 
+const bkMissing=d=>{const c=s=>d.querySelector(s);
+ return(c(".bk-oil").checked&&c(".bk-oilp").value==="")||(c(".bk-orig").checked&&((c(".bk-pour").checked&&c(".bk-pourp").value==="")||(c(".bk-sealed").checked&&c(".bk-sealedp").value==="")))};
 async function bkPublishOne(id){
  const r=bkRows.find(x=>x.id==id),d=bkQ(id);if(!r||!d)return false;
- const name=d.querySelector(".bk-name").value.trim();if(!name){alert("У одного из ароматов пустое название");return false}
- if(!d.querySelector(".bk-oil").checked&&!d.querySelector(".bk-orig").checked){alert("У «"+name+"» отметьте хотя бы один вариант: «Масл.» или «Ориг.»");return false}
- const pv=d.querySelector(".bk-price").value,btn=d.querySelector(".bk-pub");btn.disabled=true;
+ const c=s=>d.querySelector(s),pv=s=>{const v=c(s).value;return v===""?"":Number(v)};
+ const name=c(".bk-name").value.trim();if(!name){alert("У одного из ароматов пустое название");return false}
+ const oil=c(".bk-oil").checked,orig=c(".bk-orig").checked,pour=orig&&c(".bk-pour").checked,sealed=orig&&c(".bk-sealed").checked;
+ if(!oil&&!orig){alert("У «"+name+"» отметьте хотя бы один вариант: «Масл.» или «Ориг.»");return false}
+ if(orig&&!pour&&!sealed){alert("У «"+name+"» для оригинала отметьте «Разлив» и/или «Запеч.»");return false}
+ const btn=c(".bk-pub");btn.disabled=true;
  try{
   status("Публикуем…");
-  const brandId=await ensureBrand(d.querySelector(".bk-brand").value);
+  const brandId=await ensureBrand(c(".bk-brand").value);
   let img="";const f=r.items[r.sel];
   if(f&&f.img)img=await fgImage(f.img,$("bk-cut").checked);
   let desc="";   // описание — только на русском, через Groq (если ключ введён)
-  if(gKey()){try{desc=await aiDescribe(mkCtl(t=>status(t)),gModel(),name,d.querySelector(".bk-brand").value.trim(),(f&&f.notes)||[],typeWord(d.querySelector(".bk-oil").checked,d.querySelector(".bk-orig").checked))}catch(e){}}
-  const data={kind:"shop-perfume",name,brandId,groupId:d.querySelector(".bk-grp").value,oil:d.querySelector(".bk-oil").checked,orig:d.querySelector(".bk-orig").checked,price:pv===""?"":Number(pv),img,notes:(f&&f.notes)||[],desc,ts:Date.now()};
+  if(gKey()){try{desc=await aiDescribe(mkCtl(t=>status(t)),gModel(),name,c(".bk-brand").value.trim(),(f&&f.notes)||[],typeWord(oil,orig))}catch(e){}}
+  const sealedP=sealed?pv(".bk-sealedp"):"";
+  const data={kind:"shop-perfume",name,brandId,groupId:c(".bk-grp").value,oil,orig,oilPrice:oil?pv(".bk-oilp"):"",
+   origPrice:sealedP,origPour:pour,origSealed:sealed,origPourPrice:pour?pv(".bk-pourp"):"",origSealedPrice:sealedP,
+   img,notes:(f&&f.notes)||[],desc,ts:Date.now()};
   const pid=uid("shop-perfume");await setDoc(doc(db,COL,pid),data);perfumes.unshift({id:pid,...data});
   bkRows.splice(bkRows.indexOf(r),1);d.remove();bkCount();renderPerfumes();renderBrands();status("Опубликовано: "+name,"ok");return true
  }catch(e){btn.disabled=false;status("Ошибка: "+e.message,"err");alert("Ошибка: "+e.message);return false}}
 $("bk-list").onclick=async e=>{
  const d=e.target.closest(".bk");if(!d)return;
  if(e.target.closest(".bk-x")){bkRows=bkRows.filter(x=>x.id!=d.dataset.id);d.remove();bkCount();return}
- if(e.target.closest(".bk-pub")){await bkPublishOne(d.dataset.id);const n=document.querySelector(".bk-price");if(n)n.focus()}};
+ if(e.target.closest(".bk-pub")){await bkPublishOne(d.dataset.id);const n=document.querySelector(".bk input[type=number]");if(n)n.focus()}};
 $("bk-list").onchange=e=>{
  if(!e.target.classList.contains("bk-alt"))return;
  const r=bkRows.find(x=>x.id==e.target.closest(".bk").dataset.id);if(!r)return;
  bkApply(r,+e.target.value);r.state="ok";bkUpdate(r,true)};
 $("bk-list").oninput=e=>{if(e.target.classList.contains("bk-name")||e.target.classList.contains("bk-brand"))e.target.dataset.dirty=1};
 $("bk-list").addEventListener("keydown",async e=>{
- if(e.key=="Enter"&&e.target.classList.contains("bk-price")){e.preventDefault();await bkPublishOne(e.target.closest(".bk").dataset.id);const n=document.querySelector(".bk-price");if(n)n.focus()}});
+ if(e.key=="Enter"&&(e.target.classList.contains("bk-oilp")||e.target.classList.contains("bk-pourp")||e.target.classList.contains("bk-sealedp"))){e.preventDefault();await bkPublishOne(e.target.closest(".bk").dataset.id);const n=document.querySelector(".bk input[type=number]");if(n)n.focus()}});
 $("bk-clear").onclick=()=>{if(bkRows.length&&!confirm("Убрать из очереди все "+bkRows.length+"?"))return;bkRows=[];$("bk-list").innerHTML="";bkCount()};
 $("bk-all").onclick=async()=>{
- const ids=bkRows.map(x=>x.id),np=ids.filter(id=>bkQ(id)&&bkQ(id).querySelector(".bk-price").value==="").length;
+ const ids=bkRows.map(x=>x.id),np=ids.filter(id=>bkQ(id)&&bkMissing(bkQ(id))).length;
  if(!ids.length)return;
- if(np&&!confirm("У "+np+" аромат(ов) не указана цена. Опубликовать всё равно?"))return;
+ if(np&&!confirm("У "+np+" аромат(ов) не указана хотя бы одна цена — она будет «по запросу». Опубликовать всё равно?"))return;
  $("bk-all").disabled=true;
  for(const id of ids){if(!await bkPublishOne(id))break}
  $("bk-all").disabled=false};
@@ -948,16 +1321,200 @@ getDoc(QZ).then(x=>{if(x.exists()&&x.data().json){$("qz-json").value=x.data().js
 
 loadAll().then(()=>status("Готово","ok")).catch(e=>{status("Не удалось загрузить: "+e.message,"err")});
 
-// Управление акциями: отдельные документы в общей коллекции Firestore
-let promoItems=[],promoEdit=null;
-const promoFields=["name","desc","type","ml","gift","percent","start","end"];
-function promoFormReset(){promoEdit=null;["name","desc","type","ml","gift","percent","start","end"].forEach(k=>{const e=$("pr-"+k);if(e)e.value=k==="type"?"gift":""});$("pr-active").checked=true;$("pr-title").textContent="Добавить акцию";$("pr-save").textContent="Сохранить акцию"}
-function promoRender(){const root=$("pr-list");if(!promoItems.length){root.className="empty";root.textContent="Акций пока нет. Добавьте первую выше.";return}root.className="";root.innerHTML=promoItems.map(p=>`<div class="item"><div class="t"><b>${esc(p.name||"Акция без названия")} ${p.active?"":"(выключена)"}</b><span>${esc(p.desc||"")} · ${p.ml?`от ${p.ml} мл`:"объём не указан"} · ${p.type==="discount"?(p.percent||0)+"% скидка":"подарок: "+(p.gift||"не указан")}</span></div><div class="a"><button class="b g" data-pr-edit="${esc(p.id)}">Изменить</button><button class="b d" data-pr-del="${esc(p.id)}">Удалить</button></div></div>`).join("")}
-async function promoLoad(){const snap=await getDocs(query(collection(db,COL),where("kind","==","shop-promotion")));promoItems=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));promoRender()}
-$("pr-reset").onclick=promoFormReset;
-$("pr-save").onclick=()=>run(async()=>{const name=$("pr-name").value.trim();if(!name)throw Error("Укажите название акции");const type=$("pr-type").value,ml=Number($("pr-ml").value)||0,percent=Number($("pr-percent").value)||0;if(!ml)throw Error("Укажите объём покупки в мл");if(type==="discount"&&(!percent||percent>100))throw Error("Укажите скидку от 1 до 100%");if(type==="gift"&&!$("pr-gift").value.trim())throw Error("Укажите подарок");const data={kind:"shop-promotion",name,desc:$("pr-desc").value.trim(),type,ml,gift:$("pr-gift").value.trim(),percent,start:$("pr-start").value,end:$("pr-end").value,active:$("pr-active").checked,ts:Date.now()};await setDoc(doc(db,COL,promoEdit||uid("shop-promotion")),data);await promoLoad();promoFormReset()},"Акция сохранена");
-$("pr-list").onclick=async e=>{const edit=e.target.closest("[data-pr-edit]"),del=e.target.closest("[data-pr-del]");if(edit){const p=promoItems.find(x=>x.id===edit.dataset.prEdit);if(!p)return;promoEdit=p.id;["name","desc","type","ml","gift","percent","start","end"].forEach(k=>$("pr-"+k).value=p[k]??(k==="type"?"gift":""));$("pr-active").checked=p.active!==false;$("pr-title").textContent="Изменить акцию";$("pr-save").textContent="Сохранить изменения";window.scrollTo({top:0,behavior:"smooth"})}if(del&&confirm("Удалить эту акцию?"))await run(async()=>{await deleteDoc(doc(db,COL,del.dataset.prDel));await promoLoad()},"Акция удалена")};
+// ---------- Акции: конструктор. Формат документа и расчёт цены — в assets/pricing.js (AlfPricing)
+const AP=window.AlfPricing;
+var promoItems=[],promoEdit=null,F=null,scopeSl=null,condSl=[];
+const PR=$("p-promotions");
+const pLabel=p=>{const b=brands.find(x=>x.id==p.brandId);return(b?b.name+" ":"")+p.name};
+const NM={perfume:id=>{const p=perfumes.find(x=>x.id==id);return p?pLabel(p):"…"},brand:id=>{const b=brands.find(x=>x.id==id);return b?b.name:"…"},group:id=>{const g=groups.find(x=>x.id==id);return g?g.name:"…"}};
+const curS=()=>$("c-cur").value.trim()||"₽";
+const PR_HINT={
+ discount:"Простая скидка: выберите, на что она действует, и задайте размер. Например: бренд BLACK ROCK — 40%. Размер можно сделать разным для масляных, оригинала на разлив, запечатанных и для разных объёмов.",
+ combo:"Клиент покупает то, что указано в условии, — и на выбранные ароматы получает скидку. Например: купил ALFIYA99 — любой аромат из списка со скидкой 15% (10 мл) или 30% (20 мл). Условий может быть несколько: «или» / «и».",
+ gift:"Подарок за покупку. Условия задаются так же, как в «скидке при покупке»: аромат, бренд или группа, вариант, объём и количество."};
+const selCount=s=>s.brands.length+s.groups.length+s.perfumes.length;
+const newSel=()=>({all:false,brands:[],groups:[],perfumes:[]});
+const newCond=()=>({sel:newSel(),types:[],minMl:0,minQty:1});
+const newRow=()=>({types:[],ml:0,to:0,val:0});
+const blank=()=>({mode:"discount",name:"",desc:"",conds:[newCond()],condLogic:"any",scope:newSel(),vt:"percent",rows:[newRow()],gift:"",start:"",end:"",active:true});
+
+// --- выбор «аромат / бренд / группа / все ароматы» (sel меняется на месте)
+function mkSel(root,sel,onChange){
+ const st={q:"",open:!sel.all&&!selCount(sel)};
+ root.className="sl";
+ root.innerHTML='<div class="sl-c"></div><div class="sl-bar"><input class="pk-q" type="search" placeholder="Найти аромат, бренд или группу…" autocomplete="off" aria-label="Поиск"><button type="button" class="b g" data-sl="all">Все ароматы</button><button type="button" class="b g" data-sl="open"></button></div><div class="sl-l" hidden></div>';
+ const C=root.querySelector(".sl-c"),qi=root.querySelector(".pk-q"),LL=root.querySelector(".sl-l"),BA=root.querySelector('[data-sl="all"]'),BO=root.querySelector('[data-sl="open"]');
+ const arrOf=k=>k==="b"?sel.brands:k==="g"?sel.groups:sel.perfumes;
+ const chip=(k,id,t,pre)=>`<span class="pk-chip">${pre?`<i>${pre}</i>`:""}${esc(t)}<button type="button" data-x="${k}:${esc(id)}" aria-label="Убрать">×</button></span>`;
+ const chips=()=>{const a=[];
+  if(sel.all)a.push(chip("a","","Все ароматы",""));
+  else{sel.brands.forEach(i=>a.push(chip("b",i,NM.brand(i),"Бренд")));sel.groups.forEach(i=>a.push(chip("g",i,NM.group(i),"Группа")));sel.perfumes.forEach(i=>a.push(chip("p",i,NM.perfume(i),"")))}
+  C.innerHTML=a.join("")||'<span class="hint">Ничего не выбрано</span>'};
+ const li=(k,id,t,sub)=>`<label class="pk-i"><input type="checkbox" data-k="${k}" value="${esc(id)}"${arrOf(k).includes(String(id))?" checked":""}><span>${esc(t)}${sub?` <small style="color:var(--grey)">${esc(sub)}</small>`:""}</span></label>`;
+ const list=()=>{
+  if(sel.all||!st.open){LL.hidden=true;return}
+  const q=st.q.trim().toLowerCase(),f=s=>!q||String(s).toLowerCase().includes(q);
+  const cnt=(key,id)=>perfumes.filter(p=>String(p[key])===String(id)).length;
+  const Bs=brands.filter(b=>f(b.name)),Gs=groups.filter(g=>f(g.name)),Ps=perfumes.filter(p=>f(pLabel(p)));
+  let h="";
+  if(Bs.length)h+='<div class="sl-h">Бренды — все ароматы бренда</div>'+Bs.slice(0,60).map(b=>li("b",b.id,b.name,cnt("brandId",b.id)+" шт.")).join("");
+  if(Gs.length)h+='<div class="sl-h">Группы</div>'+Gs.slice(0,40).map(g=>li("g",g.id,g.name,cnt("groupId",g.id)+" шт.")).join("");
+  if(Ps.length)h+='<div class="sl-h">Ароматы</div>'+Ps.slice(0,80).map(p=>li("p",p.id,pLabel(p),"")).join("")+(Ps.length>80?`<div class="hint">Показано 80 из ${Ps.length} — уточните поиск</div>`:"");
+  LL.innerHTML=h||'<div class="empty" style="padding:8px">Ничего не найдено</div>';LL.hidden=false};
+ const bar=()=>{BA.classList.toggle("on",sel.all);BA.textContent=sel.all?"✓ Все ароматы":"Все ароматы";BO.textContent=st.open&&!sel.all?"Скрыть список ▴":"Выбрать из списка ▾";qi.hidden=BO.hidden=sel.all};
+ const redraw=()=>{chips();list();bar()};
+ qi.oninput=()=>{st.q=qi.value;if(!st.open){st.open=true;bar()}list()};
+ root.onclick=e=>{
+  const x=e.target.closest("[data-x]"),b=e.target.closest("[data-sl]");
+  if(x){const s=x.dataset.x,i=s.indexOf(":"),k=s.slice(0,i),id=s.slice(i+1);
+   if(k==="a")sel.all=false;else{const a=arrOf(k),j=a.indexOf(id);if(j>=0)a.splice(j,1)}
+   redraw();onChange();return}
+  if(b){
+   if(b.dataset.sl==="all"){sel.all=!sel.all;st.open=!sel.all&&!selCount(sel);redraw();onChange()}
+   else{st.open=!st.open;redraw()}}};
+ root.onchange=e=>{const c=e.target.closest("input[data-k]");if(!c)return;
+  const a=arrOf(c.dataset.k),j=a.indexOf(c.value);
+  if(c.checked&&j<0)a.push(c.value);else if(!c.checked&&j>=0)a.splice(j,1);
+  chips();onChange()};
+ redraw();return{redraw}}
+
+// --- вариант аромата: масляный / на разлив / запечатанный (ничего не выбрано = любой)
+const TY=[["oil","Масляный"],["orig-pour","Оригинал на разлив"],["orig-sealed","Оригинал запечатанный"]];
+const tgHtml=types=>`<div class="tg" role="group" aria-label="Вариант">${TY.map(([k,t])=>`<button type="button" data-ty="${k}" class="${types.includes(k)?"on":""}" aria-pressed="${types.includes(k)}">${t}</button>`).join("")}${types.length?"":'<span class="tg-h">не выбрано — любой вариант</span>'}</div>`;
+const sealedOnly=t=>t.length===1&&t[0]==="orig-sealed";
+
+function drawConds(){
+ const root=$("pr-conds");
+ $("pr-logic").hidden=F.conds.length<2;
+ root.innerHTML=F.conds.map((c,i)=>`${i?`<div class="cd-sep">${F.condLogic==="all"?"И":"ИЛИ"}</div>`:""}<div class="cd" data-ci="${i}"><div class="cd-h"><span>Условие ${i+1}</span>${F.conds.length>1?`<button type="button" class="b d xdel" data-cdel="${i}" aria-label="Убрать условие">×</button>`:""}</div><label>Клиент покупает (аромат, бренд или группа)</label><div data-slot></div><label>Вариант</label>${tgHtml(c.types)}<div class="row">${sealedOnly(c.types)?"":`<div><label>Объём от, мл</label><input type="number" inputmode="decimal" min="0" data-f="minMl" value="${c.minMl||""}" placeholder="любой"></div>`}<div><label>Количество от, шт.</label><input type="number" inputmode="numeric" min="1" data-f="minQty" value="${c.minQty>1?c.minQty:""}" placeholder="1"></div></div>${sealedOnly(c.types)?"":'<div class="hint">Объём считается только у масляных и оригинала на разлив — у запечатанного флакона объёма нет.</div>'}</div>`).join("");
+ condSl=[...root.querySelectorAll("[data-ci]")].map((el,i)=>mkSel(el.querySelector("[data-slot]"),F.conds[i].sel,prPreview))}
+
+function drawRows(){
+ const sym=F.vt==="amount"?esc(curS()):"%";
+ $("pr-rows").innerHTML=F.rows.map((r,i)=>`<div class="rr" data-ri="${i}"><div class="cd-h"><span>Строка ${i+1}</span>${F.rows.length>1?`<button type="button" class="b d xdel" data-rdel="${i}" aria-label="Убрать строку">×</button>`:""}</div><label>Для какого варианта</label>${tgHtml(r.types)}<div class="rr-g">${sealedOnly(r.types)?"":`<span>Объём от</span><input type="number" inputmode="decimal" min="0" data-f="ml" value="${r.ml||""}" placeholder="любой"><span>до</span><input type="number" inputmode="decimal" min="0" data-f="to" value="${r.to||""}" placeholder="—"><span>мл</span>`}<span class="rr-s">Скидка</span><input type="number" inputmode="decimal" min="0" data-f="val" value="${r.val||""}" placeholder="10"><b>${sym}</b></div></div>`).join("");
+ const vs=[...new Set(bottles.map(b=>Number(b.volume)).filter(Boolean))].sort((a,b)=>a-b);
+ $("pr-quick").innerHTML='<span class="hint" style="margin:0 6px 0 0;align-self:center">Добавить строку:</span>'+vs.map(v=>`<button type="button" class="b g" data-tq="${v}">+ от ${v} мл</button>`).join("")+'<button type="button" class="b g" data-tq="sealed">+ Запечатанный</button><button type="button" class="b g" data-tq="0">+ Любой объём</button>'}
+
+function syncMode(){const m=F.mode;
+ PR.querySelectorAll(".kd").forEach(b=>{b.classList.toggle("on",b.dataset.k===m);b.setAttribute("aria-pressed",b.dataset.k===m)});
+ PR.querySelectorAll(".stp").forEach(s=>s.hidden=!s.dataset.m.split(" ").includes(m));
+ $("pr-modehint").textContent=PR_HINT[m]}
+function setMode(k){F.mode=k;syncMode();prPreview()}
+
+function prCollect(){
+ F.name=$("pr-name").value.trim();F.desc=$("pr-desc").value.trim();F.gift=$("pr-gift").value.trim();
+ F.start=$("pr-start").value;F.end=$("pr-end").value;F.active=$("pr-active").checked;
+ const m=F.mode,cp=s=>({all:!!s.all,brands:[...s.brands],groups:[...s.groups],perfumes:[...s.perfumes]});
+ return{v:2,mode:m,name:F.name,desc:F.desc,active:F.active,start:F.start,end:F.end,
+  conds:m==="discount"?[]:F.conds.map(c=>({sel:cp(c.sel),types:[...c.types],minMl:sealedOnly(c.types)?0:c.minMl,minQty:c.minQty})),
+  condLogic:F.condLogic,scope:m==="gift"?newSel():cp(F.scope),vt:F.vt,
+  rows:m==="gift"?[]:F.rows.filter(r=>r.val>0).map(r=>sealedOnly(r.types)?{...r,ml:0,to:0}:{...r}),
+  gift:m==="gift"?F.gift:""}}
+const prModel=()=>AP.norm(prCollect());
+function prPreview(){if(!F)return;
+ const p=prModel(),w=AP.warnings(p);
+ $("pr-prev").innerHTML="<b>Как это читается</b>"+AP.lines(p,NM,curS()).map(l=>l.k==="sep"?`<div class="pv-sep">${esc(l.t)}</div>`:`<div class="pv"><span>${esc(l.h)}</span><div>${esc(l.t)}</div></div>`).join("")+w.map(t=>`<span class="pw-n">⚠ ${esc(t)}</span>`).join("")}
+
+function prFill(raw){
+ promoEdit=raw&&raw.id||null;
+ F=raw?JSON.parse(JSON.stringify(AP.norm(raw))):blank();
+ if(!F.conds.length)F.conds.push(newCond());if(!F.rows.length)F.rows.push(newRow());
+ $("pr-name").value=F.name||"";$("pr-desc").value=F.desc||"";$("pr-gift").value=F.gift||"";$("pr-start").value=F.start||"";$("pr-end").value=F.end||"";
+ $("pr-active").checked=F.active!==false;$("pr-vt").value=F.vt;$("pr-lg").value=F.condLogic;
+ scopeSl=mkSel($("pr-scope"),F.scope,prPreview);drawConds();drawRows();syncMode();
+ $("pr-title").textContent=promoEdit?"Изменить акцию":"Добавить акцию";$("pr-save").textContent=promoEdit?"Сохранить изменения":"Сохранить акцию";
+ prPreview()}
+
+// --- список акций
+const PR_TAG={discount:"скидка",combo:"скидка при покупке",gift:"подарок"};
+function prRender(){const root=$("pr-list");
+ if(!promoItems.length){root.className="empty";root.textContent="Акций пока нет. Добавьте первую — кнопка «Добавить акцию» вверху.";return}
+ root.className="";
+ root.innerHTML=promoItems.map(r=>{const p=AP.norm(r),dt=[p.start?"с "+p.start:"",p.end?"до "+p.end:""].filter(Boolean).join(" ");
+  return`<div class="item"><div class="t"><b>${esc(p.name||"Акция без названия")}<span class="pr-st">${PR_TAG[p.mode]}</span>${p.active===false?'<span class="pr-st" style="background:#eee;color:#777">выключена</span>':""}</b><span>${esc(AP.summary(p,NM,curS()))}${dt?" · "+esc(dt):""}</span></div><div class="a"><button class="b g" data-pr-on="${esc(r.id)}">${p.active===false?"Включить":"Выключить"}</button><button class="b g" data-pr-copy="${esc(r.id)}">Копия</button><button class="b g" data-pr-edit="${esc(r.id)}">Изменить</button><button class="b d" data-pr-del="${esc(r.id)}">Удалить</button></div></div>`}).join("")}
+async function promoLoad(){const snap=await getDocs(query(collection(db,COL),where("kind","==","shop-promotion")));promoItems=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));prRender()}
+// когда загрузились ароматы, бренды и флаконы — обновляем названия в форме
+function prRefresh(){if(!F)return;scopeSl&&scopeSl.redraw();condSl.forEach(s=>s.redraw());drawRows();prRender();prPreview()}
+
+// --- события формы
+PR.addEventListener("input",e=>{
+ const t=e.target,f=t.dataset&&t.dataset.f;
+ if(f){const ci=t.closest("[data-ci]"),ri=t.closest("[data-ri]"),n=Number(t.value)||0;
+  if(ci)F.conds[+ci.dataset.ci][f]=f==="minQty"?Math.max(1,Math.floor(n)):Math.max(0,n);
+  else if(ri)F.rows[+ri.dataset.ri][f]=Math.max(0,n)}
+ prPreview()});
+PR.addEventListener("change",()=>prPreview());
+PR.addEventListener("click",e=>{
+ const ty=e.target.closest("[data-ty]");
+ if(ty){const box=ty.closest("[data-ci],[data-ri]"),isC=box.dataset.ci!=null,o=isC?F.conds[+box.dataset.ci]:F.rows[+box.dataset.ri],j=o.types.indexOf(ty.dataset.ty);
+  if(j>=0)o.types.splice(j,1);else o.types.push(ty.dataset.ty);
+  if(o.types.length===TY.length)o.types=[];
+  if(sealedOnly(o.types)){o.minMl=0;o.ml=0;o.to=0}
+  isC?drawConds():drawRows();prPreview();return}
+ const kd=e.target.closest(".kd");if(kd){setMode(kd.dataset.k);return}
+ const cd=e.target.closest("[data-cdel]");if(cd){F.conds.splice(+cd.dataset.cdel,1);drawConds();prPreview();return}
+ const rd=e.target.closest("[data-rdel]");if(rd){F.rows.splice(+rd.dataset.rdel,1);drawRows();prPreview();return}
+ const tq=e.target.closest("[data-tq]");
+ if(tq){const v=tq.dataset.tq;F.rows.push(v==="sealed"?{types:["orig-sealed"],ml:0,to:0,val:0}:{types:[],ml:Number(v)||0,to:0,val:0});drawRows();prPreview();
+  const a=PR.querySelectorAll('#pr-rows [data-f="val"]');if(a.length)a[a.length-1].focus({preventScroll:false});return}});
+$("pr-addcond").onclick=()=>{F.conds.push(newCond());drawConds();prPreview();const a=PR.querySelectorAll("#pr-conds .pk-q");if(a.length)a[a.length-1].focus()};
+$("pr-vt").onchange=()=>{F.vt=$("pr-vt").value;drawRows();prPreview()};
+$("pr-lg").onchange=()=>{F.condLogic=$("pr-lg").value;drawConds();prPreview()};
+$("pr-reset").onclick=()=>prFill();
+$("pr-save").onclick=()=>run(async()=>{
+ const p=prModel(),e=AP.validate(p);if(e)throw Error(e);
+ delete p.id;
+ await setDoc(doc(db,COL,promoEdit||uid("shop-promotion")),{kind:"shop-promotion",...p,ts:Date.now()});
+ await promoLoad();prFill()},"Акция сохранена");
+$("pr-list").onclick=async e=>{const g=a=>e.target.closest("["+a+"]"),on=g("data-pr-on"),cp=g("data-pr-copy"),edit=g("data-pr-edit"),del=g("data-pr-del");
+ const find=id=>promoItems.find(x=>x.id===id);
+ if(edit){const p=find(edit.dataset.prEdit);if(p){prFill(p);PR.querySelector(".pr-form").scrollTop=0}}
+ if(on){const p=find(on.dataset.prOn);if(p)await run(async()=>{await setDoc(doc(db,COL,p.id),{active:p.active===false},{merge:true});await promoLoad()},p.active===false?"Акция включена":"Акция выключена")}
+ if(cp){const p=find(cp.dataset.prCopy);if(p)await run(async()=>{const{id,...d}=p;await setDoc(doc(db,COL,uid("shop-promotion")),{...d,name:(d.name||"Акция")+" (копия)",active:false,ts:Date.now()});await promoLoad()},"Копия создана (выключена)")}
+ if(del&&confirm("Удалить эту акцию?"))await run(async()=>{await deleteDoc(doc(db,COL,del.dataset.prDel));await promoLoad()},"Акция удалена")};
+prFill();
 promoLoad().catch(e=>status("Не удалось загрузить акции: "+e.message,"err"));
+
+</script>
+<script type="module">
+const $=i=>document.getElementById(i),Q=(s,r=document)=>r.querySelector(s),QA=(s,r=document)=>[...r.querySelectorAll(s)];
+const H={perfumes:["Ароматы","Каталог на сайте: добавляйте, меняйте и удаляйте ароматы","Добавить аромат"],
+groups:["Группы","Разделы каталога, например «Мужские» и «Женские»","Добавить группу"],
+brands:["Бренды","Производители, по которым клиенты ищут ароматы","Добавить бренд"],
+bottles:["Флаконы","Флаконы, которые клиент выбирает при заказе","Добавить флакон"],
+promotions:["Скидки и акции","Скидки, акции с условиями и подарки: любые сочетания вариантов и объёмов","Добавить акцию"],
+quiz:["Тест подбора аромата","Три шага: скопировать запрос, вставить ответ GPT, сохранить"],
+bulk:["Массовая загрузка","Вставьте список или загрузите файл — карточки, цены, картинки и описания соберутся сами"],
+ai:["ИИ и картинки","Описания через Groq и прозрачный фон у картинок"],
+contacts:["Контакты","Телефон, мессенджеры, адрес и валюта на сайте"]};
+const RESET={perfumes:"pf-cancel",groups:"gr-cancel",brands:"br-cancel",bottles:"bt-cancel",promotions:"pr-reset"};
+const LIST={perfumes:"pf-list",groups:"gr-list",brands:"br-list",bottles:"bt-list",promotions:"pr-list"};
+const side=$("side"),scrim=$("scrim"),ov=$("ov");
+const sheet=p=>Q("#p-"+p+" > .box");
+function openSheet(p){sheet(p).classList.add("open");ov.classList.add("open");document.body.classList.add("lock");
+ setTimeout(()=>{const i=Q("input:not([type=file]):not([type=checkbox]):not([type=password]),select",sheet(p));i&&i.focus({preventScroll:true})},300)}
+function closeSheet(){QA(".sheet.open").forEach(s=>s.classList.remove("open"));ov.classList.remove("open");document.body.classList.remove("lock")}
+function dismiss(){const s=Q(".sheet.open");if(!s)return;const p=s.parentElement.id.slice(2);closeSheet();$(RESET[p]).click()}
+function show(p){const h=H[p];$("pagehead").innerHTML=`<div><h1>${h[0]}</h1><p>${h[1]}</p></div>`+(h[2]?`<button class="b" id="addbtn" type="button">+ ${h[2]}</button>`:"");
+ const a=$("addbtn");if(a)a.onclick=()=>{$(RESET[p]).click();openSheet(p)};
+ document.title=h[0]+" — Админка";scrollTo(0,0);side.classList.remove("open");scrim.classList.remove("open");
+ try{localStorage.setItem("adm-tab",p)}catch(e){}}
+Object.keys(RESET).forEach(p=>{const s=sheet(p);s.classList.add("sheet");
+ const x=document.createElement("button");x.className="sx";x.type="button";x.setAttribute("aria-label","Закрыть");x.textContent="×";x.onclick=dismiss;s.prepend(x);
+ $(LIST[p]).addEventListener("click",e=>{if(e.target.closest("[data-e],[data-pr-edit]"))openSheet(p)})});
+$("dup-list").addEventListener("click",e=>{if(e.target.closest("[data-e]"))openSheet("perfumes")});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b){dismiss();show(b.dataset.p)}});
+$("burger").onclick=()=>{side.classList.add("open");scrim.classList.add("open")};
+scrim.onclick=()=>{side.classList.remove("open");scrim.classList.remove("open")};
+ov.onclick=dismiss;
+addEventListener("keydown",e=>{if(e.key=="Escape")dismiss()});
+document.addEventListener("admin-ok",closeSheet);
+// поиск по списку ароматов
+const pl=$("pf-list"),ps=$("pf-search");
+const filt=()=>{const q=ps.value.trim().toLowerCase();QA(".item",pl).forEach(i=>i.hidden=!!q&&!i.textContent.toLowerCase().includes(q))};
+ps.oninput=filt;new MutationObserver(filt).observe(pl,{childList:true});
+let last="perfumes";try{last=localStorage.getItem("adm-tab")||last}catch(e){}
+const lb=Q('#tabs [data-p="'+last+'"]');lb?lb.click():show("perfumes");
 </script>
 </body>
 </html>
